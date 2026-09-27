@@ -25,6 +25,14 @@ is talking to the Arduino, which brokers the conversation:
   tune sequence: it drives the Icom ATU interface, temporarily takes over CAT
   control of the radio to set it up for tuning, and then restores the radio
   to its prior state — all invisibly to the PC.
+- **The PC is optional.** With no PC connected at all, the tune button and
+  ATU sequencing must still work exactly the same way — the Arduino talks
+  to the radio directly over Port 2 regardless of what is or isn't
+  happening on Port 1. Standalone operation, not just PC-transparent
+  operation, is a first-class requirement.
+- Independently of CAT and the ATU, the Arduino also runs a **4-band
+  amplifier sequencer** (HF/50/144/430MHz), driven from the radio's STBY
+  jack — see "Sequencer" under Behaviour below.
 
 ## Hardware
 
@@ -47,6 +55,22 @@ is talking to the Arduino, which brokers the conversation:
   independent of — and in addition to — the AM-mode power ceiling (see
   below). Carried over from a prior project; confirmed against the FT-847
   manual — see the ALC reference section further down.
+- **Amplifier sequencer**: 4 independent relay sequencers (one per band:
+  HF, 50, 144, 430MHz — see the open question below on which physical
+  band maps to which "Band 1-4" channel), each with 5 distinct outputs —
+  `RX`, `SEQ1`, `SEQ2`, `SEQ3`, `TX` — for exactly one of which is driven
+  active at a time. All 5 drive a status LED; only `SEQ1`/`SEQ2`/`SEQ3`
+  also drive an opto-isolator (`RX`/`TX` are LED indicators only, no
+  relay/opto function) — 12 opto-isolator outputs total, 3 per band (see
+  Pin plan). Triggered by the radio's STBY jack (4 closure-to-ground T/R
+  lines, wired
+  to the interrupt-capable pins — see Pin plan). A single, shared **TX
+  INHIBIT** output (D4) holds off the radio's actual transmit output while
+  each band's sequence runs, wired to pin 8 of the radio's TUNER
+  connector. See "Sequencer" under Behaviour, and the TUNER-port reference
+  section further down for the confirmed pinout and how the CAT-disable
+  risk is avoided (by deliberately leaving the TUNER connector's separate
+  Tuner Sense pin unconnected).
 
 ### Pin plan (Mega 2560)
 
@@ -61,19 +85,40 @@ is talking to the Arduino, which brokers the conversation:
 | D10 | ALC opto-isolator gate (on/off switch) |
 | D11 | Icom AH-4 `KEY` input |
 | D12 | Icom AH-4 `START` output |
-| D2, D3, D18, D19 | **reserved, unused** — for the future STBY connection (4 band-specific T/R lines: HF/50/144/430MHz) |
+| D2 | STBY: HF (input, interrupt) |
+| D3 | STBY: 430MHz (input, interrupt) |
+| D18 | STBY: 144MHz (input, interrupt) |
+| D19 | STBY: 50MHz (input, interrupt) |
+| D4 | Shared TX INHIBIT output → TUNER connector pin 8 |
+| D5 | TUNER connector pin 2 (`TX_GND`, per fakeFC's schematic) — wired in as an input, matching fakeFC's own pin choice; purpose/use TBD |
+| D22 / D23 / D24 / D25 / D26 | Sequencer Band 1: `RX` (LED only) / `SEQ1` (LED+opto) / `SEQ2` (LED+opto) / `SEQ3` (LED+opto) / `TX` (LED only) |
+| D27 / D28 / D29 / D30 / D31 | Sequencer Band 2: `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same LED-only/LED+opto pattern as Band 1 |
+| D44 / D45 / D46 / D47 / D48 | Sequencer Band 3: `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern |
+| D49 / D50 / D51 / D52 / D53 | Sequencer Band 4: `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern; D50-D53 are the Mega's hardware SPI pins (MISO/MOSI/SCK/SS), repurposed as plain digital outputs since SPI isn't needed elsewhere in this project |
 | D20, D21 (I2C: SDA/SCL) | **kept free** — not used by anything, available for a future I2C peripheral (e.g. a status display) |
+
+Sequencer channels are numbered "Band 1-4" for now rather than tied to a
+specific RF band — see the open question below on mapping each channel to
+HF/50/144/430MHz and cross-referencing against the STBY pin assignments
+above.
 
 Only six Mega 2560 pins support true external interrupts: D2, D3, D18,
 D19, D20, D21. Putting both CAT links on Serial2/Serial3 (rather than
 Serial1) means Serial1's pins — D18/D19, which are two of those six
 interrupt-capable pins — are never touched, so **all six** interrupt pins
-stay free instead of just four. Four of them (D2, D3, D18, D19) are
-earmarked for the eventual STBY connection; the remaining two (D20/D21)
-are then free of any reservation and can be used for I2C later without
-conflicting with STBY. The tune button (D7) doesn't need an
-interrupt-capable pin — it's polled in the main loop — so it and the
-status LED (D8) sit comfortably outside the reserved set.
+stay free instead of just four. Four of them (D2, D3, D18, D19) are now
+used for the 4 STBY band lines (interrupt-driven, since a TX request
+needs to be caught immediately to start the sequencer); the remaining two
+(D20/D21) stay free of any reservation for I2C. The tune button (D7)
+doesn't need an interrupt-capable pin — it's polled in the main loop — so
+it and the status LED (D8) sit comfortably outside the reserved set. The
+12 sequencer outputs and the shared TX INHIBIT output (D22-D34) are plain
+digital outputs with no special pin requirements, so their exact pin
+numbers are a free choice — the assignment above is a proposal, not yet
+confirmed. The Arduino-side band↔pin mapping for STBY (which of D2/D3/D18/D19
+is HF vs 50 vs 144 vs 430) is likewise our own software's choice; what
+actually matters is wiring it consistently against the STBY jack's real
+per-band wiring (see the STBY jack reference below).
 
 ## Behaviour
 
@@ -82,15 +127,52 @@ status LED (D8) sit comfortably outside the reserved set.
 - Bytes arriving on Port 1 (from the PC) are forwarded to Port 2 (to the
   radio), and bytes arriving on Port 2 (from the radio) are forwarded to
   Port 1 (to the PC).
-- While relaying, the Arduino snoops the traffic and maintains a cache of the
-  radio's last-known state relevant to tuning: frequency, mode, RF power
-  level, and PTT/TX status (and any other CAT parameters needed later).
+- If no PC is connected, Port 1 simply carries no traffic — there is
+  nothing to relay. This is a normal, fully supported state, not an error
+  condition; see "Standalone operation" below for how the tune cycle still
+  works correctly in this case.
+
+### What actually needs faking during a tune cycle
+
+The tune cycle only ever changes two things about the radio's externally
+visible state: **mode** (forced to AM) and **PTT/TX status** (forced on).
+Frequency doesn't change; CTCSS/DCS/satellite-toggle/etc. don't change;
+none of it is touched by tuning. That means the Arduino only ever needs to
+fake two specific things, not maintain a general-purpose cache of
+"everything the PC might ask":
+
+- **Mode** — the mode byte within the `Get freq+mode, Main` reply
+  (opcode `0x03`; see the CAT reference below). This reply packs
+  frequency and mode into one 5-byte frame, so the Arduino must splice the
+  *real, live* frequency (queried from the radio, since it's genuinely
+  unchanged) together with the *faked* pre-tune mode byte — not fake the
+  whole response.
+- **PTT/TX status** — the PTT bit in the `Get TX status` reply
+  (opcode `0xF7`).
+- Nothing else needs faking. In particular, RX status/S-meter (opcode
+  `0xE7`) can be forwarded live and truthfully even while keyed — a
+  receiver being blind during any transmission (including an entirely
+  ordinary, manually-initiated one) is unremarkable and gives nothing
+  away.
+- **Any CAT query the Arduino doesn't specifically recognise is simply
+  forwarded to the radio and its response forwarded back, live, even
+  during a tune cycle.** There is no cache-completeness problem to solve —
+  a query the Arduino has never seen before isn't one it needs to fake an
+  answer for, because the radio itself can truthfully answer it regardless
+  of whether it's mid-tune. Pre-populating an exhaustive cache of "every
+  possible CAT parameter" is unnecessary; only the two items above ever
+  diverge from the truth.
 
 ### Tune cycle (triggered by the tune button)
 
-1. Issue the appropriate start sequence to the Icom ATU interface.
-2. Take over the CAT link to the radio (without forwarding PC traffic
-   verbatim during this window) and:
+1. Actively query the radio's current mode over CAT (`Get freq+mode, Main`,
+   opcode `0x03`) and note the current PTT/TX status is "off" (this is
+   always known without needing to ask, since the Arduino is the one about
+   to turn it on). This captures the two values that will need to be
+   faked and restored, freshly, at the start of every cycle — so it works
+   identically whether or not a PC (and any snooped history) exists.
+2. Issue the appropriate start sequence to the Icom ATU interface.
+3. Take over the CAT link to the radio and:
    - Select AM mode (there is no CAT power-set command on this radio —
      switching to AM mode is itself the main power reduction, since the
      FT-847 caps AM output much lower than SSB/CW/FM; see the CAT
@@ -98,27 +180,93 @@ status LED (D8) sit comfortably outside the reserved set.
    - Optionally assert the ALC injection circuit to pull power down
      further, closer to true minimum, independent of CAT.
    - Key the radio's PTT.
-3. Wait for the ATU to signal that its tune cycle has completed.
-4. Unkey the radio's PTT.
-5. Release the ALC injection (if it was asserted) and restore the radio's
-   original mode (from the cached pre-tune state).
-6. Resume normal passthrough.
+   - Meanwhile, continue forwarding any other CAT traffic between PC and
+     radio live (see above) — only mode and PTT/TX status queries get
+     answered from the values captured in step 1 instead of the truth.
+4. Wait for the ATU to signal that its tune cycle has completed.
+5. Unkey the radio's PTT.
+6. Release the ALC injection (if it was asserted) and restore the radio's
+   original mode (from the value captured in step 1).
+7. Resume normal passthrough with no faking.
+
+### Standalone operation
+
+The ATU controller functionality must work with no PC connected at all —
+this is a first-class use case, not just a side effect of the design:
+
+- The tune button, the Icom ATU interface, the ALC injection circuit, and
+  CAT control of the radio (Port 2) are all wired directly to the Arduino
+  and don't depend on Port 1 having anything connected to it.
+- The tune cycle captures its own pre-tune mode/PTT state directly from
+  the radio (step 1 above) rather than depending on anything snooped from
+  PC traffic — so it behaves identically whether a PC has ever been
+  connected or not.
+- With no PC, there's no CAT traffic on Port 1 to fake answers for or
+  forward in the first place — the mode/PTT faking and live-forwarding
+  behaviour above simply has nothing to do. It isn't a separate mode, it
+  just naturally goes inert.
 
 ### PC transparency during a tune cycle
 
 While a tune cycle is in progress, the PC must not be able to tell that
 anything unusual is happening:
 
-- Any CAT queries from the PC (e.g. frequency, mode, power, status) are
-  answered by the Arduino directly, using the last cached values from before
-  the tune cycle began, rather than forwarding them to the radio.
-- Commands from the PC that would conflict with the in-progress tune sequence
-  (e.g. changing power, mode, or PTT) are silently swallowed — not forwarded
-  to the radio and not queued — so the PC never sees an error, and the tune
-  cycle runs to completion undisturbed.
+- Queries for mode or PTT/TX status are answered using the values captured
+  at the start of the cycle (see above), not the radio's true current
+  state.
+- Every other CAT query or command is forwarded to/from the radio live, as
+  normal — nothing needs to be cached or swallowed for these, since the
+  tune cycle doesn't affect them.
+- Commands from the PC that would directly conflict with the in-progress
+  tune sequence (setting mode, or PTT, while the Arduino is mid-cycle) are
+  silently swallowed — not forwarded to the radio — so the PC never sees
+  an error and the tune cycle runs to completion undisturbed.
 - Once the tune cycle completes and the radio is restored, the Arduino
-  resumes transparent passthrough and the cache is refreshed from real radio
-  traffic.
+  resumes transparent passthrough with no faking at all.
+
+### Sequencer
+
+A 4-band amplifier/relay sequencer, entirely independent of the CAT
+broker and ATU logic above — it runs off the radio's STBY jack, not CAT,
+so it works identically whether the PC or even the CAT link is present at
+all.
+
+- Each band (HF, 50, 144, 430MHz) has its own STBY input line (closure to
+  ground = that band's TX requested) and its own independent 5-output
+  sequence channel: `RX`, `SEQ1`, `SEQ2`, `SEQ3`, `TX`, with exactly one
+  driven active at a time. All 5 drive a status LED; only `SEQ1`/`SEQ2`/
+  `SEQ3` also drive a dedicated opto-isolator — `RX`/`TX` are indicator
+  LEDs only, with no relay/opto function — giving 12 opto-isolator
+  outputs total, 3 per band.
+- A single **TX INHIBIT** output is shared across all 4 bands (the radio
+  only ever transmits on one band at a time, so one inhibit line is
+  enough) and asserted into the radio's TUNER-port TXINH input.
+- **Up-sequence**, triggered the instant a band's STBY line asserts:
+  1. Assert TX INHIBIT immediately, to hold off actual RF before the relay
+     chain has finished settling.
+  2. Step that band's channel through its outputs in order, de-energising
+     the previous output as the next one energises: `RX → SEQ1 → SEQ2 →
+     SEQ3 → TX`, with a hold between each step (exact timing TBD — see
+     open questions).
+  3. Once the sequence reaches `TX`, release TX INHIBIT so the radio can
+     actually transmit.
+- **Down-sequence**, triggered when that band's STBY line de-asserts:
+  mirrors the up-sequence in reverse — `TX → SEQ3 → SEQ2 → SEQ1 → RX` —
+  bringing relays back down safely once transmission has stopped, ending
+  with `RX` energised again (rather than all outputs off), matching the
+  fact that `RX` is itself a distinct, actively-driven output.
+- STBY lines are watched via hardware interrupts (D2/D3/D18/D19 — see pin
+  plan above) specifically because the lead time between STBY asserting
+  and the radio actually transmitting may be very short; catching the
+  edge immediately, rather than via a polling loop, is what makes it
+  possible to assert TX INHIBIT in time.
+- TX INHIBIT is wired to TUNER connector pin 8, alongside power (pin 1)
+  and ground (pin 2) only. The FT-847 manual warns that CAT cannot be used
+  while something is connected to the TUNER port — but that interlock is
+  believed to be tripped specifically by the connector's separate Tuner
+  Sense pin, which is deliberately left unconnected. See the reference
+  section below for the full reasoning; still worth a bench check before
+  relying on it in the field.
 
 ### Debug/control port
 
@@ -206,8 +354,8 @@ and `docs/ft-847_manual.pdf` ("Rear Panel Connectors", item 4).
   the true TX frequency under split operation. The YT-847 needs that
   certainty because it stores tuning parameters per exact TX frequency.
   **This project doesn't need the SAT-mode trick**: we're not doing
-  split-aware, per-frequency tuning memory, so polling Main VFO directly
-  (or just snooping PC↔radio traffic, our default approach) is enough.
+  split-aware, per-frequency tuning memory, so directly polling Main VFO
+  (opcode `0x03`) whenever the current frequency is needed is enough.
 - **Mic audio is live during the tune keying window.** Because the tune
   cycle works by switching to AM mode and keying PTT, whatever the
   operator says into the mic during that window is transmitted. The YT-847
@@ -308,6 +456,111 @@ item 11).
   be used to switch amplifiers or other external devices (that's what the
   separate STBY jack is for).
 
+## STBY jack, TUNER port, and TX INHIBIT (reference)
+
+Sources: `docs/ft-847_manual.pdf` ("Linear Amplifier Interfacing" and
+"Rear Panel Connectors" sections) and pinouts confirmed directly by
+inspection/prior documentation of the connectors themselves.
+
+- **STBY connector (rear panel item 8, 5-pin mini-DIN)** — confirmed
+  pinout:
+
+  | Pin | Signal | Arduino pin |
+  |---|---|---|
+  | 1 | GND (common) | — |
+  | 2 | 430MHz | D3 |
+  | 3 | HF | D2 |
+  | 4 | 144MHz | D18 |
+  | 5 | 50MHz | D19 |
+
+  Per the manual, these are "closure-to-ground" open-collector T/R lines,
+  one per band, rated +24V DC / 100 mA max, **positive DC only** — "not
+  compatible with negative DC voltages, nor AC voltages of any
+  magnitude." All 4 lines land on the Mega's interrupt-capable pins (see
+  Pin plan) so a TX request can be caught immediately, which matters given
+  how little lead time there may be before the radio actually transmits.
+- **TUNER connector (rear panel item 5, 8-pin mini-DIN)** — confirmed
+  pinout (partial, relevant pins only):
+
+  | Pin | Signal | Arduino pin |
+  |---|---|---|
+  | 1 | +13.8V | — |
+  | 2 | GND | — |
+  | 8 | TX INHIBIT | D4 |
+
+  There is also a separate **Tuner Sense** pin on this connector, believed
+  to be what actually triggers the FT-847's CAT-disable interlock (see
+  below) — **deliberately left unconnected**. Only pins 1, 2, and 8 are
+  wired in.
+- **⚠ Possible pin-2 discrepancy, worth double-checking.** fakeFC's own
+  schematic (`docs/fakeFC/docs/fakeFC-circuit_prototype01.png` —
+  `fakeFC-prototype01.kicad_sch`) labels the equivalent 8-pin connector as
+  `1=13.8V, 2=TX_GND, 3=GND, 4=DATA_IN, 5=DATA_OUT, 6=SENSE, 7=RESET
+  (unconnected), 8=TX_INH`. Their pin 2 (`TX_GND`) is wired through a 1kΩ
+  resistor to a separate Arduino pin configured `INPUT_PULLUP` — and in
+  firmware it's *only ever read* (`digitalRead`), never written, and its
+  (inverted) value is continuously mirrored onto its own dedicated status
+  LED every loop iteration. That combination — pulled up, polled, and
+  worth a live indicator — only makes sense for a real, changing status
+  signal, almost certainly the radio pulling it to ground while
+  transmitting (the same closure-to-ground convention as the STBY lines),
+  not a static ground reference; their real ground is the separate pin 3.
+  That doesn't match "Pin 2 = Gnd" as documented for this project.
+  **Decision: wire it as a signal, not ground** — pin 2 is connected to
+  Arduino D5 as an input (mirroring fakeFC's own pin choice), with its
+  actual use deferred for now. It is *not* tied to the project's ground
+  rail, precisely because it may not be one.
+- **TX INHIBIT electrical characteristics, per fakeFC's schematic**: their
+  `TX_INH` (J1 pin 8) connects directly to a Sparkfun Pro Micro GPIO
+  (running at 5V, confirmed by the schematic's onboard 7805 regulator)
+  through nothing more than a 1kΩ resistor and an indicator LED — no
+  transistor, opto-isolator, or level-shifter. This strongly suggests
+  TX INHIBIT is a plain 0–5V TTL/CMOS-level digital input on the radio's
+  side (unlike ALC's special -4V to 0V range), and that D4 can likely
+  drive it directly.
+  - **Polarity (inferred from firmware behaviour)**: `PIN_TXINH` is set
+    `OUTPUT` and driven LOW at boot/idle, and only pulsed HIGH briefly
+    (25–60ms) during specific protocol handshake states. This is
+    consistent with **active-high**: HIGH = inhibit asserted, LOW
+    (default/idle) = not inhibited — the opposite sense from the STBY
+    lines' closure-to-ground (active-low) convention, so worth being
+    careful not to mix the two up.
+  - **Caveat**: fakeFC only ever asserts `TX_INH` while it's also actively
+    exchanging bytes on `DATA_IN`/`DATA_OUT` (the real Yaesu tuner
+    protocol) — never as a bare standalone signal on its own. Since this
+    project's plan is to leave `DATA_IN`/`DATA_OUT` unconnected and assert
+    TX INHIBIT bare, it isn't confirmed from this reference whether the
+    radio treats it as a fully independent inhibit line, or expects it
+    alongside an ongoing tuner-protocol conversation. Worth including in
+    the bench test alongside the CAT-interlock check.
+  - Also worth noting: the schematic's `SENSE` pin (6) matches the "Tuner
+    Sense" terminology used for this project, which is reassuring, but its
+    exact wiring/destination in fakeFC's circuit wasn't legible enough at
+    the available resolution to independently confirm the CAT-disable
+    hypothesis from the schematic alone.
+- **The CAT/TUNER-port conflict, and how it's avoided.** The manual states,
+  in the CAT programming section: "**Important Notice!** It is not
+  possible to engage the CAT System when the FC-20 Automatic Antenna Tuner
+  is in use. Please disconnect the FC-20 Control Cable from the TUNER jack
+  on the rear panel of the FT-847 prior to commencing CAT System control
+  of the FT-847." This looked like a serious risk to this project's
+  architecture, since TX INHIBIT lives on that same connector (matching
+  fakeFC's `PIN_TXINH`) — but the interlock is believed to be driven
+  specifically by the separate Tuner Sense pin, not by TXINH/power/ground.
+  By leaving Tuner Sense unconnected and wiring only power, ground, and
+  TX INHIBIT, the radio should never detect a tuner as "present" and CAT
+  should keep working normally. **This is a belief, not yet bench-verified
+  against this specific radio** — worth confirming with a simple test
+  (wire it up, confirm CAT still responds on Port 2) before relying on it.
+- **The YT-847 precedent** supports this being a reasonable approach: its
+  manual's install steps connect its interface cable to *both* the TUNER
+  jack and the CAT jack simultaneously, and CAT still works for it — its
+  own text says the TUNER jack is used *only* to draw +12V power from the
+  radio, with all actual radio control happening over the separate CAT
+  port, never speaking the FC-20 tuner protocol. Same underlying strategy:
+  don't engage whatever it is on the TUNER connector that trips the
+  interlock.
+
 ## Open questions / to be determined
 
 - Whether the AH-4's active-low, open-collector-style `START`/`KEY` lines
@@ -316,6 +569,25 @@ item 11).
   we're not also bridging to a second tuner's protocol).
 - Debounce/timing behaviour of the physical tune button (D7), and exact
   blink/status patterns for the tune LED (D8).
-- Eventual STBY port wiring (rear panel item 8, 5-pin mini-DIN, one
-  closure-to-ground T/R line per band: HF/50/144/430MHz) — pins are
-  reserved (D2, D3, D18, D19) but the actual connection is future work.
+- **What to do with TUNER pin 2 / D5** (wired in as `TX_GND` per fakeFC's
+  schematic, purpose deferred): confirm on the bench whether it's really
+  an active closure-to-ground status signal (and if so, what it
+  indicates — TX status, tuner-presence, something else) or turns out to
+  just be ground after all, distinct from the connector's pin 3.
+- **Confirm TX INHIBIT polarity/voltage** (TUNER connector pin 8):
+  fakeFC's firmware behaviour suggests active-high, plain 0–5V logic,
+  drivable directly from D4 with no isolation — but this is inferred from
+  a different device's firmware, not measured on this radio directly, so
+  worth confirming on the bench.
+- **Bench-verify that leaving Tuner Sense unconnected really does avoid
+  the CAT-disable interlock**, and that TX INHIBIT works as a standalone
+  signal without the DATA_IN/DATA_OUT tuner-protocol traffic fakeFC always
+  pairs it with — wire up only power/ground/TX INHIBIT (pins 1, 2, 8) and
+  confirm both that CAT still responds correctly on Port 2, and that
+  asserting TX INHIBIT alone actually holds off transmission.
+- The 12 sequencer opto-isolator output pins (`SEQ1`/`SEQ2`/`SEQ3` × 4
+  bands) — to be specified.
+- Per-step sequencer timing: how long each of `SEQ1`/`SEQ2`/`SEQ3` is held
+  before advancing to the next step (and the reverse, on the way down) —
+  likely needs to be tuned against the actual amplifier relays' switching
+  times, so may end up configurable rather than fixed.
