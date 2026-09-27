@@ -699,6 +699,32 @@ inspection/prior documentation of the connectors themselves.
   port, never speaking the FC-20 tuner protocol. Same underlying strategy:
   don't engage whatever it is on the TUNER connector that trips the
   interlock.
+- **A more concrete hardware theory for *why* the interlock exists**: the
+  FT-847 likely has a single internal UART, switched by an analogue mux
+  (e.g. a 4053-style chip) between the MAX232/CAT port on one side and the
+  TUNER connector's `DATA_IN`/`DATA_OUT` pins on the other — i.e. CAT and
+  the TUNER protocol are mutually exclusive not because of a software
+  interlock, but because they physically share the same UART hardware.
+  Re-checking fakeFC's code against this: every single `fc_txinh(true)`
+  call in the sketch is sandwiched directly between two `Serial1`
+  byte-sends (its "RIG" UART, wired to `DATA_IN`/`DATA_OUT`) — it is never
+  asserted standalone, outside an active protocol exchange. That's
+  consistent with the mux theory, but doesn't prove TX INHIBIT itself is
+  what drives the mux, since fakeFC never tries it in isolation — it only
+  shows correlation. Circumstantial evidence points the other way, though:
+  in fakeFC's own schematic, `TX_INH` (pin 8) is a plain, dedicated
+  GPIO-to-GPIO wire, electrically separate from both `DATA_IN`/`DATA_OUT`
+  (the actual muxed UART) and `SENSE` (pin 6) — `SENSE` is the more
+  electrically plausible mux-control candidate, precisely because it
+  isn't part of the UART signal path at all. Still an inference, not a
+  measurement.
+- **This raises the stakes on the bench test below.** If TX INHIBIT itself
+  turns out to be what flips the mux (rather than `SENSE`), CAT would drop
+  out during *every* sequenced transmission — not just ATU tune cycles —
+  since the sequencer asserts TX INHIBIT on every band's up-sequence. The
+  test needs to specifically confirm CAT keeps responding *while TX
+  INHIBIT is actively asserted*, not merely that it responds with the
+  wire connected but idle.
 
 ## Open questions / to be determined
 
@@ -718,12 +744,17 @@ inspection/prior documentation of the connectors themselves.
   drivable directly from D4 with no isolation — but this is inferred from
   a different device's firmware, not measured on this radio directly, so
   worth confirming on the bench.
-- **Bench-verify that leaving Tuner Sense unconnected really does avoid
-  the CAT-disable interlock**, and that TX INHIBIT works as a standalone
-  signal without the DATA_IN/DATA_OUT tuner-protocol traffic fakeFC always
-  pairs it with — wire up only power/ground/TX INHIBIT (pins 1, 2, 8) and
-  confirm both that CAT still responds correctly on Port 2, and that
-  asserting TX INHIBIT alone actually holds off transmission.
+- **Critical bench test, elevated priority**: wire up only power/ground/TX
+  INHIBIT (pins 1, 2, 8), leaving `SENSE` and `DATA_IN`/`DATA_OUT`
+  unconnected, then with a PC actively polling CAT on Port 2, assert TX
+  INHIBIT and confirm CAT *keeps responding while it's held high* — not
+  just that it works with the wire connected but idle. This is the test
+  that distinguishes "`SENSE` trips the mux, TX INHIBIT is safe alone"
+  from "TX INHIBIT itself trips the mux" — the latter would mean CAT
+  drops out on every sequenced transmission, not just ATU tune cycles, and
+  would force a redesign. Also confirm asserting TX INHIBIT alone (with no
+  `DATA_IN`/`DATA_OUT` traffic, unlike every case in fakeFC) actually
+  holds off transmission as expected.
 - Exact JSON schema for the sequencer config (per-band step timing values,
   band-edge frequency ranges, per-band tune-vs-normal step-inclusion
   flags, + cross-band trigger rule list) — the shape of the data, not just
