@@ -172,29 +172,78 @@ fake two specific things, not maintain a general-purpose cache of
 
 ### Tune cycle (triggered by the tune button)
 
-1. Actively query the radio's current mode over CAT (`Get freq+mode, Main`,
-   opcode `0x03`) and note the current PTT/TX status is "off" (this is
-   always known without needing to ask, since the Arduino is the one about
-   to turn it on). This captures the two values that will need to be
-   faked and restored, freshly, at the start of every cycle — so it works
-   identically whether or not a PC (and any snooped history) exists.
-2. Issue the appropriate start sequence to the Icom ATU interface.
-3. Take over the CAT link to the radio and:
-   - Select AM mode (there is no CAT power-set command on this radio —
-     switching to AM mode is itself the main power reduction, since the
-     FT-847 caps AM output much lower than SSB/CW/FM; see the CAT
-     reference below).
-   - Optionally assert the ALC injection circuit to pull power down
-     further, closer to true minimum, independent of CAT.
-   - Key the radio's PTT.
-   - Meanwhile, continue forwarding any other CAT traffic between PC and
-     radio live (see above) — only mode and PTT/TX status queries get
-     answered from the values captured in step 1 instead of the truth.
-4. Wait for the ATU to signal that its tune cycle has completed.
-5. Unkey the radio's PTT.
-6. Release the ALC injection (if it was asserted) and restore the radio's
-   original mode (from the value captured in step 1).
-7. Resume normal passthrough with no faking.
+The tune cycle must also drive the amplifier sequencer for whichever band
+it's about to transmit on — a tune cycle keys PTT just like any other
+transmission, and the sequencer's relay chain has to be up before RF
+appears, exactly as it would for a normal transmission.
+
+It's not yet confirmed whether a CAT-commanded PTT naturally asserts the
+radio's STBY line(s) with enough lead time for the existing STBY-driven
+sequencer (see "Sequencer" below) to run on its own — that's untested.
+Rather than depend on that, the tune cycle **explicitly drives the
+sequencer itself**, calling the same up/down-sequence logic the STBY
+interrupt handler uses, directly and proactively:
+
+1. Actively query the radio's current mode and frequency over CAT
+   (`Get freq+mode, Main`, opcode `0x03`) and note the current PTT/TX
+   status is "off" (this is always known without needing to ask, since
+   the Arduino is the one about to turn it on). This captures the values
+   that will need to be faked and restored, freshly, at the start of
+   every cycle — so it works identically whether or not a PC (and any
+   snooped history) exists.
+2. Map that frequency to one of the 4 sequencer bands (see "Sequencer
+   configuration" below — band edges live in the same JSON config).
+3. **Explicitly run that band's *tune* profile up-sequence first, before
+   touching the AH-4 at all** — assert TX INHIBIT, step through whichever
+   stages the tune profile includes for this band (may stop at `SEQ2`,
+   skipping `SEQ3` — see "Two profiles per band" under Sequencer above),
+   release TX INHIBIT — using the same function the STBY interrupt handler
+   calls, but with the tune profile rather than the normal-TX profile.
+   - **This band's STBY interrupt handling must be suppressed for the
+     duration of the tune cycle.** The idempotency argument used elsewhere
+     (calling "run up-sequence" again on an already-sequenced band is a
+     harmless no-op) only holds when both callers agree on the same
+     profile. Here they don't: if the radio's own STBY line asserts once
+     PTT goes active and the interrupt handler fires using the *normal*
+     profile, it would engage `SEQ3` anyway — exactly what the tune
+     profile exists to prevent. So the tune cycle needs to mark this band
+     as "under explicit tune-profile control" and have the STBY handler
+     defer to it (skip its own trigger) until the tune cycle releases
+     that band again in step 9.
+   - **Ordering also matters here**: this step is deliberately done
+     *before* issuing the AH-4 `START` signal (step 5), not interleaved
+     with it.
+     The AH-4 protocol has its own tight internal timeout — it expects RF
+     to appear within a few hundred ms of `START` being asserted (fakeFC
+     times out at ~500ms) — and the sequencer's relay-settling delay is
+     user-configurable and could easily be longer than that. Running the
+     sequencer to completion first, while the radio is still fully idle,
+     keeps that variable delay out of the AH-4's time-sensitive window
+     entirely, so `START → PTT-key → RF appears` stays a tight,
+     undisturbed sequence exactly as the AH-4 expects.
+4. Take over the CAT link to the radio and select AM mode (there is no CAT
+   power-set command on this radio — switching to AM mode is itself the
+   main power reduction, since the FT-847 caps AM output much lower than
+   SSB/CW/FM; see the CAT reference below). Optionally assert the ALC
+   injection circuit to pull power down further, independent of CAT.
+5. Issue the appropriate start sequence to the Icom ATU interface. The
+   sequencer has already completed its up-sequence by this point (step 3),
+   so relays are already up and TX INHIBIT already released — nothing
+   further needs to happen before keying PTT.
+6. Key the radio's PTT, immediately following `START` as the AH-4 protocol
+   expects. Meanwhile, continue forwarding any other CAT traffic between
+   PC and radio live (see above) — only mode and PTT/TX status queries get
+   answered from the values captured in step 1 instead of the truth.
+7. Wait for the ATU to signal that its tune cycle has completed.
+8. Unkey the radio's PTT.
+9. **Explicitly run that band's *tune* profile down-sequence** — the
+   mirror of step 3, stepping down through whatever stages the tune
+   profile actually engaged. Once complete, release this band from
+   "under explicit tune-profile control" so its STBY interrupt handling
+   resumes normally.
+10. Release the ALC injection (if it was asserted) and restore the
+    radio's original mode (from the value captured in step 1).
+11. Resume normal passthrough with no faking.
 
 ### Standalone operation
 
@@ -233,10 +282,20 @@ anything unusual is happening:
 
 ### Sequencer
 
-A 4-band amplifier/relay sequencer, entirely independent of the CAT
-broker and ATU logic above — it runs off the radio's STBY jack, not CAT,
-so it works identically whether the PC or even the CAT link is present at
-all.
+A 4-band amplifier/relay sequencer. It runs primarily off the radio's
+STBY jack, not CAT, so it works identically whether the PC or even the
+CAT link is present at all — but its up/down-sequence logic is also
+called directly and proactively by the ATU tune cycle (see above), since
+it's not yet confirmed that a CAT-commanded PTT asserts STBY with enough
+lead time on its own. Both trigger paths call the same up/down-sequence
+function, which is safely re-entrant/idempotent **as long as both callers
+are applying the same profile**. They aren't always: a tune cycle
+deliberately uses each band's "tune" profile (which may skip stages like
+`SEQ3` — see below), while the STBY-driven path always applies the
+"normal" profile. So while a tune cycle holds explicit control of a
+band, that band's STBY-driven triggering must be suppressed rather than
+left to run alongside it — see the Tune cycle steps above for exactly
+when that hold starts and ends.
 
 - Each band (HF, 50, 144, 430MHz) has its own STBY input line (closure to
   ground = that band's TX requested) and its own independent 5-output
@@ -271,6 +330,23 @@ all.
   with `RX` LED on — `SEQ1`/`SEQ2` stay energised throughout the early
   part of the down-sequence, only dropping out one at a time in reverse
   order.
+- **Two profiles per band: "normal TX" and "tune."** A band's step list
+  isn't necessarily the same for both. Motivating example: if `SEQ3` is
+  wired to a high-power amplifier, engaging it during an ATU tune cycle
+  could overload the tuner (which is only ever seeing AM-mode, possibly
+  ALC-reduced power — see the ATU tune cycle above — not the amp's full
+  output). The **tune** profile for that band would skip `SEQ3` entirely,
+  with TX INHIBIT released once `SEQ2` has settled instead of waiting on a
+  stage that's deliberately not being engaged. This is per-step
+  (`SEQ1`/`SEQ2`/`SEQ3` each independently flagged "included in tune
+  profile?"), not hardcoded to skipping `SEQ3` specifically — a different
+  band/installation might need to skip a different stage, or more than
+  one. Configured via the same JSON config as everything else below.
+  Cross-band trigger rules (see "Sequencer configuration" below) are
+  assumed to fire the same way regardless of which profile is active —
+  RF is present during tuning too, just at reduced power, so protection
+  like the masthead-preamp example should still apply. That's a stated
+  default, not yet independently confirmed as the right call.
 - STBY lines are watched via hardware interrupts (D2/D3/D18/D19 — see pin
   plan above) specifically because the lead time between STBY asserting
   and the radio actually transmitting may be very short; catching the
@@ -322,6 +398,11 @@ band's sequencer, configured rather than hardcoded.
   when triggered; it does not phase in on its own band's normal step
   delay. No per-rule timing/trigger-stage options — if finer control turns
   out to be needed later, that's a schema extension, not a redesign.
+- **Band-edge frequency ranges also belong in this config**, not
+  hardcoded: the ATU tune cycle needs to map "current frequency" to one of
+  the 4 sequencer bands (see Tune cycle above), and exact sub-band edges
+  can vary by license class/region — so, consistent with everything else
+  here, they're configurable rather than baked into firmware.
 
 ### Debug/control port
 
@@ -643,9 +724,23 @@ inspection/prior documentation of the connectors themselves.
   pairs it with — wire up only power/ground/TX INHIBIT (pins 1, 2, 8) and
   confirm both that CAT still responds correctly on Port 2, and that
   asserting TX INHIBIT alone actually holds off transmission.
-- Exact JSON schema for the sequencer config (per-band step timing values
-  + cross-band trigger rule list) — the shape of the data, not just its
-  semantics, still needs designing, along with the wire format for
+- Exact JSON schema for the sequencer config (per-band step timing values,
+  band-edge frequency ranges, per-band tune-vs-normal step-inclusion
+  flags, + cross-band trigger rule list) — the shape of the data, not just
+  its semantics, still needs designing, along with the wire format for
   loading/updating it over Serial0.
-- Default/fallback timing values to ship with, for when EEPROM is empty or
-  invalid on first boot.
+- Default/fallback timing, band-edge, and tune-profile values to ship
+  with, for when EEPROM is empty or invalid on first boot.
+- **Implementation mechanism for "suppress this band's STBY handling
+  while a tune cycle holds it"** — likely a simple per-band flag/state the
+  interrupt handler checks before acting, but needs designing alongside
+  the sequencer's core state machine so it can't be forgotten or race
+  against the interrupt firing at an inconvenient moment.
+- Whether cross-band trigger rules should really apply unconditionally
+  regardless of tune-vs-normal profile (the stated default above), or
+  whether that too should be configurable per rule.
+- **Bench-verify whether a CAT-commanded PTT asserts the radio's STBY
+  line(s) at all, and if so with enough lead time** for the STBY-driven
+  sequencer path to be useful rather than purely redundant alongside the
+  tune cycle's explicit trigger call (see Tune cycle above). Doesn't block
+  building the explicit-call path, but worth knowing either way.
