@@ -55,19 +55,24 @@ is talking to the Arduino, which brokers the conversation:
   independent of — and in addition to — the AM-mode power ceiling (see
   below). Carried over from a prior project; confirmed against the FT-847
   manual — see the ALC reference section further down.
-- **Amplifier sequencer**: 4 independent relay sequencers (one per band:
-  HF, 50, 144, 430MHz — see the open question below on which physical
-  band maps to which "Band 1-4" channel), each with 5 distinct outputs —
-  `RX`, `SEQ1`, `SEQ2`, `SEQ3`, `TX` — for exactly one of which is driven
-  active at a time. All 5 drive a status LED; only `SEQ1`/`SEQ2`/`SEQ3`
-  also drive an opto-isolator (`RX`/`TX` are LED indicators only, no
-  relay/opto function) — 12 opto-isolator outputs total, 3 per band (see
-  Pin plan). Triggered by the radio's STBY jack (4 closure-to-ground T/R
-  lines, wired
-  to the interrupt-capable pins — see Pin plan). A single, shared **TX
-  INHIBIT** output (D4) holds off the radio's actual transmit output while
-  each band's sequence runs, wired to pin 8 of the radio's TUNER
-  connector. See "Sequencer" under Behaviour, and the TUNER-port reference
+- **Amplifier sequencer**: 4 independent relay sequencers, one per band —
+  Band 1=HF, Band 2=50MHz, Band 3=144MHz, Band 4=430MHz — each with 5
+  distinct outputs —
+  `RX`, `SEQ1`, `SEQ2`, `SEQ3`, `TX`. These are cumulative, not mutually
+  exclusive: `SEQ1`-`SEQ3` latch on in order and stay on together for the
+  whole transmission, while `RX`/`TX` are boundary-condition indicator
+  LEDs (see "Sequencer" under Behaviour for the exact timing). All 5 drive
+  a status LED; only `SEQ1`/`SEQ2`/`SEQ3` also drive an opto-isolator
+  (`RX`/`TX` are LED indicators only, no relay/opto function) — 12
+  opto-isolator outputs total, 3 per band (see Pin plan). Triggered by the
+  radio's STBY jack (4 closure-to-ground T/R lines, wired to the
+  interrupt-capable pins — see Pin plan). A single, shared **TX INHIBIT**
+  output (D4) holds off the radio's actual transmit output while each
+  band's sequence runs, wired to pin 8 of the radio's TUNER connector.
+  Also configurable (JSON-based — see below) so that transmitting on one
+  band can partially trigger another band's sequencer, e.g. disabling a
+  masthead preamp on an unrelated band while transmitting nearby. See
+  "Sequencer" under Behaviour, and the TUNER-port reference
   section further down for the confirmed pinout and how the CAT-disable
   risk is avoided (by deliberately leaving the TUNER connector's separate
   Tuner Sense pin unconnected).
@@ -91,16 +96,18 @@ is talking to the Arduino, which brokers the conversation:
 | D19 | STBY: 50MHz (input, interrupt) |
 | D4 | Shared TX INHIBIT output → TUNER connector pin 8 |
 | D5 | TUNER connector pin 2 (`TX_GND`, per fakeFC's schematic) — wired in as an input, matching fakeFC's own pin choice; purpose/use TBD |
-| D22 / D23 / D24 / D25 / D26 | Sequencer Band 1: `RX` (LED only) / `SEQ1` (LED+opto) / `SEQ2` (LED+opto) / `SEQ3` (LED+opto) / `TX` (LED only) |
-| D27 / D28 / D29 / D30 / D31 | Sequencer Band 2: `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same LED-only/LED+opto pattern as Band 1 |
-| D44 / D45 / D46 / D47 / D48 | Sequencer Band 3: `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern |
-| D49 / D50 / D51 / D52 / D53 | Sequencer Band 4: `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern; D50-D53 are the Mega's hardware SPI pins (MISO/MOSI/SCK/SS), repurposed as plain digital outputs since SPI isn't needed elsewhere in this project |
+| D22 / D23 / D24 / D25 / D26 | Sequencer Band 1 (**HF**): `RX` (LED only) / `SEQ1` (LED+opto) / `SEQ2` (LED+opto) / `SEQ3` (LED+opto) / `TX` (LED only) |
+| D27 / D28 / D29 / D30 / D31 | Sequencer Band 2 (**50MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same LED-only/LED+opto pattern as Band 1 |
+| D44 / D45 / D46 / D47 / D48 | Sequencer Band 3 (**144MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern |
+| D49 / D50 / D51 / D52 / D53 | Sequencer Band 4 (**430MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern; D50-D53 are the Mega's hardware SPI pins (MISO/MOSI/SCK/SS), repurposed as plain digital outputs since SPI isn't needed elsewhere in this project |
 | D20, D21 (I2C: SDA/SCL) | **kept free** — not used by anything, available for a future I2C peripheral (e.g. a status display) |
 
-Sequencer channels are numbered "Band 1-4" for now rather than tied to a
-specific RF band — see the open question below on mapping each channel to
-HF/50/144/430MHz and cross-referencing against the STBY pin assignments
-above.
+Sequencer band↔channel mapping (Band 1=HF, Band 2=50MHz, Band 3=144MHz,
+Band 4=430MHz) is independent of, and doesn't follow the same order as,
+the STBY input pin assignment above (D2=HF, D3=430MHz, D18=144MHz,
+D19=50MHz) — each STBY input simply needs to be cross-wired in firmware
+to drive its matching band's sequencer channel, e.g. STBY D2 (HF) drives
+Band 1 (D22-26), STBY D3 (430MHz) drives Band 4 (D49-53), and so on.
 
 Only six Mega 2560 pins support true external interrupts: D2, D3, D18,
 D19, D20, D21. Putting both CAT links on Serial2/Serial3 (rather than
@@ -233,28 +240,37 @@ all.
 
 - Each band (HF, 50, 144, 430MHz) has its own STBY input line (closure to
   ground = that band's TX requested) and its own independent 5-output
-  sequence channel: `RX`, `SEQ1`, `SEQ2`, `SEQ3`, `TX`, with exactly one
-  driven active at a time. All 5 drive a status LED; only `SEQ1`/`SEQ2`/
-  `SEQ3` also drive a dedicated opto-isolator — `RX`/`TX` are indicator
-  LEDs only, with no relay/opto function — giving 12 opto-isolator
-  outputs total, 3 per band.
+  sequence channel: `RX`, `SEQ1`, `SEQ2`, `SEQ3`, `TX`. All 5 drive a
+  status LED; only `SEQ1`/`SEQ2`/`SEQ3` also drive a dedicated
+  opto-isolator — `RX`/`TX` are indicator LEDs only, with no relay/opto
+  function — giving 12 opto-isolator outputs total, 3 per band.
+- **The outputs are cumulative, not mutually exclusive.** `SEQ1`,
+  `SEQ2`, and `SEQ3` latch on in sequence and *stay* on together for the
+  whole duration of the transmission — they don't step through as
+  separate exclusive states. `RX` and `TX` are boundary-condition
+  indicator LEDs: `RX` is lit exactly when `SEQ1` is off (i.e. fully idle)
+  and unlit the moment `SEQ1` turns on; `TX` lights only once all three
+  `SEQ` stages are on and settled, indicating the radio is clear to
+  transmit — it does not replace them.
 - A single **TX INHIBIT** output is shared across all 4 bands (the radio
   only ever transmits on one band at a time, so one inhibit line is
   enough) and asserted into the radio's TUNER-port TXINH input.
-- **Up-sequence**, triggered the instant a band's STBY line asserts:
+- **Up-sequence**, triggered the instant a band's STBY line asserts (PTT
+  pressed):
   1. Assert TX INHIBIT immediately, to hold off actual RF before the relay
      chain has finished settling.
-  2. Step that band's channel through its outputs in order, de-energising
-     the previous output as the next one energises: `RX → SEQ1 → SEQ2 →
-     SEQ3 → TX`, with a hold between each step (exact timing TBD — see
-     open questions).
-  3. Once the sequence reaches `TX`, release TX INHIBIT so the radio can
-     actually transmit.
-- **Down-sequence**, triggered when that band's STBY line de-asserts:
-  mirrors the up-sequence in reverse — `TX → SEQ3 → SEQ2 → SEQ1 → RX` —
-  bringing relays back down safely once transmission has stopped, ending
-  with `RX` energised again (rather than all outputs off), matching the
-  fact that `RX` is itself a distinct, actively-driven output.
+  2. Immediately: `SEQ1` on, `RX` LED off.
+  3. After a delay: `SEQ2` on (`SEQ1` stays on).
+  4. After a delay: `SEQ3` on (`SEQ1`+`SEQ2` stay on).
+  5. After a delay: `TX` LED on — `SEQ1`/`SEQ2`/`SEQ3` are all still
+     energised at this point and remain so for the whole transmission.
+  6. Release TX INHIBIT so the radio can actually transmit.
+- **Down-sequence**, triggered when that band's STBY line de-asserts (PTT
+  released), the exact mirror image: `TX` LED off immediately, then after
+  a delay `SEQ3` off, then `SEQ2` off, then finally `SEQ1` off together
+  with `RX` LED on — `SEQ1`/`SEQ2` stay energised throughout the early
+  part of the down-sequence, only dropping out one at a time in reverse
+  order.
 - STBY lines are watched via hardware interrupts (D2/D3/D18/D19 — see pin
   plan above) specifically because the lead time between STBY asserting
   and the radio actually transmitting may be very short; catching the
@@ -268,10 +284,52 @@ all.
   section below for the full reasoning; still worth a bench check before
   relying on it in the field.
 
+### Sequencer configuration and cross-band triggers
+
+The 4 bands' sequencers don't have to be fully independent — the design
+needs to support one band's transmit event partially triggering another
+band's sequencer, configured rather than hardcoded.
+
+- **Motivating example**: transmitting on 50MHz should be able to assert
+  the 144MHz channel's `SEQ1` output on its own — e.g. to disable a
+  masthead preamp on 144MHz that would otherwise be desensitised or
+  damaged by nearby 50MHz RF — without running the rest of the 144MHz
+  sequence (`SEQ2`/`SEQ3`/`TX`), since the radio isn't actually
+  transmitting on that band.
+- **Config-driven, not hardcoded**: defined via a JSON config, loaded over
+  the Serial0 USB debug link at runtime rather than from an SD card — this
+  was a deliberate choice, since an SD-card approach would need the Mega's
+  hardware SPI bus, which the sequencer's Band 4 outputs (D50-D53) have
+  already claimed as plain digital pins. Loading over serial avoids that
+  conflict and needs no extra hardware.
+- **Persisted to EEPROM**, so it survives a power cycle without needing to
+  be resent every boot. The Mega's 4KB of EEPROM is comfortably enough for
+  this config. If EEPROM is empty or fails validation (e.g. first boot, or
+  corrupted data), the sequencer falls back to safe built-in default
+  timing with no cross-band trigger rules active, rather than refusing to
+  run.
+- **Per-band step timing lives in the same config**: the delay between
+  each of `RX → SEQ1 → SEQ2 → SEQ3 → TX` (and its mirror on the way down)
+  is configurable per band via this same JSON, not a hardcoded constant —
+  consistent with the whole reason a runtime config exists at all, and
+  lets relay timing be tuned per amplifier without reflashing.
+- **Cross-band trigger rules are kept deliberately simple**: a rule maps a
+  source band to a target band + output (e.g. "50MHz → 144MHz `SEQ1`").
+  The trigger point is always the source band's own `SEQ1` turning on
+  (the earliest point in its up-sequence, maximising protection margin
+  before RF appears) and release is always the mirror — source `SEQ1`
+  turning off on the way down. The target output snaps on/off immediately
+  when triggered; it does not phase in on its own band's normal step
+  delay. No per-rule timing/trigger-stage options — if finer control turns
+  out to be needed later, that's a schema extension, not a redesign.
+
 ### Debug/control port
 
 Serial0 (USB) is available for logging Arduino/CAT activity and for local
-control of the sequencer, independent of the CAT passthrough path.
+control of the sequencer, independent of the CAT passthrough path. This is
+also the transport for loading the sequencer's JSON config (band timing,
+cross-band trigger rules) at runtime — see "Sequencer configuration and
+cross-band triggers" above.
 
 ## Yaesu FT-847 CAT protocol (reference)
 
@@ -585,9 +643,9 @@ inspection/prior documentation of the connectors themselves.
   pairs it with — wire up only power/ground/TX INHIBIT (pins 1, 2, 8) and
   confirm both that CAT still responds correctly on Port 2, and that
   asserting TX INHIBIT alone actually holds off transmission.
-- The 12 sequencer opto-isolator output pins (`SEQ1`/`SEQ2`/`SEQ3` × 4
-  bands) — to be specified.
-- Per-step sequencer timing: how long each of `SEQ1`/`SEQ2`/`SEQ3` is held
-  before advancing to the next step (and the reverse, on the way down) —
-  likely needs to be tuned against the actual amplifier relays' switching
-  times, so may end up configurable rather than fixed.
+- Exact JSON schema for the sequencer config (per-band step timing values
+  + cross-band trigger rule list) — the shape of the data, not just its
+  semantics, still needs designing, along with the wire format for
+  loading/updating it over Serial0.
+- Default/fallback timing values to ship with, for when EEPROM is empty or
+  invalid on first boot.
