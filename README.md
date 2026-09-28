@@ -88,14 +88,14 @@ is talking to the Arduino, which brokers the conversation:
 | D8 | Tune status LED (output) |
 | D9 | ALC injection charge pump (PWM output) |
 | D10 | ALC opto-isolator gate (on/off switch) |
-| D11 | Icom AH-4 `KEY` input |
-| D12 | Icom AH-4 `START` output |
+| D11 | Icom AH-4 `KEY` input, via opto-isolator, `INPUT_PULLUP` |
+| D12 | Icom AH-4 `START` output, via opto-isolator |
 | D2 | STBY: HF (input, interrupt) |
 | D3 | STBY: 430MHz (input, interrupt) |
 | D18 | STBY: 144MHz (input, interrupt) |
 | D19 | STBY: 50MHz (input, interrupt) |
 | D4 | Shared TX INHIBIT output → TUNER connector pin 8 |
-| D5 | TUNER connector pin 2 (`TX_GND`, per fakeFC's schematic) — wired in as an input, matching fakeFC's own pin choice; purpose/use TBD |
+| D5 | TUNER connector pin 2 (`TX_GND`) — input, `INPUT_PULLUP`. Open-collector, active-low: asserted (low) when the radio transmits on HF or 50MHz. Logged/cross-check only, not load-bearing (STBY already covers this with more granularity) |
 | D22 / D23 / D24 / D25 / D26 | Sequencer Band 1 (**HF**): `RX` (LED only) / `SEQ1` (LED+opto) / `SEQ2` (LED+opto) / `SEQ3` (LED+opto) / `TX` (LED only) |
 | D27 / D28 / D29 / D30 / D31 | Sequencer Band 2 (**50MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same LED-only/LED+opto pattern as Band 1 |
 | D44 / D45 / D46 / D47 / D48 | Sequencer Band 3 (**144MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern |
@@ -553,6 +553,31 @@ diagrams for the genuine Icom AH-4 protocol) and
   port can drive a non-Yaesu tuner. That part isn't relevant to us — we are
   driving the AH-4's `START`/`KEY` lines directly from the Arduino and
   controlling the radio purely over CAT, not emulating a Yaesu tuner port.
+- **Opto-isolated drive/read circuit**, for galvanic isolation between the
+  Arduino's 5V logic and the AH-4's 13.8V circuit. Both opto LED circuits
+  are powered from the AH-4 connector's own `+13.8V`/`GND` pins, so no
+  separate supply is needed and the isolation boundary stays clean — no
+  shared ground between the Arduino and the AH-4/radio side at all.
+  - **`START`** (Arduino asserts by pulling it low at the AH-4 end): `D12`
+    → ~330-470Ω resistor → opto LED anode → cathode → Arduino GND (drives
+    the opto). Opto's phototransistor: collector → AH-4 `START` pin,
+    emitter → AH-4-side `GND`; a ~10kΩ pull-up from `START` to the AH-4
+    connector's `+13.8V` provides the idle-high level. Opto off → pull-up
+    holds `START` high; opto on (D12 driven high) → phototransistor pulls
+    `START` near 0V (asserted). Worth checking with a meter whether the
+    real AH-4 already has its own internal pull-up on `START` before
+    assuming this external one is required (harmless either way if it
+    turns out to be redundant).
+  - **`KEY`** (AH-4 asserts by pulling it low at its own end): AH-4-side
+    `+13.8V` → ~1kΩ resistor → opto LED anode → cathode → AH-4 `KEY` pin
+    (the AH-4 completes this loop to its own ground when busy). Opto's
+    phototransistor: collector → `D11`, configured `INPUT_PULLUP` (same
+    convention as fakeFC's direct-wired approach) → Arduino's own 5V
+    internally; emitter → Arduino GND. AH-4 idle → opto off → `D11` reads
+    high (pull-up); AH-4 busy → opto on → phototransistor pulls `D11` low.
+  - A standard low-speed part (e.g. PC817) is more than adequate — these
+    are millisecond-scale control lines, nowhere near a PC817's ~µs-scale
+    switching time, and its Vceo (~35V) comfortably clears the 13.8V rail.
 
 ## ALC injection for true minimum power (reference)
 
@@ -646,9 +671,23 @@ inspection/prior documentation of the connectors themselves.
   not a static ground reference; their real ground is the separate pin 3.
   That doesn't match "Pin 2 = Gnd" as documented for this project.
   **Decision: wire it as a signal, not ground** — pin 2 is connected to
-  Arduino D5 as an input (mirroring fakeFC's own pin choice), with its
-  actual use deferred for now. It is *not* tied to the project's ground
-  rail, precisely because it may not be one.
+  Arduino D5 as an input (mirroring fakeFC's own pin choice). It is *not*
+  tied to the project's ground rail, precisely because it isn't one.
+- **`TX_GND` function confirmed against the actual FT-847 schematic.** It's
+  the collector of a **DTC114EK** digital transistor, emitter to ground —
+  so it's an **open-collector, active-low** signal: pulled to ~0V when
+  asserted, floating high otherwise (confirming why fakeFC wires its
+  equivalent pin `INPUT_PULLUP`, and why D5 should be too). The base is
+  driven when the radio is transmitting on **HF or 50MHz specifically** —
+  which lines up exactly with the FC-20 tuner's actual coverage range
+  (1.8-50MHz): this is a band-scoped "TX active on a band the FC-20 cares
+  about" status line, not a general TX indicator. Since the STBY jack
+  already gives 4 independent, full-resolution per-band lines (HF/50/144/
+  430), `TX_GND` doesn't add anything STBY doesn't already cover — if
+  anything it's less granular (one combined line for 2 of the 4 bands).
+  **Conclusion: not load-bearing for the sequencer or tune cycle** — worth
+  logging on Serial0 as a cross-check against the STBY-HF/STBY-50MHz
+  lines, but nothing in the core logic needs to depend on it.
 - **TX INHIBIT electrical characteristics, per fakeFC's schematic**: their
   `TX_INH` (J1 pin 8) connects directly to a Sparkfun Pro Micro GPIO
   (running at 5V, confirmed by the schematic's onboard 7805 regulator)
@@ -768,22 +807,12 @@ inspection/prior documentation of the connectors themselves.
 
 ## Open questions / to be determined
 
-- Whether the AH-4's active-low, open-collector-style `START`/`KEY` lines
-  need transistor buffering/level shifting on our side (the SGC converter
-  design uses MOSFETs for this; our AH-4-only case may be simpler since
-  we're not also bridging to a second tuner's protocol).
+- Whether the real AH-4 already has its own internal pull-up on `START` —
+  determines whether the external ~10kΩ pull-up in the opto circuit above
+  is required or just harmless redundancy. Check with a meter at the AH-4
+  end before assuming either way.
 - Debounce/timing behaviour of the physical tune button (D7), and exact
   blink/status patterns for the tune LED (D8).
-- **What to do with TUNER pin 2 / D5** (wired in as `TX_GND` per fakeFC's
-  schematic, purpose deferred): confirm on the bench whether it's really
-  an active closure-to-ground status signal (and if so, what it
-  indicates — TX status, tuner-presence, something else) or turns out to
-  just be ground after all, distinct from the connector's pin 3.
-- **Confirm TX INHIBIT polarity/voltage** (TUNER connector pin 8):
-  fakeFC's firmware behaviour suggests active-high, plain 0–5V logic,
-  drivable directly from D4 with no isolation — but this is inferred from
-  a different device's firmware, not measured on this radio directly, so
-  worth confirming on the bench.
 - **Bench test to confirm** (polarity settled as active-high per G0AFH's
   article, and direct 5V drive confirmed sufficient by the DTC144E
   datasheet — no longer a live architectural risk, and no external
