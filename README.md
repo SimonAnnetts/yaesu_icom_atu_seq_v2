@@ -699,32 +699,72 @@ inspection/prior documentation of the connectors themselves.
   port, never speaking the FC-20 tuner protocol. Same underlying strategy:
   don't engage whatever it is on the TUNER connector that trips the
   interlock.
-- **A more concrete hardware theory for *why* the interlock exists**: the
-  FT-847 likely has a single internal UART, switched by an analogue mux
-  (e.g. a 4053-style chip) between the MAX232/CAT port on one side and the
-  TUNER connector's `DATA_IN`/`DATA_OUT` pins on the other — i.e. CAT and
-  the TUNER protocol are mutually exclusive not because of a software
-  interlock, but because they physically share the same UART hardware.
-  Re-checking fakeFC's code against this: every single `fc_txinh(true)`
-  call in the sketch is sandwiched directly between two `Serial1`
-  byte-sends (its "RIG" UART, wired to `DATA_IN`/`DATA_OUT`) — it is never
-  asserted standalone, outside an active protocol exchange. That's
-  consistent with the mux theory, but doesn't prove TX INHIBIT itself is
-  what drives the mux, since fakeFC never tries it in isolation — it only
-  shows correlation. Circumstantial evidence points the other way, though:
-  in fakeFC's own schematic, `TX_INH` (pin 8) is a plain, dedicated
-  GPIO-to-GPIO wire, electrically separate from both `DATA_IN`/`DATA_OUT`
-  (the actual muxed UART) and `SENSE` (pin 6) — `SENSE` is the more
-  electrically plausible mux-control candidate, precisely because it
-  isn't part of the UART signal path at all. Still an inference, not a
-  measurement.
-- **This raises the stakes on the bench test below.** If TX INHIBIT itself
-  turns out to be what flips the mux (rather than `SENSE`), CAT would drop
-  out during *every* sequenced transmission — not just ATU tune cycles —
-  since the sequencer asserts TX INHIBIT on every band's up-sequence. The
-  test needs to specifically confirm CAT keeps responding *while TX
-  INHIBIT is actively asserted*, not merely that it responds with the
-  wire connected but idle.
+- **A single-shared-UART mux theory was floated and investigated for *why*
+  the interlock exists**: the idea being the FT-847 has one internal
+  UART, switched by an analogue mux (e.g. a 4053-style chip) between the
+  MAX232/CAT port and the TUNER connector's `DATA_IN`/`DATA_OUT` pins, so
+  CAT and the TUNER protocol would be mutually exclusive at the hardware
+  level. Re-checking fakeFC's code against this: every single
+  `fc_txinh(true)` call in the sketch is sandwiched directly between two
+  `Serial1` byte-sends (its "RIG" UART, wired to `DATA_IN`/`DATA_OUT`) —
+  never asserted standalone. That's consistent with the mux theory, but
+  only shows correlation, not which signal actually drives it.
+- **Resolved with high confidence** by G0AFH's article ["How To Sequence
+  The FT-847"](http://g0afh.com/how-to-sequence-the-ft847/) (the primary
+  source; its content was pasted in directly since the page wouldn't load
+  for this session — a TLS/certificate issue on their server), corroborated
+  by [kl7uw.com/TX-INHIBIT.htm](https://www.kl7uw.com/TX-INHIBIT.htm) and
+  this project's own FT-847 schematic trace:
+  - **Why TX INHIBIT exists at all**: the FT-847 has "VOX always on" —
+    mic PTT, the front-panel MOX switch, *and* the CW key input can each
+    independently put the radio into TX, which is a real risk with a
+    masthead preamp or high-power amp in the chain. Routing PTT itself
+    through sequencer relay contacts is described as the common but
+    imperfect fix (doesn't catch the front-panel MOX switch, and can
+    introduce AC hum / break QSK). TX INHIBIT catches all of these paths
+    uniformly, which is why it's the right mechanism for this project too.
+  - **Polarity confirmed, not just inferred**: "Pulling this signal high
+    prevents the radio from generating any RF." Active-high, directly
+    stated for this exact radio — matching what fakeFC's firmware
+    behaviour had only implied.
+  - **The load-bearing fact for this whole sequencer design, confirmed**:
+    "Keying the microphone, pushing the MOX, or touching the key will
+    still put the radio into TX but no RF will be produced. Usefully the
+    PTT lines from the STANDBY socket still work which make interfacing
+    to an external sequencer even easier." STBY keeps asserting normally
+    regardless of TX INHIBIT state — exactly the assumption the sequencer
+    is built on, now confirmed by someone who's actually built and used
+    this exact technique on this exact radio.
+  - **Reference circuit**: G0AFH's own TX INHIBIT driver is simple — a
+    78L05 5V regulator (powered from TUNER pin 1's ~13.5V, matching this
+    project's own pin 1 reading), a resistor (shown as 1kΩ, noted as
+    "almost certainly" fine up to 10kΩ) and a schottky diode (type
+    non-critical — a BAS16 was used) to pull TX-INH high. No opto-isolator
+    or special circuitry — consistent with fakeFC's own plain-GPIO
+    approach.
+  - **Direct 5V drive confirmed by the actual internal part, datasheet in
+    hand.** Tracing the FT-847's own schematic further: TX INH feeds into
+    the `IN` pin of a **ROHM DTC144E-series digital transistor** (an NPN
+    BJT with built-in bias resistors, `R1 = R2 = 47kΩ`) — a part family
+    whose entire purpose, per ROHM's datasheet, is "built-in bias
+    resistors enable the configuration of an inverter circuit *without
+    connecting external input resistors*." Guaranteed thresholds:
+    `V_I(on)` ≥ 3.0V, `V_I(off)` ≤ 0.5V, input current ≤ 180µA at 5V —
+    directly driving it from D4 (5V logic) with no series resistor, diode,
+    or regulator is exactly this part's intended use, and simpler even
+    than G0AFH's own reference circuit above. **Confirmed against the
+    actual FT-847 schematic**: pin 1 = base (`IN`), pin 2 = emitter
+    (`GND`), pin 3 = collector (`OUT`) — matching the
+    `DTC144EM`/`DTC144EEB`/`DTC144EUB` pinout variant, not the other one.
+    Pin 1 is the input as assumed.
+  - This also confirms the earlier mux-theory worry was unfounded: TX INH
+    runs through transistors to an internal `KEY` node on the keying
+    signal path, not through whatever governs CAT/TUNER-port UART sharing.
+- **The bench test is now a confirmation, not a live architectural
+  risk.** Still worth verifying CAT keeps responding while TX INHIBIT is
+  actively held high, and pinning down its exact polarity/timing against
+  the real radio, but this is no longer expected to threaten the broker
+  architecture the way it looked like it might.
 
 ## Open questions / to be determined
 
@@ -744,17 +784,16 @@ inspection/prior documentation of the connectors themselves.
   drivable directly from D4 with no isolation — but this is inferred from
   a different device's firmware, not measured on this radio directly, so
   worth confirming on the bench.
-- **Critical bench test, elevated priority**: wire up only power/ground/TX
-  INHIBIT (pins 1, 2, 8), leaving `SENSE` and `DATA_IN`/`DATA_OUT`
-  unconnected, then with a PC actively polling CAT on Port 2, assert TX
-  INHIBIT and confirm CAT *keeps responding while it's held high* — not
-  just that it works with the wire connected but idle. This is the test
-  that distinguishes "`SENSE` trips the mux, TX INHIBIT is safe alone"
-  from "TX INHIBIT itself trips the mux" — the latter would mean CAT
-  drops out on every sequenced transmission, not just ATU tune cycles, and
-  would force a redesign. Also confirm asserting TX INHIBIT alone (with no
-  `DATA_IN`/`DATA_OUT` traffic, unlike every case in fakeFC) actually
-  holds off transmission as expected.
+- **Bench test to confirm** (polarity settled as active-high per G0AFH's
+  article, and direct 5V drive confirmed sufficient by the DTC144E
+  datasheet — no longer a live architectural risk, and no external
+  resistor/diode circuit needed): wire up only power/ground/TX INHIBIT
+  (pins 1, 2, 8) with D4 driving TX INHIBIT directly, leaving `SENSE` and
+  `DATA_IN`/`DATA_OUT` unconnected. With a PC actively polling CAT on Port
+  2, assert TX INHIBIT and confirm CAT keeps responding while it's held
+  high, that it actually holds off transmission as expected, and that
+  STBY keeps asserting normally throughout (G0AFH's article says it
+  should).
 - Exact JSON schema for the sequencer config (per-band step timing values,
   band-edge frequency ranges, per-band tune-vs-normal step-inclusion
   flags, + cross-band trigger rule list) — the shape of the data, not just
