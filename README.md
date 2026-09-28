@@ -84,8 +84,9 @@ is talking to the Arduino, which brokers the conversation:
 | D0/D1 (Serial0) | USB debug/control link to PC |
 | D16/D17 (Serial2) | Port 1 — CAT to PC, via MAX202CPE |
 | D14/D15 (Serial3) | Port 2 — CAT to radio, via MAX202CPE |
-| D7 | Tune button (input, polled) |
-| D8 | Tune status LED (output) |
+| D6 | Tune button (input, polled) |
+| D7 | Tune status LED (output) |
+| D8 | Generic activity LED (output) |
 | D9 | ALC injection charge pump (PWM output) |
 | D10 | ALC opto-isolator gate (on/off switch) |
 | D11 | Icom AH-4 `KEY` input, via opto-isolator, `INPUT_PULLUP` |
@@ -116,13 +117,12 @@ interrupt-capable pins — are never touched, so **all six** interrupt pins
 stay free instead of just four. Four of them (D2, D3, D18, D19) are now
 used for the 4 STBY band lines (interrupt-driven, since a TX request
 needs to be caught immediately to start the sequencer); the remaining two
-(D20/D21) stay free of any reservation for I2C. The tune button (D7)
+(D20/D21) stay free of any reservation for I2C. The tune button (D6)
 doesn't need an interrupt-capable pin — it's polled in the main loop — so
-it and the status LED (D8) sit comfortably outside the reserved set. The
-12 sequencer outputs and the shared TX INHIBIT output (D22-D34) are plain
-digital outputs with no special pin requirements, so their exact pin
-numbers are a free choice — the assignment above is a proposal, not yet
-confirmed. The Arduino-side band↔pin mapping for STBY (which of D2/D3/D18/D19
+it and the two status LEDs (D7, D8) sit comfortably outside the reserved
+set. The 20 sequencer outputs (D22-D53) and the shared TX INHIBIT output
+(D4) are plain digital outputs with no special pin requirements. The
+Arduino-side band↔pin mapping for STBY (which of D2/D3/D18/D19
 is HF vs 50 vs 144 vs 430) is likewise our own software's choice; what
 actually matters is wiring it consistently against the STBY jack's real
 per-band wiring (see the STBY jack reference below).
@@ -811,8 +811,9 @@ inspection/prior documentation of the connectors themselves.
   determines whether the external ~10kΩ pull-up in the opto circuit above
   is required or just harmless redundancy. Check with a meter at the AH-4
   end before assuming either way.
-- Debounce/timing behaviour of the physical tune button (D7), and exact
-  blink/status patterns for the tune LED (D8).
+- Debounce/timing behaviour of the physical tune button (D6), exact
+  blink/status patterns for the tune LED (D7), and what the generic
+  activity LED (D8) should actually indicate.
 - **Bench test to confirm** (polarity settled as active-high per G0AFH's
   article, and direct 5V drive confirmed sufficient by the DTC144E
   datasheet — no longer a live architectural risk, and no external
