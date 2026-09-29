@@ -2,3 +2,7 @@ docs/fakeFC
 docs/Hamlib
 **/*.lck
 **/*-backups/*.zip
+.pio/
+.vscode/
+__pycache__/
+*.pyc

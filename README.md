@@ -403,14 +403,44 @@ band's sequencer, configured rather than hardcoded.
   the 4 sequencer bands (see Tune cycle above), and exact sub-band edges
   can vary by license class/region — so, consistent with everything else
   here, they're configurable rather than baked into firmware.
+- **Concrete schema**: see [`config/sequencer.json`](config/sequencer.json)
+  for a full worked example (including the 50MHz→144MHz preamp-protection
+  rule above). Top level: `schema_version` (lets firmware reject/fall back
+  on a shape it doesn't understand), `bands` (keyed `"HF"`/`"50M"`/
+  `"144M"`/`"430M"`, each with `freq_min_hz`/`freq_max_hz`, a `timing_ms`
+  object with the four up-sequence step delays — the down-sequence mirrors
+  these, so there's nothing separate to configure there — and a
+  `tune_profile` object of `seq1`/`seq2`/`seq3` booleans), and
+  `cross_band_triggers` (an array of `{source_band, target_band,
+  target_output}`). The example file's band edges are placeholder IARU
+  Region 1 values — adjust for actual license/region.
+- **Transport protocol, over Serial0**: PC sends `CONFIG\n`. Firmware
+  responds `READY\n` and switches into "awaiting JSON" mode. PC streams
+  the raw JSON bytes; firmware parses with ArduinoJson's stream parser
+  (`deserializeJson(doc, Serial)`, which reads exactly one JSON value and
+  stops — no explicit end-marker needed), validates it, writes it to
+  EEPROM, and replies `OK\n` or `ERROR: <reason>\n`. Outside that
+  handshake, Serial0 behaves exactly as it always does (debug logging,
+  etc.) — this is a small carve-out, not a separate mode that changes
+  anything else about the port.
+- **PC-side helper**: [`tools/send_config.py`](tools/send_config.py) —
+  validates the JSON is well-formed *before* touching the serial port
+  (fails fast with a clear Python error rather than a round-trip to the
+  device), then runs the handshake above and prints the Arduino's
+  response. Makes a config change a one-command action:
+  `python3 tools/send_config.py config/sequencer.json /dev/ttyACM0`.
+  Requires `pip install pyserial`.
 
 ### Debug/control port
 
-Serial0 (USB) is available for logging Arduino/CAT activity and for local
-control of the sequencer, independent of the CAT passthrough path. This is
-also the transport for loading the sequencer's JSON config (band timing,
-cross-band trigger rules) at runtime — see "Sequencer configuration and
-cross-band triggers" above.
+Serial0 (USB) runs at **115200 baud** — deliberately faster than, and
+independent of, the CAT link's 57600 (Serial2/Serial3 are constrained to
+match the radio's CAT-rate menu; Serial0 is a USB virtual serial port with
+no such constraint). Available for logging Arduino/CAT activity and for
+local control of the sequencer, independent of the CAT passthrough path.
+This is also the transport for loading the sequencer's JSON config (band
+timing, cross-band trigger rules) at runtime — see "Sequencer
+configuration and cross-band triggers" above.
 
 ## Yaesu FT-847 CAT protocol (reference)
 
@@ -824,13 +854,11 @@ inspection/prior documentation of the connectors themselves.
   high, that it actually holds off transmission as expected, and that
   STBY keeps asserting normally throughout (G0AFH's article says it
   should).
-- Exact JSON schema for the sequencer config (per-band step timing values,
-  band-edge frequency ranges, per-band tune-vs-normal step-inclusion
-  flags, + cross-band trigger rule list) — the shape of the data, not just
-  its semantics, still needs designing, along with the wire format for
-  loading/updating it over Serial0.
 - Default/fallback timing, band-edge, and tune-profile values to ship
-  with, for when EEPROM is empty or invalid on first boot.
+  with, for when EEPROM is empty or invalid on first boot — plausibly just
+  `config/sequencer.json`'s own values, embedded at build time, but the
+  exact mechanism (generated from that file vs. a hand-written fallback
+  table) hasn't been decided.
 - **Implementation mechanism for "suppress this band's STBY handling
   while a tune cycle holds it"** — likely a simple per-band flag/state the
   interrupt handler checks before acting, but needs designing alongside
