@@ -1,16 +1,17 @@
 #include "sequencer.h"
 
-constexpr uint16_t GAP_MS = 300;
-
-const SequencerConfig DEFAULT_SEQUENCER_CONFIG = {{
-    // Band edges are the placeholder IARU Region 1 values from config/sequencer.json.
-    // HF: tune profile skips SEQ3
-    {1800000, 29700000, {GAP_MS, GAP_MS, GAP_MS}, {true, true, false}},
-    // 50M, 144M, 430M
-    {50000000, 54000000, {GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
-    {144000000, 146000000, {GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
-    {430000000, 440000000, {GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
-}};
+const SequencerConfig DEFAULT_SEQUENCER_CONFIG = {
+    {
+        // Band edges are the placeholder IARU Region 1 values.
+        // HF: tune profile skips SEQ3
+        {1800000, 29700000, {50, 50, 20}, {true, true, false}},
+        {50000000, 54000000, {50, 50, 20}, {true, true, true}},   // 50M
+        {144000000, 146000000, {50, 50, 20}, {true, true, true}}, // 144M
+        {430000000, 440000000, {50, 50, 20}, {true, true, true}}, // 430M
+    },
+    0,
+    {},
+};
 
 int8_t bandForFrequency(const SequencerConfig &cfg, uint32_t hz) {
   for (uint8_t b = 0; b < SEQ_BANDS; b++) {
@@ -116,6 +117,13 @@ void Sequencer::poll(uint32_t now) {
   for (uint8_t b = 0; b < SEQ_BANDS; b++) pollBand(b, now);
 }
 
+bool Sequencer::allIdle() const {
+  for (uint8_t b = 0; b < SEQ_BANDS; b++) {
+    if (band_[b].state != State::Idle) return false;
+  }
+  return true;
+}
+
 SequencerOutputs Sequencer::outputs() const {
   SequencerOutputs o = {};
   for (uint8_t b = 0; b < SEQ_BANDS; b++) {
@@ -124,6 +132,12 @@ SequencerOutputs Sequencer::outputs() const {
     o.tx[b] = st.txLed;
     for (uint8_t s = 0; s < SEQ_STAGES; s++) o.seq[b][s] = st.on[s];
     if (st.state == State::Up) o.txInhibit = true;
+  }
+  // Cross-band triggers follow the source band's SEQ1 output. They run after the
+  // loop so a rule's source reflects that band's own sequence only.
+  for (uint8_t i = 0; i < cfg_->triggerCount; i++) {
+    const CrossBandTrigger &t = cfg_->trigger[i];
+    if (band_[t.sourceBand].on[0]) o.seq[t.targetBand][t.targetStage] = true;
   }
   return o;
 }

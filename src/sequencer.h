@@ -23,12 +23,26 @@ struct BandConfig {
   bool tuneProfile[SEQ_STAGES]; // stage engaged during a tune cycle?
 };
 
+// Cross-band trigger: while the source band's SEQ1 is on, the target band's
+// output `targetStage` (0 = SEQ1 .. 2 = SEQ3) is forced on, snapping on and off
+// with it. Rules only ever turn outputs on: several rules aimed at the same
+// output, or an output the target band's own sequence already has on, just OR.
+struct CrossBandTrigger {
+  uint8_t sourceBand;
+  uint8_t targetBand;
+  uint8_t targetStage;
+};
+constexpr uint8_t MAX_TRIGGERS = 8;
+
 struct SequencerConfig {
   BandConfig band[SEQ_BANDS];
+  uint8_t triggerCount;
+  CrossBandTrigger trigger[MAX_TRIGGERS];
 };
 
-// Built-in defaults. All gaps are 300ms for easy bench visibility; the tune
-// profiles are from config/sequencer.json (HF skips SEQ3).
+// Built-in fallback, used when EEPROM is empty or invalid: the band edges, timing
+// and tune profiles of config/sequencer.json (a native test keeps them in
+// step), with no cross-band triggers.
 extern const SequencerConfig DEFAULT_SEQUENCER_CONFIG;
 
 // Index of the band containing hz, or -1 if it is in none of them.
@@ -63,6 +77,7 @@ public:
 
   SequencerOutputs outputs() const;
 
+  bool allIdle() const;
   bool idle(uint8_t band) const { return band_[band].state == State::Idle; }
   bool active(uint8_t band) const { return band_[band].state == State::Active; }
 

@@ -3,6 +3,7 @@
 #include "cat_bridge.h"
 #include "cat_codec.h"
 #include "sequencer.h"
+#include "sequencer_io.h"
 
 constexpr uint32_t PTT_ARM_MS = 5000;
 constexpr uint32_t PTT_MAX_ON_MS = 3000;
@@ -43,7 +44,7 @@ static void reportFreqMode(const uint8_t *r) {
   }
   haveMode = true;
   lastMode = r[4];
-  int8_t band = bandForFrequency(DEFAULT_SEQUENCER_CONFIG, hz);
+  int8_t band = bandForFrequency(sequencerIoConfig(), hz);
   Serial.print(F("radio: "));
   printMHz(hz);
   Serial.print(F(" MHz "));

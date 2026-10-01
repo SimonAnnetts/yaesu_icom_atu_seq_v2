@@ -177,9 +177,8 @@ it's about to transmit on — a tune cycle keys PTT just like any other
 transmission, and the sequencer's relay chain has to be up before RF
 appears, exactly as it would for a normal transmission.
 
-It's not yet confirmed whether a CAT-commanded PTT naturally asserts the
-radio's STBY line(s) with enough lead time for the existing STBY-driven
-sequencer (see "Sequencer" below) to run on its own — that's untested.
+A CAT-commanded PTT does assert the radio's STBY line(s) (bench-verified —
+see "Bench results" below), but the lead time before RF is still unmeasured.
 Rather than depend on that, the tune cycle **explicitly drives the
 sequencer itself**, calling the same up/down-sequence logic the STBY
 interrupt handler uses, directly and proactively:
@@ -286,8 +285,8 @@ A 4-band amplifier/relay sequencer. It runs primarily off the radio's
 STBY jack, not CAT, so it works identically whether the PC or even the
 CAT link is present at all — but its up/down-sequence logic is also
 called directly and proactively by the ATU tune cycle (see above), since
-it's not yet confirmed that a CAT-commanded PTT asserts STBY with enough
-lead time on its own. Both trigger paths call the same up/down-sequence
+a CAT-commanded PTT does assert STBY (bench-verified) but its lead time
+before RF is unmeasured. Both trigger paths call the same up/down-sequence
 function, which is safely re-entrant/idempotent **as long as both callers
 are applying the same profile**. They aren't always: a tune cycle
 deliberately uses each band's "tune" profile (which may skip stages like
@@ -357,8 +356,8 @@ when that hold starts and ends.
   while something is connected to the TUNER port — but that interlock is
   believed to be tripped specifically by the connector's separate Tuner
   Sense pin, which is deliberately left unconnected. See the reference
-  section below for the full reasoning; still worth a bench check before
-  relying on it in the field.
+  section below for the full reasoning. Bench-verified: CAT keeps working
+  with this wiring (see "Bench results").
 
 ### Sequencer configuration and cross-band triggers
 
@@ -396,7 +395,11 @@ band's sequencer, configured rather than hardcoded.
   before RF appears) and release is always the mirror — source `SEQ1`
   turning off on the way down. The target output snaps on/off immediately
   when triggered; it does not phase in on its own band's normal step
-  delay. No per-rule timing/trigger-stage options — if finer control turns
+  delay. Rules only ever switch an output *on*: several rules aimed at the
+  same output, or an output the target band's own sequence already has
+  on, simply OR together — a rule can never switch off something the
+  target's own sequence is holding. The target band's RX LED is untouched
+  (the band isn't transmitting). No per-rule timing/trigger-stage options — if finer control turns
   out to be needed later, that's a schema extension, not a redesign.
 - **Band-edge frequency ranges also belong in this config**, not
   hardcoded: the ATU tune cycle needs to map "current frequency" to one of
@@ -415,19 +418,37 @@ band's sequencer, configured rather than hardcoded.
   target_output}`). The example file's band edges are placeholder IARU
   Region 1 values — adjust for actual license/region.
 - **Transport protocol, over Serial0**: PC sends `CONFIG\n`. Firmware
-  responds `READY\n` and switches into "awaiting JSON" mode. PC streams
-  the raw JSON bytes; firmware parses with ArduinoJson's stream parser
-  (`deserializeJson(doc, Serial)`, which reads exactly one JSON value and
-  stops — no explicit end-marker needed), validates it, writes it to
-  EEPROM, and replies `OK\n` or `ERROR: <reason>\n`. Outside that
-  handshake, Serial0 behaves exactly as it always does (debug logging,
-  etc.) — this is a small carve-out, not a separate mode that changes
-  anything else about the port.
+  responds `READY\n` and switches into "awaiting JSON" mode. The PC streams
+  the JSON object; the firmware collects it without blocking (the sequencer
+  and CAT bridge keep running), dropping whitespace outside strings as it
+  arrives, and stops at the object's closing brace — no end-marker needed.
+  The collected text may be at most 1024 characters (whitespace excluded),
+  and the upload is abandoned with an error if the port goes quiet for 3
+  seconds. The firmware then validates it (structure, types, band edges
+  ordered and non-overlapping, timings 0–5000ms, at most 8 trigger rules),
+  applies it, writes it to EEPROM, and replies `OK\n` — or
+  `ERROR: <reason>\n`, in which case the previous config stays in force.
+  `CONFIG` is refused with `ERROR: busy...` (instead of `READY`) while any
+  band is transmitting, so a config change can't disturb a live
+  transmission. Outside that handshake Serial0 behaves exactly as it always
+  does (debug logging, etc.) — this is a small carve-out, not a separate
+  mode that changes anything else about the port.
+- **EEPROM image**: magic, layout version, length, a field-by-field
+  little-endian payload and a CRC-16, so padding or compiler changes can't
+  matter, and any corruption (or erased EEPROM) is rejected. A loaded
+  image is re-validated with the same rules as an uploaded config.
+- **Built-in fallback**: if EEPROM is empty or invalid, the firmware runs
+  from a compiled-in table with the band edges, timing and tune profiles
+  of `config/sequencer.json` and **no** cross-band triggers; a native test
+  keeps the table in step with that file. `config/sequencer-bench.json` is
+  the same config with every timing at 300ms, for easy visibility on the
+  bench.
 - **PC-side helper**: [`tools/send_config.py`](tools/send_config.py) —
   validates the JSON is well-formed *before* touching the serial port
   (fails fast with a clear Python error rather than a round-trip to the
-  device), then runs the handshake above and prints the Arduino's
-  response. Makes a config change a one-command action:
+  device), waits out the Mega's reset on port open, then runs the
+  handshake above (skipping any log lines the firmware prints in between)
+  and prints the Arduino's response. Makes a config change a one-command action:
   `python3 tools/send_config.py config/sequencer.json /dev/ttyACM0`.
   Requires `pip install pyserial`.
 
@@ -757,9 +778,9 @@ inspection/prior documentation of the connectors themselves.
   specifically by the separate Tuner Sense pin, not by TXINH/power/ground.
   By leaving Tuner Sense unconnected and wiring only power, ground, and
   TX INHIBIT, the radio should never detect a tuner as "present" and CAT
-  should keep working normally. **This is a belief, not yet bench-verified
-  against this specific radio** — worth confirming with a simple test
-  (wire it up, confirm CAT still responds on Port 2) before relying on it.
+  should keep working normally. **Bench-verified on this radio** — with only pins 1, 2 and 8 wired
+  and Tuner Sense unconnected, CAT still responds on Port 2 (see "Bench
+  results").
 - **The YT-847 precedent** supports this being a reasonable approach: its
   manual's install steps connect its interface cable to *both* the TUNER
   jack and the CAT jack simultaneously, and CAT still works for it — its
@@ -835,6 +856,27 @@ inspection/prior documentation of the connectors themselves.
   the real radio, but this is no longer expected to threaten the broker
   architecture the way it looked like it might.
 
+## Bench results
+
+Verified on the real FT-847 with the test jig (TX INHIBIT, the four STBY
+lines and CAT connected; TUNER Sense unconnected):
+
+- **Pin map**: every output and input checked against `src/pins.h`
+  (walk-test, Phase 0). LEDs and optos are active-high; `START` idles low.
+- **STBY**: the radio pulls the correct band's STBY line low on PTT, on
+  all four bands, for both manual PTT and **CAT-commanded PTT** (`0x08`).
+- **TX INHIBIT (D4 → TUNER pin 8)**: works as designed. No RF was observed
+  between STBY asserting and TX INHIBIT asserting, driving it from the
+  main loop (not the ISR) — so the loop is fast enough as things stand.
+  No latency figure has been measured.
+- **CAT with the TUNER connector wired** (pins 1, 2, 8 only): CAT keeps
+  working through the Arduino, including while TX INHIBIT is held during a
+  sequence and with flrig polling.
+- **CAT bridge**: transparent passthrough to flrig over an extended
+  session with no stray, torn or timed-out frames.
+- **Arduino-originated CAT** on Port 2 (freq/mode, TX status, set mode,
+  PTT) works standalone and alongside a PC polling at full rate.
+
 ## Open questions / to be determined
 
 - Whether the real AH-4 already has its own internal pull-up on `START` —
@@ -844,21 +886,6 @@ inspection/prior documentation of the connectors themselves.
 - Debounce/timing behaviour of the physical tune button (D6), exact
   blink/status patterns for the tune LED (D7), and what the generic
   activity LED (D8) should actually indicate.
-- **Bench test to confirm** (polarity settled as active-high per G0AFH's
-  article, and direct 5V drive confirmed sufficient by the DTC144E
-  datasheet — no longer a live architectural risk, and no external
-  resistor/diode circuit needed): wire up only power/ground/TX INHIBIT
-  (pins 1, 2, 8) with D4 driving TX INHIBIT directly, leaving `SENSE` and
-  `DATA_IN`/`DATA_OUT` unconnected. With a PC actively polling CAT on Port
-  2, assert TX INHIBIT and confirm CAT keeps responding while it's held
-  high, that it actually holds off transmission as expected, and that
-  STBY keeps asserting normally throughout (G0AFH's article says it
-  should).
-- Default/fallback timing, band-edge, and tune-profile values to ship
-  with, for when EEPROM is empty or invalid on first boot — plausibly just
-  `config/sequencer.json`'s own values, embedded at build time, but the
-  exact mechanism (generated from that file vs. a hand-written fallback
-  table) hasn't been decided.
 - **Implementation mechanism for "suppress this band's STBY handling
   while a tune cycle holds it"** — likely a simple per-band flag/state the
   interrupt handler checks before acting, but needs designing alongside
@@ -867,8 +894,7 @@ inspection/prior documentation of the connectors themselves.
 - Whether cross-band trigger rules should really apply unconditionally
   regardless of tune-vs-normal profile (the stated default above), or
   whether that too should be configurable per rule.
-- **Bench-verify whether a CAT-commanded PTT asserts the radio's STBY
-  line(s) at all, and if so with enough lead time** for the STBY-driven
-  sequencer path to be useful rather than purely redundant alongside the
-  tune cycle's explicit trigger call (see Tune cycle above). Doesn't block
-  building the explicit-call path, but worth knowing either way.
+- **STBY-to-RF lead time** (manual and CAT PTT) hasn't been measured; no
+  RF was seen leaking before TX INHIBIT asserted, but there's no figure
+  yet. Needs a scope capture of STBY falling against D4 rising and RF
+  onset.

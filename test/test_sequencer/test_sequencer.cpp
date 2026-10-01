@@ -165,10 +165,71 @@ void test_millis_wraparound() {
   expectBand(HF, false, true, true, true, true);
 }
 
-void test_default_config_is_300ms() {
-  for (auto &b : DEFAULT_SEQUENCER_CONFIG.band) {
-    for (auto g : b.gapMs) TEST_ASSERT_EQUAL(300, g);
-  }
+void test_default_config_has_no_triggers() {
+  TEST_ASSERT_EQUAL(0, DEFAULT_SEQUENCER_CONFIG.triggerCount);
+}
+
+// 50M -> 144M SEQ1, as in config/sequencer.json
+static void addPreampRule() {
+  cfg.triggerCount = 1;
+  cfg.trigger[0] = {M50, 2, 0};
+}
+
+void test_trigger_follows_source_seq1() {
+  addPreampRule();
+  seq->stby(M50, true, 0);
+  seq->poll(0);
+  TEST_ASSERT_TRUE(seq->outputs().seq[2][0]); // 144M SEQ1 snaps on with 50M SEQ1
+  expectBand(2, true, true, false, false, false); // ...and only that output; its RX stays lit
+  advance(1, 300);
+  expectBand(2, true, true, false, false, false); // 50M's later stages don't spread
+  seq->stby(M50, false, 400);
+  advance(400, 700); // 50M down-sequence: SEQ1 drops last
+  expectBand(2, true, false, false, false, false);
+  TEST_ASSERT_TRUE(seq->idle(M50));
+}
+
+void test_trigger_holds_until_source_seq1_off() {
+  addPreampRule();
+  seq->stby(M50, true, 0);
+  advance(0, 300);
+  seq->stby(M50, false, 400);
+  advance(400, 419); // TX off, SEQ3 not yet down
+  TEST_ASSERT_TRUE(seq->outputs().seq[2][0]);
+  advance(420, 600); // SEQ3 (20), SEQ2 (60), then SEQ1 (50) at +130
+  TEST_ASSERT_FALSE(seq->outputs().seq[2][0]);
+}
+
+void test_trigger_ors_with_target_own_sequence() {
+  addPreampRule();
+  seq->stby(2, true, 0); // 144M transmitting itself
+  advance(0, 300);
+  seq->stby(M50, true, 301);
+  seq->poll(301);
+  seq->stby(M50, false, 302);
+  advance(302, 800);
+  // 50M finished: the rule must not have switched off 144M's own SEQ1
+  expectBand(2, false, true, true, true, true);
+}
+
+void test_two_rules_same_output() {
+  cfg.triggerCount = 2;
+  cfg.trigger[0] = {M50, 2, 0};
+  cfg.trigger[1] = {HF, 2, 0};
+  seq->stby(M50, true, 0);
+  seq->stby(HF, true, 0);
+  seq->poll(0);
+  TEST_ASSERT_TRUE(seq->outputs().seq[2][0]);
+  seq->stby(M50, false, 10);
+  advance(10, 300); // 50M finishes, HF still up
+  TEST_ASSERT_TRUE(seq->idle(M50));
+  TEST_ASSERT_TRUE(seq->outputs().seq[2][0]);
+}
+
+void test_all_idle() {
+  TEST_ASSERT_TRUE(seq->allIdle());
+  seq->stby(HF, true, 0);
+  TEST_ASSERT_FALSE(seq->allIdle());
 }
 
 void test_band_for_frequency() {
@@ -196,7 +257,12 @@ int main() {
   RUN_TEST(test_tune_profile_skips_stage);
   RUN_TEST(test_hold_suppresses_stby_only);
   RUN_TEST(test_millis_wraparound);
-  RUN_TEST(test_default_config_is_300ms);
+  RUN_TEST(test_default_config_has_no_triggers);
+  RUN_TEST(test_trigger_follows_source_seq1);
+  RUN_TEST(test_trigger_holds_until_source_seq1_off);
+  RUN_TEST(test_trigger_ors_with_target_own_sequence);
+  RUN_TEST(test_two_rules_same_output);
+  RUN_TEST(test_all_idle);
   RUN_TEST(test_band_for_frequency);
   return UNITY_END();
 }

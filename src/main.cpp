@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "cat_bridge.h"
+#include "config_io.h"
 #include "pins.h"
 #include "radio.h"
 #include "sequencer_io.h"
@@ -78,6 +79,7 @@ void setup() {
   catBridgeBegin();
 
   startAlcPump();
+  configIoBegin();
   sequencerIoBegin();
 
   Serial.println(F("ALC pump PWM on D9: ~14.9kHz, gate (D10) off"));
@@ -87,10 +89,12 @@ void setup() {
 void loop() {
   while (Serial.available()) {
     char c = Serial.read();
+    if (configIoHandleChar(c)) continue; // a config upload is in progress
     if (walktestHandleChar(c)) continue;
     catBridgeHandleChar(c);
     radioHandleChar(c);
   }
+  configIoPoll();
   walktestPoll();
   if (walktestActive()) return; // bench walk-test owns the pins and Serial0
 

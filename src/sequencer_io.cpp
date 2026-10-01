@@ -12,7 +12,8 @@ static_assert(BAND_COUNT == SEQ_BANDS, "pins.h Band and sequencer band counts di
 constexpr uint32_t STBY_RELEASE_DEBOUNCE_MS = 5;
 constexpr int LOG_LINE_MAX = 60;
 
-static Sequencer sequencer(DEFAULT_SEQUENCER_CONFIG);
+static SequencerConfig activeConfig = DEFAULT_SEQUENCER_CONFIG;
+static Sequencer sequencer(activeConfig);
 
 // ISRs only note that a falling edge (STBY assert) happened; the loop acts on
 // it. That way an assert pulse shorter than one loop pass is still seen.
@@ -39,6 +40,14 @@ void sequencerIoBegin() {
 }
 
 void sequencerIoInvalidate() { lastValid = false; }
+
+const SequencerConfig &sequencerIoConfig() { return activeConfig; }
+
+bool sequencerIoApplyConfig(const SequencerConfig &cfg) {
+  if (!sequencer.allIdle()) return false;
+  activeConfig = cfg;
+  return true;
+}
 
 static void pollStby(uint32_t now) {
   noInterrupts();
