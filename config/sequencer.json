@@ -9,7 +9,12 @@
         "seq2_to_seq3": 50,
         "seq3_to_tx": 20
       },
-      "tune_profile": { "seq1": true, "seq2": true, "seq3": false }
+      "tune_profile": {
+        "seq1": true,
+        "seq2": true,
+        "seq3": false
+      },
+      "atu": true
     },
     "50M": {
       "freq_min_hz": 50000000,
@@ -19,7 +24,12 @@
         "seq2_to_seq3": 50,
         "seq3_to_tx": 20
       },
-      "tune_profile": { "seq1": true, "seq2": true, "seq3": true }
+      "tune_profile": {
+        "seq1": true,
+        "seq2": true,
+        "seq3": true
+      },
+      "atu": true
     },
     "144M": {
       "freq_min_hz": 144000000,
@@ -29,7 +39,12 @@
         "seq2_to_seq3": 50,
         "seq3_to_tx": 20
       },
-      "tune_profile": { "seq1": true, "seq2": true, "seq3": true }
+      "tune_profile": {
+        "seq1": true,
+        "seq2": true,
+        "seq3": true
+      },
+      "atu": false
     },
     "430M": {
       "freq_min_hz": 430000000,
@@ -39,10 +54,19 @@
         "seq2_to_seq3": 50,
         "seq3_to_tx": 20
       },
-      "tune_profile": { "seq1": true, "seq2": true, "seq3": true }
+      "tune_profile": {
+        "seq1": true,
+        "seq2": true,
+        "seq3": true
+      },
+      "atu": false
     }
   },
   "cross_band_triggers": [
-    { "source_band": "50M", "target_band": "144M", "target_output": "seq1" }
+    {
+      "source_band": "50M",
+      "target_band": "144M",
+      "target_output": "seq1"
+    }
   ]
 }

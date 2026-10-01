@@ -20,7 +20,8 @@ static int8_t bandIndex(const char *name) {
   return -1;
 }
 
-static bool parseBand(JsonVariantConst v, const char *name, BandConfig &out, char *err, size_t n) {
+static bool parseBand(JsonVariantConst v, const char *name, uint8_t index, BandConfig &out, char *err,
+                      size_t n) {
   if (!v.is<JsonObjectConst>()) {
     fail(err, n, "band %s: missing or not an object", name);
     return false;
@@ -64,6 +65,18 @@ static bool parseBand(JsonVariantConst v, const char *name, BandConfig &out, cha
       return false;
     }
     out.tuneProfile[i] = f.as<bool>();
+  }
+
+  // Optional: may the tune cycle run on this band? Absent means the tuner is
+  // assumed to cover HF and 50M (an AH-4 does; VHF/UHF it does not).
+  JsonVariantConst atu = v["atu"];
+  if (atu.isNull()) {
+    out.atu = index <= 1;
+  } else if (atu.is<bool>()) {
+    out.atu = atu.as<bool>();
+  } else {
+    fail(err, n, "band %s: atu is not true/false", name);
+    return false;
   }
   return true;
 }
@@ -122,7 +135,7 @@ bool configFromJson(JsonVariantConst root, SequencerConfig &out, char *err, size
 
   SequencerConfig cfg = {};
   for (uint8_t i = 0; i < SEQ_BANDS; i++) {
-    if (!parseBand(bands[BAND_KEYS[i]], BAND_KEYS[i], cfg.band[i], err, errLen)) return false;
+    if (!parseBand(bands[BAND_KEYS[i]], BAND_KEYS[i], i, cfg.band[i], err, errLen)) return false;
   }
   if (!parseTriggers(root["cross_band_triggers"], cfg, err, errLen)) return false;
 

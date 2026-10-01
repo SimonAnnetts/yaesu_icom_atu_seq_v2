@@ -250,9 +250,10 @@ interrupt handler uses, directly and proactively:
 7. Wait for the ATU to signal that its tune cycle has completed: `KEY`
    releasing and staying released is success; `KEY` releasing for ~20ms,
    re-asserting for ~200ms, then releasing is the AH-4's "not tuned"
-   signal. (An EDX-2 that gives up early looks like a success, only
-   shorter: judge a tune by the SWR and by how long `KEY` was asserted,
-   which the log shows.)
+   signal. (A short `KEY` is not necessarily a failure: an EDX-2 with a
+   stored match for the frequency finishes quickly, and the match only
+   shows in the SWR on the next key-up. The log shows how long `KEY` was
+   asserted; the real judge is the SWR afterwards.)
 8. Unkey the radio's PTT **immediately on `KEY`'s first release** (the
    tuner never switches its relays under power, and an Icom radio stops
    transmitting the moment `KEY` goes away).
@@ -286,7 +287,7 @@ interrupt handler uses, directly and proactively:
   locked out.
 - **Refusals** (nothing is left changed): a band already transmitting, the
   radio reporting it is transmitting, a frequency in no band, a band the AH-4
-  doesn't cover (only HF and 50MHz for now; `tuneBandSupported()`), no usable
+  isn't enabled for (the config's per-band `atu` flag), no usable
   answer to a CAT query (including a mode byte that couldn't be restored).
 - **Tune LED (D7):** solid while a cycle runs; three slow blinks on
   success; fast blinking for about a second on failure or refusal; dark
@@ -478,7 +479,11 @@ band's sequencer, configured rather than hardcoded.
   `"144M"`/`"430M"`, each with `freq_min_hz`/`freq_max_hz`, a `timing_ms`
   object with the three up-sequence step delays (`seq1_to_seq2`, `seq2_to_seq3`, `seq3_to_tx`) — the down-sequence mirrors
   these, so there's nothing separate to configure there — and a
-  `tune_profile` object of `seq1`/`seq2`/`seq3` booleans), and
+  `tune_profile` object of `seq1`/`seq2`/`seq3` booleans, and an optional
+  `atu` boolean saying whether the tune cycle may run on that band — absent
+  means on for HF and 50M and off for 144/430MHz, the coverage of an AH-4; an
+  Alinco EDX-2, which cannot tune 50MHz, sets `"atu": false` there, as
+  `config/sequencer-bench.json` does), and
   `cross_band_triggers` (an array of `{source_band, target_band,
   target_output}`). The example file's band edges are placeholder IARU
   Region 1 values — adjust for actual license/region.
@@ -499,7 +504,9 @@ band's sequencer, configured rather than hardcoded.
   does (debug logging, etc.) — this is a small carve-out, not a separate
   mode that changes anything else about the port.
 - **EEPROM image**: magic, layout version, length, a field-by-field
-  little-endian payload and a CRC-16, so padding or compiler changes can't
+  little-endian payload (the per-band `atu` flags sit at the end, so images
+  saved before they existed still load, with the default coverage) and a
+  CRC-16, so padding or compiler changes can't
   matter, and any corruption (or erased EEPROM) is rejected. A loaded
   image is re-validated with the same rules as an uploaded config.
 - **Built-in fallback**: if EEPROM is empty or invalid, the firmware runs
@@ -995,6 +1002,10 @@ lines and CAT connected; TUNER Sense unconnected):
   for 3.1s and 4.0s (two runs, 18.14MHz and 14.3MHz) and the SWR ends close
   to 1.0 — a real tune, and the radio's original mode (AM already, and CW)
   restored afterwards. The default tune now keys at `START`.
+  The EDX-2 appears to have tuning memories, so a repeat tune on a frequency
+  it already knows can finish in well under a second, and it only switches
+  its matched network in after `KEY` releases and the radio has unkeyed, so
+  the SWR still reads high as the cycle ends and is ~1.0 on the next key-up.
   Along the way: `KEY` asserts ≈31ms after `START` is released (any hold
   length), and spurious STBY pulses on the 430M line while HF transmitted
   (probably RF pickup) are why every band's STBY is held during a tune.
@@ -1014,9 +1025,6 @@ lines and CAT connected; TUNER Sense unconnected):
   AM mode can do 25W. Calibrate the RF power setting and ALC level for
   about 10W on a power meter. The transmit-status meter bits (`0xF7`,
   bits 4:0) might allow a sanity check from the Arduino.
-- **Bands the AH-4 can tune**: it covers 160–6m, not 2m/70cm, so the tune
-  cycle should probably refuse 144/430MHz — possibly a per-band flag in
-  the config.
 - **Tuner reset on band change**: Icom radios reset the AH-4 (a ~70ms
   `START` pulse) when the band changes so a stale tuning network isn't
   left in circuit. Nothing here does that yet; the band is known at each

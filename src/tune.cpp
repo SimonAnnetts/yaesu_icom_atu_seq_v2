@@ -136,7 +136,7 @@ void TuneCycle::onOpDone(Kind k, bool ok, uint32_t now) {
       origMode_ = reply_[4];
       band_ = env_.bandForFreq(freqHz_);
       if (band_ < 0) { enterTail(TuneOutcome::Refused, TuneReason::NoBand, now); break; }
-      if (!tuneBandSupported((uint8_t)band_)) {
+      if (!env_.atuAllowed((uint8_t)band_)) {
         enterTail(TuneOutcome::Refused, TuneReason::BandUnsupported, now);
         break;
       }

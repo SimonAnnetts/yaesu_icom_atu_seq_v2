@@ -104,6 +104,7 @@ size_t configSerialize(const SequencerConfig &cfg, uint8_t *buf, size_t cap) {
     w.u8(cfg.trigger[i].targetBand);
     w.u8(cfg.trigger[i].targetStage);
   }
+  for (uint8_t b = 0; b < SEQ_BANDS; b++) w.u8(cfg.band[b].atu ? 1 : 0); // added after v1 images existed
   if (!w.ok) return 0;
   size_t payload = w.n - HEADER_LEN;
   buf[5] = payload & 0xFF;
@@ -156,6 +157,16 @@ bool configDeserialize(const uint8_t *buf, size_t len, SequencerConfig &out, con
     cfg.trigger[i].sourceBand = r.u8();
     cfg.trigger[i].targetBand = r.u8();
     cfg.trigger[i].targetStage = r.u8();
+  }
+  // Images written before the per-band ATU flag existed end here: keep the old
+  // behaviour (HF and 50M on) for them.
+  size_t left = payload - r.n;
+  if (left != 0 && left != SEQ_BANDS) {
+    err = "payload size does not match layout";
+    return false;
+  }
+  for (uint8_t b = 0; b < SEQ_BANDS; b++) {
+    cfg.band[b].atu = left ? r.u8() != 0 : b <= 1;
   }
   if (!r.ok || r.n != payload) {
     err = "payload size does not match layout";

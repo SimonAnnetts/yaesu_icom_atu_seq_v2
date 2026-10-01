@@ -24,6 +24,7 @@ public:
   bool seqActive(uint8_t band) override { return sequencerIoActive(band); }
   bool seqIdle(uint8_t band) override { return sequencerIoIdle(band); }
   int8_t bandForFreq(uint32_t hz) override { return bandForFrequency(sequencerIoConfig(), hz); }
+  bool atuAllowed(uint8_t band) override { return sequencerIoConfig().band[band].atu; }
   bool ah4Begin(uint32_t) override { return ::ah4Begin(); }
   bool ah4KeySeen() override { return ::ah4KeySeen(); }
   bool ah4KeyReleased() override { return ::ah4KeyReleased(); }
@@ -63,7 +64,7 @@ const __FlashStringHelper *reasonText(TuneReason r) {
     case TuneReason::BusTimeout: return F("could not claim the CAT bus");
     case TuneReason::CatFailed: return F("CAT query failed or gave an unusable answer");
     case TuneReason::NoBand: return F("frequency is not in any configured band");
-    case TuneReason::BandUnsupported: return F("the ATU does not cover this band");
+    case TuneReason::BandUnsupported: return F("the ATU is not enabled for this band (config \"atu\")");
     case TuneReason::SequencerTimeout: return F("sequencer never came up");
     case TuneReason::Ah4Busy: return F("START still held from a previous cycle");
     case TuneReason::KeyStuck: return F("KEY already asserted before START");

@@ -34,6 +34,7 @@ public:
   virtual bool seqActive(uint8_t band) = 0;
   virtual bool seqIdle(uint8_t band) = 0;
   virtual int8_t bandForFreq(uint32_t hz) = 0;
+  virtual bool atuAllowed(uint8_t band) = 0; // the config's per-band "atu" flag
   // AH-4
   virtual bool ah4Begin(uint32_t now) = 0;
   virtual bool ah4KeySeen() = 0;
@@ -51,9 +52,6 @@ constexpr uint32_t TUNE_SEQ_TIMEOUT_MS = 16000; // 3 stages x 5000ms max + margi
 constexpr uint32_t TUNE_DRY_DWELL_MS = 1000;
 constexpr uint32_t TUNE_CARRIER_MS = 2000;
 constexpr uint8_t TUNE_MODE_RESTORE_TRIES = 3;
-
-// The AH-4 covers 160-6m, not VHF/UHF (README open question: make this a config flag).
-inline bool tuneBandSupported(uint8_t band) { return band <= 1; } // HF, 50M
 
 struct TuneOptions {
   bool ah4;   // run the START/KEY handshake
@@ -83,7 +81,7 @@ enum class TuneReason : uint8_t {
   BusTimeout,        // could not claim the CAT bus
   CatFailed,         // a CAT query got no/invalid answer
   NoBand,            // frequency is not in any configured band
-  BandUnsupported,   // band the ATU doesn't cover
+  BandUnsupported,   // the ATU is not enabled for this band in the config
   SequencerTimeout,
   Ah4Busy,           // START still held from a previous cycle
   KeyStuck,          // KEY already asserted before START

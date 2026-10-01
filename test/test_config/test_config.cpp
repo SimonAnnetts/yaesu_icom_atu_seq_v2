@@ -79,6 +79,7 @@ void test_defaults_match_example_file() {
     const BandConfig &d = DEFAULT_SEQUENCER_CONFIG.band[b], &f = cfg.band[b];
     TEST_ASSERT_EQUAL_UINT32(f.freqMinHz, d.freqMinHz);
     TEST_ASSERT_EQUAL_UINT32(f.freqMaxHz, d.freqMaxHz);
+    TEST_ASSERT_EQUAL(f.atu, d.atu);
     for (uint8_t i = 0; i < SEQ_STAGES; i++) {
       TEST_ASSERT_EQUAL(f.gapMs[i], d.gapMs[i]);
       TEST_ASSERT_EQUAL(f.tuneProfile[i], d.tuneProfile[i]);
@@ -217,6 +218,43 @@ void test_trigger_rules() {
   TEST_ASSERT_FALSE(loadDoc(doc, cfg));
 }
 
+void test_atu_flag_parsed_and_defaults() {
+  SequencerConfig cfg;
+  JsonDocument doc = goodDoc();
+  TEST_ASSERT_TRUE_MESSAGE(loadDoc(doc, cfg), err);
+  TEST_ASSERT_TRUE(cfg.band[0].atu);   // the shipped example documents the field
+  TEST_ASSERT_TRUE(cfg.band[1].atu);
+  TEST_ASSERT_FALSE(cfg.band[2].atu);
+  TEST_ASSERT_FALSE(cfg.band[3].atu);
+
+  doc["bands"]["50M"]["atu"] = false;  // an EDX-2 owner
+  doc["bands"]["144M"]["atu"] = true;
+  TEST_ASSERT_TRUE_MESSAGE(loadDoc(doc, cfg), err);
+  TEST_ASSERT_FALSE(cfg.band[1].atu);
+  TEST_ASSERT_TRUE(cfg.band[2].atu);
+
+  // absent: the previous behaviour (HF and 50M on, VHF/UHF off)
+  for (const char *b : {"HF", "50M", "144M", "430M"}) doc["bands"][b].remove("atu");
+  TEST_ASSERT_TRUE_MESSAGE(loadDoc(doc, cfg), err);
+  TEST_ASSERT_TRUE(cfg.band[0].atu);
+  TEST_ASSERT_TRUE(cfg.band[1].atu);
+  TEST_ASSERT_FALSE(cfg.band[2].atu);
+  TEST_ASSERT_FALSE(cfg.band[3].atu);
+
+  doc["bands"]["HF"]["atu"] = "yes"; // present but not a bool
+  TEST_ASSERT_FALSE(loadDoc(doc, cfg));
+  TEST_ASSERT_NOT_NULL(strstr(err, "atu"));
+  doc["bands"]["HF"]["atu"] = 1;
+  TEST_ASSERT_FALSE(loadDoc(doc, cfg));
+}
+
+void test_bench_file_has_the_edx2_setup() {
+  SequencerConfig cfg;
+  TEST_ASSERT_TRUE_MESSAGE(load(readFile("config/sequencer-bench.json"), cfg), err);
+  TEST_ASSERT_TRUE(cfg.band[0].atu);
+  TEST_ASSERT_FALSE(cfg.band[1].atu); // the EDX-2 can't tune 50MHz
+}
+
 void test_trigger_count_limit_and_omission() {
   SequencerConfig cfg;
   JsonDocument doc = goodDoc();
@@ -273,6 +311,61 @@ void test_image_roundtrip() {
       TEST_ASSERT_EQUAL(in.band[b].gapMs[i], out.band[b].gapMs[i]);
       TEST_ASSERT_EQUAL(in.band[b].tuneProfile[i], out.band[b].tuneProfile[i]);
     }
+  }
+}
+
+void test_atu_flags_survive_the_eeprom_image() {
+  SequencerConfig in = sampleConfig(), out = {};
+  in.band[0].atu = false;
+  in.band[1].atu = true;
+  in.band[2].atu = true;
+  in.band[3].atu = false;
+  uint8_t buf[CONFIG_IMAGE_MAX];
+  size_t n = configSerialize(in, buf, sizeof buf);
+  const char *why;
+  TEST_ASSERT_TRUE_MESSAGE(configDeserialize(buf, n, out, why), why);
+  for (uint8_t b = 0; b < SEQ_BANDS; b++) TEST_ASSERT_EQUAL(in.band[b].atu, out.band[b].atu);
+}
+
+// An image saved before the flag existed: same header, payload without the 4 flag
+// bytes. It must still load, with the old behaviour (HF and 50M on).
+static size_t stripFlags(uint8_t *buf, size_t n, size_t keepOfFlags) {
+  size_t payload = buf[5] | (size_t)buf[6] << 8;
+  size_t newPayload = payload - SEQ_BANDS + keepOfFlags;
+  buf[5] = newPayload & 0xFF;
+  buf[6] = newPayload >> 8;
+  uint16_t crc = configCrc16(buf, 7 + newPayload);
+  buf[7 + newPayload] = crc & 0xFF;
+  buf[7 + newPayload + 1] = crc >> 8;
+  (void)n;
+  return 7 + newPayload + 2;
+}
+
+void test_old_eeprom_image_without_atu_flags_still_loads() {
+  SequencerConfig in = sampleConfig(), out = {};
+  in.band[1].atu = false; // would be lost: old images can't carry it
+  uint8_t buf[CONFIG_IMAGE_MAX];
+  size_t n = configSerialize(in, buf, sizeof buf);
+  size_t oldN = stripFlags(buf, n, 0);
+  const char *why;
+  TEST_ASSERT_TRUE_MESSAGE(configDeserialize(buf, oldN, out, why), why);
+  TEST_ASSERT_TRUE(out.band[0].atu);
+  TEST_ASSERT_TRUE(out.band[1].atu);
+  TEST_ASSERT_FALSE(out.band[2].atu);
+  TEST_ASSERT_FALSE(out.band[3].atu);
+  TEST_ASSERT_EQUAL(1, out.triggerCount); // everything else intact
+}
+
+void test_partial_atu_flags_are_rejected() {
+  SequencerConfig in = sampleConfig(), out;
+  uint8_t buf[CONFIG_IMAGE_MAX];
+  size_t n = configSerialize(in, buf, sizeof buf);
+  for (size_t keep = 1; keep < SEQ_BANDS; keep++) {
+    uint8_t copy[CONFIG_IMAGE_MAX];
+    memcpy(copy, buf, n);
+    size_t m = stripFlags(copy, n, keep);
+    const char *why;
+    TEST_ASSERT_FALSE(configDeserialize(copy, m, out, why));
   }
 }
 
@@ -351,9 +444,14 @@ int main() {
   RUN_TEST(test_rejects_inverted_equal_and_overlapping_edges);
   RUN_TEST(test_rejects_oversized_timing);
   RUN_TEST(test_trigger_rules);
+  RUN_TEST(test_atu_flag_parsed_and_defaults);
+  RUN_TEST(test_bench_file_has_the_edx2_setup);
   RUN_TEST(test_trigger_count_limit_and_omission);
   RUN_TEST(test_failed_load_leaves_output_untouched);
   RUN_TEST(test_image_roundtrip);
+  RUN_TEST(test_atu_flags_survive_the_eeprom_image);
+  RUN_TEST(test_old_eeprom_image_without_atu_flags_still_loads);
+  RUN_TEST(test_partial_atu_flags_are_rejected);
   RUN_TEST(test_image_fits_with_max_triggers);
   RUN_TEST(test_any_corrupted_byte_is_rejected);
   RUN_TEST(test_blank_eeprom_and_short_images_rejected);

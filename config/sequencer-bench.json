@@ -13,7 +13,8 @@
         "seq1": true,
         "seq2": true,
         "seq3": false
-      }
+      },
+      "atu": true
     },
     "50M": {
       "freq_min_hz": 50000000,
@@ -27,7 +28,8 @@
         "seq1": true,
         "seq2": true,
         "seq3": true
-      }
+      },
+      "atu": false
     },
     "144M": {
       "freq_min_hz": 144000000,
@@ -41,7 +43,8 @@
         "seq1": true,
         "seq2": true,
         "seq3": true
-      }
+      },
+      "atu": false
     },
     "430M": {
       "freq_min_hz": 430000000,
@@ -55,7 +58,8 @@
         "seq1": true,
         "seq2": true,
         "seq3": true
-      }
+      },
+      "atu": false
     }
   },
   "cross_band_triggers": [

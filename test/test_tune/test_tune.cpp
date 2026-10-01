@@ -87,6 +87,7 @@ struct Fake : TuneEnv {
   bool seqActive(uint8_t band) override { return !seqStuck && seq.active(band); }
   bool seqIdle(uint8_t band) override { return seq.idle(band); }
   int8_t bandForFreq(uint32_t hz) override { return bandForFrequency(cfg, hz); }
+  bool atuAllowed(uint8_t band) override { return cfg.band[band].atu; }
   bool ah4Begin(uint32_t now) override {
     startAt = now;
     return ah4.begin(keyLine(), now);
@@ -553,6 +554,48 @@ void test_refuses_vhf_and_uhf() {
   }
 }
 
+void test_atu_flag_per_band_decides_what_may_be_tuned() {
+  { // an EDX-2 owner turns 50MHz off: refused, nothing touched
+    Fake f;
+    f.freq = 50150000;
+    f.cfg.band[1].atu = false;
+    TuneCycle c(f);
+    runCycle(f, c, TUNE_FULL);
+    TuneReason why;
+    TEST_ASSERT_EQUAL(TuneOutcome::Refused, outcomeOf(c, why));
+    TEST_ASSERT_EQUAL(TuneReason::BandUnsupported, why);
+    TEST_ASSERT_EQUAL(0, f.amSetAt);
+    TEST_ASSERT_EQUAL(0, f.startAt);
+    expectSafe(f, MODE_USB);
+  }
+  { // ...while HF still tunes
+    Fake f;
+    f.cfg.band[1].atu = false;
+    TuneCycle c(f);
+    runCycle(f, c, TUNE_FULL);
+    TuneReason why;
+    TEST_ASSERT_EQUAL(TuneOutcome::Success, outcomeOf(c, why));
+  }
+  { // and a band can be turned on that is off by default
+    Fake f;
+    f.freq = 145500000;
+    f.cfg.band[2].atu = true;
+    TuneCycle c(f);
+    runCycle(f, c, TUNE_FULL);
+    TuneReason why;
+    TEST_ASSERT_EQUAL(TuneOutcome::Success, outcomeOf(c, why));
+  }
+  { // HF itself can be switched off
+    Fake f;
+    f.cfg.band[0].atu = false;
+    TuneCycle c(f);
+    runCycle(f, c, TUNE_FULL);
+    TuneReason why;
+    TEST_ASSERT_EQUAL(TuneOutcome::Refused, outcomeOf(c, why));
+    TEST_ASSERT_EQUAL(TuneReason::BandUnsupported, why);
+  }
+}
+
 void test_refuses_a_frequency_in_no_band() {
   Fake f;
   f.freq = 100000000;
@@ -825,6 +868,7 @@ int main() {
   RUN_TEST(test_refuses_when_a_band_is_busy);
   RUN_TEST(test_refuses_when_radio_is_transmitting);
   RUN_TEST(test_refuses_vhf_and_uhf);
+  RUN_TEST(test_atu_flag_per_band_decides_what_may_be_tuned);
   RUN_TEST(test_refuses_a_frequency_in_no_band);
   RUN_TEST(test_start_rejected_while_running);
   RUN_TEST(test_bus_never_free);
