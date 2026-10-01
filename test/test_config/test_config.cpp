@@ -63,8 +63,11 @@ void test_example_file_parses() {
 void test_bench_file_parses() {
   SequencerConfig cfg;
   TEST_ASSERT_TRUE_MESSAGE(load(readFile("config/sequencer-bench.json"), cfg), err);
+  // Meant for bench visibility: every step the same, and slow enough to watch.
+  uint16_t first = cfg.band[0].gapMs[0];
+  TEST_ASSERT_GREATER_OR_EQUAL(300, first);
   for (const BandConfig &b : cfg.band) {
-    for (uint16_t g : b.gapMs) TEST_ASSERT_EQUAL(300, g);
+    for (uint16_t g : b.gapMs) TEST_ASSERT_EQUAL(first, g);
   }
 }
 

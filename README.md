@@ -441,8 +441,8 @@ band's sequencer, configured rather than hardcoded.
   from a compiled-in table with the band edges, timing and tune profiles
   of `config/sequencer.json` and **no** cross-band triggers; a native test
   keeps the table in step with that file. `config/sequencer-bench.json` is
-  the same config with every timing at 300ms, for easy visibility on the
-  bench.
+  the same config with every timing slowed to 1000ms, for easy visibility
+  on the bench.
 - **PC-side helper**: [`tools/send_config.py`](tools/send_config.py) —
   validates the JSON is well-formed *before* touching the serial port
   (fails fast with a clear Python error rather than a round-trip to the

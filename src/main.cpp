@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "ah4_io.h"
 #include "cat_bridge.h"
 #include "config_io.h"
 #include "pins.h"
@@ -73,6 +74,7 @@ void setup() {
   walktestBegin([] {
     configurePins();
     sequencerIoInvalidate();
+    ah4IoResync();
   });
 
   Serial.begin(115200);
@@ -81,6 +83,7 @@ void setup() {
   startAlcPump();
   configIoBegin();
   sequencerIoBegin();
+  ah4IoBegin();
 
   Serial.println(F("ALC pump PWM on D9: ~14.9kHz, gate (D10) off"));
   Serial.println(F("CAT passthrough: Serial2 (PC) <-> Serial3 (radio), 57600 8N2; c = frame log, ? = radio keys"));
@@ -93,12 +96,14 @@ void loop() {
     if (walktestHandleChar(c)) continue;
     catBridgeHandleChar(c);
     radioHandleChar(c);
+    ah4IoHandleChar(c);
   }
   configIoPoll();
   walktestPoll();
   if (walktestActive()) return; // bench walk-test owns the pins and Serial0
 
   sequencerIoPoll();
+  ah4IoPoll();
 
   bool moved = catBridgePoll();
   radioPoll();
