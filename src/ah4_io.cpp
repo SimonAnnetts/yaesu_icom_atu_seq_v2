@@ -30,12 +30,8 @@ bool ah4Begin() {
   beganAt = millis();
   lastKey = k;
   writeStart();
+  Serial.println(F("AH4: START asserted"));
   return true;
-}
-
-void ah4Release() {
-  driver.release(millis());
-  writeStart();
 }
 
 void ah4Abort() {
@@ -52,7 +48,7 @@ static const __FlashStringHelper *resultName(Ah4Driver::Result r) {
     case Ah4Driver::Result::Success: return F("success");
     case Ah4Driver::Result::NoAtu: return F("no ATU: KEY never asserted");
     case Ah4Driver::Result::Timeout: return F("timeout: KEY never released");
-    case Ah4Driver::Result::Bounce: return F("failed: KEY bounced back after releasing");
+    case Ah4Driver::Result::TuneFailed: return F("tune failed: KEY re-asserted after releasing");
     case Ah4Driver::Result::KeyStuck: return F("refused: KEY already asserted");
     case Ah4Driver::Result::Aborted: return F("aborted");
     default: return F("?");
@@ -80,9 +76,11 @@ void ah4IoPoll() {
     Ah4Driver::Result r = driver.takeResult();
     if (r != Ah4Driver::Result::None) {
       Serial.print(F("AH4: "));
-      Serial.println(resultName(r));
+      // With no RF applied a KEY cycle can't be a tune, so don't call it one.
+      Serial.println(r == Ah4Driver::Result::Success
+                         ? F("KEY cycle completed (no RF was applied, so not a real tune)")
+                         : resultName(r));
       benchRun = false;
-      if (r == Ah4Driver::Result::Success) ah4Release(); // bench run: nothing to unkey
     }
   }
 }

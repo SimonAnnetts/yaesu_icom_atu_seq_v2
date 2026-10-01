@@ -50,10 +50,10 @@ is talking to the Arduino, which brokers the conversation:
   initiate a tune cycle.
 - **ALC injection circuit**: a charge pump driven from an Arduino PWM pin
   (producing roughly -4V), gated onto the radio's ALC line through an
-  opto-isolator used purely as a switch. This lets the Arduino pull the
-  radio's RF output down closer to true minimum during a tune cycle,
-  independent of — and in addition to — the AM-mode power ceiling (see
-  below). Carried over from a prior project; confirmed against the FT-847
+  opto-isolator used purely as a switch. This lets the Arduino trim the
+  radio's RF output to the ~10W carrier the AH-4 wants during a tune cycle
+  (it aborts outside 5–15W — see the AH-4 reference below), independent
+  of — and in addition to — the AM-mode power ceiling (see below). Carried over from a prior project; confirmed against the FT-847
   manual — see the ALC reference section further down.
 - **Amplifier sequencer**: 4 independent relay sequencers, one per band —
   Band 1=HF, Band 2=50MHz, Band 3=144MHz, Band 4=430MHz — each with 5
@@ -212,29 +212,44 @@ interrupt handler uses, directly and proactively:
    - **Ordering also matters here**: this step is deliberately done
      *before* issuing the AH-4 `START` signal (step 5), not interleaved
      with it.
-     The AH-4 protocol has its own tight internal timeout — it expects RF
-     to appear within a few hundred ms of `START` being asserted (fakeFC
-     times out at ~500ms) — and the sequencer's relay-settling delay is
+     The AH-4 has its own tight timing — it asserts `KEY` about 300ms
+     after `START`, then expects the carrier almost immediately so it can
+     check the power — and the sequencer's relay-settling delay is
      user-configurable and could easily be longer than that. Running the
      sequencer to completion first, while the radio is still fully idle,
      keeps that variable delay out of the AH-4's time-sensitive window
-     entirely, so `START → PTT-key → RF appears` stays a tight,
+     entirely, so `START → KEY → PTT-key → RF appears` stays a tight,
      undisturbed sequence exactly as the AH-4 expects.
 4. Take over the CAT link to the radio and select AM mode (there is no CAT
    power-set command on this radio — switching to AM mode is itself the
    main power reduction, since the FT-847 caps AM output much lower than
-   SSB/CW/FM; see the CAT reference below). Optionally assert the ALC
-   injection circuit to pull power down further, independent of CAT.
-5. Issue the appropriate start sequence to the Icom ATU interface. The
-   sequencer has already completed its up-sequence by this point (step 3),
-   so relays are already up and TX INHIBIT already released — nothing
-   further needs to happen before keying PTT.
-6. Key the radio's PTT, immediately following `START` as the AH-4 protocol
-   expects. Meanwhile, continue forwarding any other CAT traffic between
-   PC and radio live (see above) — only mode and PTT/TX status queries get
+   SSB/CW/FM; see the CAT reference below). **The target is about 10W, not
+   the minimum:** the AH-4 measures the carrier during the tune and aborts
+   if it is outside 5–15W (see the AH-4 reference below). AM mode alone
+   still allows up to 25W on HF, so the radio's RF power setting and/or the
+   ALC injection circuit must bring the carrier into that window.
+   Also claim the CAT bus now (hold PC traffic) so that PTT can go out the
+   instant `KEY` asserts, rather than queueing behind a PC poll.
+5. Assert `START` (pull it low via its opto), hold it for about 560ms like
+   an Icom radio does, then release it. **Do not key the radio yet:**
+   until the tuner asserts `KEY` it has not yet switched RF through its
+   power divider, so a carrier now would go straight through to the
+   antenna unmatched.
+6. Wait for the tuner to assert `KEY` (during the `START` hold on a genuine
+   AH-4, ~35ms after `START` is released on the Alinco EDX-2; give up as
+   "no ATU" if it never does). **The moment `KEY` asserts, key the
+   radio's PTT via CAT** — on a real Icom radio `KEY` is what makes the
+   transmitter produce the carrier, and here the Arduino stands in for
+   that. Meanwhile, continue forwarding any other CAT traffic between PC
+   and radio live (see above) — only mode and PTT/TX status queries get
    answered from the values captured in step 1 instead of the truth.
-7. Wait for the ATU to signal that its tune cycle has completed.
-8. Unkey the radio's PTT.
+7. Wait for the ATU to signal that its tune cycle has completed: `KEY`
+   releasing and staying released is success; `KEY` releasing for ~20ms,
+   re-asserting for ~200ms, then releasing is the AH-4's "not tuned"
+   signal.
+8. Unkey the radio's PTT **immediately on `KEY`'s first release** (the
+   tuner never switches its relays under power, and an Icom radio stops
+   transmitting the moment `KEY` goes away).
 9. **Explicitly run that band's *tune* profile down-sequence** — the
    mirror of step 3, stepping down through whatever stages the tune
    profile actually engaged. Once complete, release this band from
@@ -523,7 +538,10 @@ and `docs/ft-847_manual.pdf` ("Rear Panel Connectors", item 4).
   whose transmit power ceiling the FT-847 caps far lower than SSB/CW/FM
   (25W AM vs 100W SSB/CW on HF, per Hamlib's `tx_range_list`). **Resolution
   for this project: switching to AM mode before keying PTT is the power
-  reduction** — there is no separate power-set step, and none is needed.
+  reduction** — there is no separate power-set step. But AM mode on its own
+  is not enough for the AH-4, which needs a carrier of 5–15W (about 10W)
+  and aborts outside that: 25W AM exceeds it, so the radio's RF power
+  setting and/or the ALC injection must trim it into the window.
 - **Early FT-847 units had genuinely unidirectional CAT — a separate issue
   from the SAT-mode trick below.** Confirmed directly in the Hamlib source
   comments: "The FT-847, as originally delivered, could not poll the radio
@@ -560,44 +578,77 @@ and `docs/ft-847_manual.pdf` ("Rear Panel Connectors", item 4).
 
 ## Icom AH-4 ATU interface (reference)
 
-Sources: `docs/Icom AH4 SGC Tuner Protocol Converter.pdf` (captured timing
-diagrams for the genuine Icom AH-4 protocol) and
-[doumae/fakeFC](https://github.com/doumae/fakeFC) —
+Sources: `docs/AH-4_Design_and_Operation.pdf` (K9EQ, "Inside the Icom
+AH-4"; abbreviated "K9EQ" below), `docs/Icom AH4 SGC Tuner Protocol
+Converter.pdf` (captured timing diagrams for the genuine Icom AH-4
+protocol) and [doumae/fakeFC](https://github.com/doumae/fakeFC) —
 [`fakeFC.ino`](https://github.com/doumae/fakeFC/blob/9eb30efeaafe0d38e46a250920fb501777e3a7f1/fakeFC.ino)
 (an Arduino sketch that drives a real AH-4 from a Yaesu tuner port).
 
 - **Physical interface**: a 4-wire connector — `START` (input to the
   tuner), `KEY` (output from the tuner), `+13.8V`, `GND`. Both `START` and
-  `KEY` are **active-low** on the real AH-4 wiring (the PDF calls them
-  `START_L` / `KEY_L`): a line is "asserted" by pulling it to ground, and
-  idles high (pulled up).
-- **Sequence** (from the PDF's "AH4 Normal Tuning Sequence" diagram, and
-  matching fakeFC's state machine):
-  1. Controller asserts `START` (pulls low) to begin a cycle.
-  2. If `START` is released again within ~100ms, that's treated as a
-     bypass/mode-toggle request, not a real tune (not something we need).
-  3. If `START` stays asserted past ~100ms, the tuner responds by asserting
-     `KEY` (pulls low) roughly 10ms later — this is the tuner's "busy,
-     apply RF now" signal.
-  4. The tuner remains busy for up to ~2–2.5 seconds (fakeFC times out the
-     wait at 2500ms).
-  5. When tuning finishes, the tuner releases `KEY` (goes high). This edge
-     is the "tune cycle complete" signal.
-  6. The controller then releases `START`.
+  `KEY` are **active-low** (the SGC PDF calls them `START_L` / `KEY_L`): a
+  line is "asserted" by pulling it to ground, and idles high. The tuner
+  draws under 300mA typically and under 1A peak.
+- **What the tuner does** (K9EQ): the microprocessor is powered down except
+  while tuning. `START` asserted resets it, and it is running about 300ms
+  later. It then asserts `KEY` and routes RF through a 10:1 power divider,
+  measurement circuit and the tuning network, so the radio sees a low SWR
+  (about 350mW reaches the tuner). `KEY` is what makes an Icom radio
+  transmit a carrier of about **10W**. The AH-4 checks that the power is
+  **between 5W and 15W** and aborts the tune if it is not. About 250ms
+  after it starts tuning the radio releases `START`. When tuned, the AH-4
+  releases `KEY` and switches RF to pass through the tuning network only;
+  the radio stops transmitting when `KEY` goes away. The tuning relays are
+  never switched under power. If the AH-4 cannot tune, it releases `KEY`
+  for 20ms, asserts it again for 200ms, then releases it for good, which
+  the radio reports as "not tuned". A band change on the radio resets the
+  tuner (tuning network out of circuit).
+- **Timing — the sources differ, so the firmware is conservative to all
+  of them and the real tuner should be measured** (the bench key `h` logs
+  when `KEY` asserts). Measured on an **Alinco EDX-2** (Icom-compatible
+  tuner), with no RF applied: `KEY` asserts **≈35ms after `START` is
+  *released***, however long `START` was held — `START` held 800ms gave
+  `KEY` at 833ms and held 2000ms gave 2036ms (repeatable to ±2ms) — then
+  stays asserted for ≈326ms and releases once, with no re-assert. So that
+  tuner acts on `START`'s trailing edge, which a driver that holds `START`
+  until `KEY` appears can never satisfy.
+
+  | | SGC capture / fakeFC | K9EQ |
+  |---|---|---|
+  | `KEY` asserts after `START` | ~10ms after `START` has been held >100ms (≈110ms) | ≈300ms (figure 4 shows ≈250–310ms) |
+  | `START` released | by the controller after `KEY` releases | by the radio ≈250ms after tuning begins (`START` low ≈560ms in total), while `KEY` is still asserted |
+  | Alinco EDX-2 (measured) | — | `KEY` ≈35ms after `START` is released; no re-assert, `KEY` ≈326ms with no RF |
+  | `KEY` asserted for | up to ~2–2.5s | 560ms – 2s typical |
+  | Failed tune | `KEY` re-asserts within ~25ms of releasing | `KEY` low, released 20ms, asserted 200ms, released |
+  | Short `START` | <~100ms = bypass/toggle request | ~70ms pulse with no `KEY` activity = **tuner reset** (pass-through, tuning network out) |
+
 - **Practical sequence for this project** (Arduino driving a real AH-4
-  directly, not through the Yaesu tuner-port protocol fakeFC emulates):
-  1. Pull `START` low and hold it (>150ms, comfortably past the 100ms
-     bypass threshold).
-  2. Once `START` has been asserted, key the radio's PTT via CAT so the
-     AH-4 sees RF.
-  3. Watch `KEY`: if it never asserts within ~500ms, there's no AH-4
-     responding (error case). Once asserted, wait for it to release again
-     (busy phase, ~2.5s timeout).
-  4. On `KEY` release, re-sample ~25ms later to debounce/confirm (fakeFC
-     does this — a bounce back to asserted within that window means the
-     tune failed rather than succeeded).
-  5. Unkey PTT via CAT, release `START`, then restore the radio's prior
-     power/mode via CAT.
+  directly, not through the Yaesu tuner-port protocol fakeFC emulates).
+  The driver (`src/ah4.h`) behaves like an Icom radio and accepts either
+  tuner's timing:
+  1. Pull `START` low and hold it for 560ms (K9EQ: an Icom radio's `START`
+     is low about that long), then release it, whatever `KEY` is doing.
+     It is never released earlier than 150ms after asserting (also on
+     abort), since a `START` pulse of ~70–100ms is the tuner's reset
+     command.
+  2. **Do not key the radio yet.** Accept `KEY` asserting anywhere from
+     `START` asserting to 500ms after `START` is released (a genuine AH-4
+     asserts it during the hold; the EDX-2 ~35ms after release); if it
+     never does there is no tuner responding (error case).
+  3. **When `KEY` asserts, key the radio's PTT via CAT** (the tune cycle's
+     job; it must be fast, see the tune cycle above). Wait for `KEY` to
+     release again (busy phase, 2.5s timeout).
+  4. When `KEY` releases, unkey PTT at once, then keep watching `KEY` for
+     50ms. Any re-assertion in that window is the AH-4's failure signature
+     (its 20ms gap sits inside the window with margin); `KEY` staying
+     released is success.
+  5. Restore the radio's prior mode via CAT.
+  `KEY` releasing with no RF applied is *not* a tune — the EDX-2 just lets
+  go of `KEY` after ~326ms — so the tune cycle, which knows whether it
+  actually keyed RF, decides what counts as success.
+  A `KEY` already asserted before `START` is refused (stuck line or a
+  tuner that is already busy) without touching `START`.
 - fakeFC also emulates the separate Yaesu FC-40 tuner-port protocol (a
   different connector/protocol from CAT, using single-byte `0xa0`/`0xa1`
   status codes and `TXINH`/`TXGND` lines) so a Yaesu radio's native tuner
@@ -615,10 +666,10 @@ diagrams for the genuine Icom AH-4 protocol) and
     emitter → AH-4-side `GND`; a ~10kΩ pull-up from `START` to the AH-4
     connector's `+13.8V` provides the idle-high level. Opto off → pull-up
     holds `START` high; opto on (D12 driven high) → phototransistor pulls
-    `START` near 0V (asserted). Worth checking with a meter whether the
-    real AH-4 already has its own internal pull-up on `START` before
-    assuming this external one is required (harmless either way if it
-    turns out to be redundant).
+    `START` near 0V (asserted). **The external pull-up is required:**
+    K9EQ describes `START` as pulled up to 13.8V inside the *radio*, not
+    in the AH-4, so with the Arduino standing in for the radio this circuit
+    has to provide it.
   - **`KEY`** (AH-4 asserts by pulling it low at its own end): AH-4-side
     `+13.8V` → ~1kΩ resistor → opto LED anode → cathode → AH-4 `KEY` pin
     (the AH-4 completes this loop to its own ground when busy). Opto's
@@ -626,11 +677,17 @@ diagrams for the genuine Icom AH-4 protocol) and
     convention as fakeFC's direct-wired approach) → Arduino's own 5V
     internally; emitter → Arduino GND. AH-4 idle → opto off → `D11` reads
     high (pull-up); AH-4 busy → opto on → phototransistor pulls `D11` low.
+    (K9EQ: the AH-4's `KEY` is an open-collector transistor to ground, with
+    an internal 22kΩ + diode towards 5V, and the radio pulls the line up to
+    13.8V through a resistor. The opto LED's series resistor is that
+    pull-up here; the AH-4's sink current is `(13.8V − 1.2V) / R`, so a
+    larger R (e.g. 2.2kΩ ≈ 5mA) is gentler on the AH-4 than 1kΩ ≈ 12mA,
+    and the opto still saturates easily.)
   - A standard low-speed part (e.g. PC817) is more than adequate — these
     are millisecond-scale control lines, nowhere near a PC817's ~µs-scale
     switching time, and its Vceo (~35V) comfortably clears the 13.8V rail.
 
-## ALC injection for true minimum power (reference)
+## ALC injection for tune power (reference)
 
 Carried over from a prior project; the FT-847-specific details below are
 now confirmed against `docs/ft-847_manual.pdf` ("Rear Panel Connectors",
@@ -647,12 +704,14 @@ item 11).
   ALC voltage forces the radio's own gain-reduction loop to turn down RF
   output — a genuine hardware-level power reduction, independent of any
   CAT command, and capable of going lower than AM mode's power ceiling
-  alone.
+  alone. The goal is the AH-4's ~10W carrier (it aborts below 5W as well
+  as above 15W), so the PWM level is a calibration to set against a power
+  meter, not "as low as possible".
 - **Relationship to AM mode**: the two are complementary, not
   alternatives. AM mode is switched to regardless (see the CAT reference
   above — the FT-847 offers no other way to run a controlled tune cycle
-  over CAT), and the ALC injection is layered on top of that to pull
-  power down further during the keyed window.
+  over CAT), and the ALC injection is layered on top of that to trim the
+  carrier down to about 10W during the keyed window.
 - **Confirmed FT-847 connector and spec**: rear panel item **(11) EXT
   ALC**, an RCA female jack. Per the manual: "The specified control
   voltage range is 0V ~ −4V DC, with −4V corresponding to the maximum
@@ -879,10 +938,23 @@ lines and CAT connected; TUNER Sense unconnected):
 
 ## Open questions / to be determined
 
-- Whether the real AH-4 already has its own internal pull-up on `START` —
-  determines whether the external ~10kΩ pull-up in the opto circuit above
-  is required or just harmless redundancy. Check with a meter at the AH-4
-  end before assuming either way.
+- **How soon after `KEY` the tuner expects RF**, and what it does with RF
+  present (the failure signature, the tune length, whether the EDX-2
+  repeats the 20ms/200ms pattern or something else). `KEY`-to-RF latency
+  through the CAT PTT path (arbiter quiet gap, radio response) has to land
+  well inside the tuner's window. Needs a keyed test into a dummy load.
+- **Tune carrier power**: the AH-4 aborts outside 5–15W, and the radio in
+  AM mode can do 25W. Calibrate the RF power setting and ALC level for
+  about 10W on a power meter. The transmit-status meter bits (`0xF7`,
+  bits 4:0) might allow a sanity check from the Arduino.
+- **Bands the AH-4 can tune**: it covers 160–6m, not 2m/70cm, so the tune
+  cycle should probably refuse 144/430MHz — possibly a per-band flag in
+  the config.
+- **Tuner reset on band change**: Icom radios reset the AH-4 (a ~70ms
+  `START` pulse) when the band changes so a stale tuning network isn't
+  left in circuit. Nothing here does that yet; the band is known at each
+  PTT from STBY, so resetting when it differs from the last tuned band is
+  possible.
 - Debounce/timing behaviour of the physical tune button (D6), exact
   blink/status patterns for the tune LED (D7), and what the generic
   activity LED (D8) should actually indicate.
