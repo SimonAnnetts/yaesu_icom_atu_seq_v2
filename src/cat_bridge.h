@@ -27,3 +27,10 @@ bool catBridgeSubmit(const uint8_t cmd[5]);
 
 // True once per finished transaction; reply gets up to 5 bytes.
 bool catBridgeTakeResult(CatArbiter::Result &r, uint8_t *reply, uint8_t &len);
+
+// Claim the bus for a multi-command job (the tune cycle): PC bytes wait in the
+// Serial2 RX buffer until releaseClaim, and commands go out without queueing
+// behind PC traffic. See CatArbiter.
+bool catBridgeClaim();
+CatArbiter::ClaimState catBridgeClaimState();
+void catBridgeReleaseClaim();

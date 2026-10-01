@@ -29,5 +29,8 @@ void ah4IoResync();
 bool ah4Begin();
 void ah4Abort();
 bool ah4StartAsserted();
+bool ah4KeySeen();
+bool ah4KeyReleased();
+bool ah4Busy();
 // Final outcome once known (see Ah4Driver::takeResult).
 Ah4Driver::Result ah4TakeResult();

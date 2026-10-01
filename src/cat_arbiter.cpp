@@ -5,7 +5,7 @@
 static bool reached(uint32_t now, uint32_t at) { return (int32_t)(now - at) >= 0; }
 
 bool CatArbiter::submit(const uint8_t cmd[CAT_FRAME_LEN], uint32_t now) {
-  if (state_ != State::Idle) return false;
+  if (state_ != State::Idle || claim_ == ClaimState::Pending) return false;
   memcpy(cmd_, cmd, CAT_FRAME_LEN);
   replyWanted_ = catReplyLength(cmd[CAT_FRAME_LEN - 1]);
   replyGot_ = 0;
@@ -17,10 +17,29 @@ bool CatArbiter::submit(const uint8_t cmd[CAT_FRAME_LEN], uint32_t now) {
 }
 
 bool CatArbiter::pcMayTransmit() const {
+  if (claim_ == ClaimState::Held) return false;
   switch (state_) {
-    case State::Idle: return true;
+    case State::Idle: return !(claim_ == ClaimState::Pending && gateClosed_);
     case State::WaitBus: return !gateClosed_;
     default: return false;
+  }
+}
+
+bool CatArbiter::claim(uint32_t now) {
+  if (claim_ == ClaimState::Pending || claim_ == ClaimState::Held) return false;
+  claim_ = ClaimState::Pending;
+  claimAt_ = now;
+  gateClosed_ = false;
+  return true;
+}
+
+void CatArbiter::releaseClaim(uint32_t now) {
+  bool wasHeld = claim_ == ClaimState::Held;
+  claim_ = ClaimState::None;
+  gateClosed_ = false;
+  if (wasHeld && state_ == State::Idle) {
+    state_ = State::Hold; // quiet gap before the PC talks to the radio again
+    deadline_ = now + ARB_QUIET_MS;
   }
 }
 
@@ -29,6 +48,9 @@ void CatArbiter::finish(Result r, uint32_t now) {
   gateClosed_ = false;
   if (r == Result::BusTimeout) {
     state_ = State::Idle; // never touched the bus, nothing to hold off
+  } else if (claim_ == ClaimState::Held) {
+    state_ = State::Idle; // still our bus: the next submit() enforces its own spacing
+    lastActivity_ = now;
   } else {
     state_ = State::Hold;
     deadline_ = now + ARB_QUIET_MS;
@@ -36,8 +58,28 @@ void CatArbiter::finish(Result r, uint32_t now) {
 }
 
 void CatArbiter::poll(uint32_t now, bool pcBusIdle) {
+  if (claim_ == ClaimState::Held && (uint32_t)(now - claimAt_) >= ARB_CLAIM_MAX_MS) {
+    releaseClaim(now); // safety: never leave the PC locked out
+  } else if (claim_ == ClaimState::Pending) {
+    if ((uint32_t)(now - claimAt_) >= ARB_CLAIM_TIMEOUT_MS) {
+      claim_ = ClaimState::Failed;
+      gateClosed_ = false;
+    } else if (state_ == State::Idle) {
+      if (!gateClosed_ && pcBusIdle) gateClosed_ = true; // PC held from here on
+      if (gateClosed_ && (uint32_t)(now - lastActivity_) >= ARB_QUIET_MS) {
+        claim_ = ClaimState::Held;
+        claimAt_ = now;
+        gateClosed_ = false;
+      }
+    }
+  }
+
   switch (state_) {
     case State::WaitBus:
+      if (claim_ == ClaimState::Held) { // we own the bus: only the spacing applies
+        if ((uint32_t)(now - lastActivity_) >= ARB_QUIET_MS) state_ = State::Sending;
+        break;
+      }
       if ((uint32_t)(now - submittedAt_) >= ARB_BUS_TIMEOUT_MS) {
         finish(Result::BusTimeout, now);
         break;
@@ -60,6 +102,7 @@ void CatArbiter::poll(uint32_t now, bool pcBusIdle) {
 
 void CatArbiter::sent(uint32_t now) {
   if (state_ != State::Sending) return;
+  lastActivity_ = now;
   if (replyWanted_) {
     state_ = State::WaitReply;
     deadline_ = now + ARB_REPLY_TIMEOUT_MS;
@@ -70,6 +113,7 @@ void CatArbiter::sent(uint32_t now) {
 
 void CatArbiter::radioByte(uint8_t b, uint32_t now) {
   if (state_ != State::WaitReply) return;
+  lastActivity_ = now;
   reply_[replyGot_++] = b;
   if (replyGot_ >= replyWanted_) finish(Result::Ok, now);
 }

@@ -135,7 +135,9 @@ void radioPoll() {
   CatArbiter::Result res;
   uint8_t reply[CAT_FRAME_LEN];
   uint8_t len;
-  if (catBridgeTakeResult(res, reply, len)) {
+  // Only collect a result if one of these debug keys started the command: the
+  // tune cycle shares the arbiter, and its results must not be taken from it.
+  if (inFlight != Op::None && catBridgeTakeResult(res, reply, len)) {
     Op op = inFlight;
     inFlight = Op::None;
     handleResult(op, res, reply, len);

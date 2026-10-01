@@ -79,6 +79,10 @@ bool catBridgePoll() {
 
 bool catBridgeSubmit(const uint8_t cmd[5]) { return arbiter.submit(cmd, millis()); }
 
+bool catBridgeClaim() { return arbiter.claim(millis()); }
+CatArbiter::ClaimState catBridgeClaimState() { return arbiter.claimState(); }
+void catBridgeReleaseClaim() { arbiter.releaseClaim(millis()); }
+
 bool catBridgeTakeResult(CatArbiter::Result &r, uint8_t *reply, uint8_t &len) {
   return arbiter.takeResult(r, reply, len);
 }

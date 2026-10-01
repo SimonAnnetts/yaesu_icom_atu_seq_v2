@@ -5,6 +5,7 @@ static bool reached(uint32_t now, uint32_t at) { return (int32_t)(now - at) >= 0
 bool Ah4Driver::begin(bool keyAsserted, uint32_t now) {
   if (busy()) return false;
   keySeen_ = false;
+  keyReleased_ = false;
   if (keyAsserted) {
     result_ = Result::KeyStuck; // never drive START into a tuner that already says busy
     return true;
@@ -49,6 +50,7 @@ void Ah4Driver::poll(bool keyAsserted, uint32_t now) {
       break;
     case State::Busy:
       if (!keyAsserted) {
+        keyReleased_ = true;
         state_ = State::Confirm;
         deadline_ = now + AH4_CONFIRM_MS;
       } else if (reached(now, deadline_)) {

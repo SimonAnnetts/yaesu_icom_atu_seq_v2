@@ -49,6 +49,14 @@ bool sequencerIoApplyConfig(const SequencerConfig &cfg) {
   return true;
 }
 
+void sequencerIoSetHold(uint8_t band, bool held) { sequencer.setHold(band, held); }
+void sequencerIoRequest(uint8_t band, bool wantTx) {
+  sequencer.request(band, wantTx, Profile::Tune, millis());
+}
+bool sequencerIoActive(uint8_t band) { return sequencer.active(band); }
+bool sequencerIoIdle(uint8_t band) { return sequencer.idle(band); }
+bool sequencerIoAllIdle() { return sequencer.allIdle(); }
+
 static void pollStby(uint32_t now) {
   noInterrupts();
   uint8_t pending = pendingAssert;

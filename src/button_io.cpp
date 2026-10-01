@@ -11,11 +11,11 @@ static bool rawPressed() { return digitalRead(PIN_TUNE_BUTTON) == LOW; }
 
 void buttonIoBegin() { button.init(rawPressed(), millis()); }
 
-void buttonIoPoll() {
+bool buttonIoPoll() {
   switch (button.update(rawPressed(), millis())) {
     case Button::Event::Pressed:
       Serial.println(F("Tune button pressed"));
-      break;
+      return true;
     case Button::Event::Released:
       Serial.print(F("Tune button released after "));
       Serial.print(button.heldMs());
@@ -24,4 +24,5 @@ void buttonIoPoll() {
     default:
       break;
   }
+  return false;
 }

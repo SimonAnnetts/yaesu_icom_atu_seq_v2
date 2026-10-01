@@ -7,6 +7,7 @@ static bool fakeKey = false;
 static bool lastKey = false;
 static bool lastStart = false;
 static uint32_t beganAt = 0;
+static uint32_t keyAssertedAt = 0;
 static bool benchRun = false; // started by the 'h' key: log results
 
 static bool keyAsserted() { return digitalRead(PIN_AH4_KEY) == LOW || fakeKey; }
@@ -40,6 +41,9 @@ void ah4Abort() {
 }
 
 bool ah4StartAsserted() { return driver.startAsserted(); }
+bool ah4KeySeen() { return driver.keySeen(); }
+bool ah4KeyReleased() { return driver.keyReleased(); }
+bool ah4Busy() { return driver.busy(); }
 
 Ah4Driver::Result ah4TakeResult() { return driver.takeResult(); }
 
@@ -70,7 +74,15 @@ void ah4IoPoll() {
     Serial.print(k ? F("asserted") : F("released"));
     Serial.print(F(" at +"));
     Serial.print(now - beganAt);
-    Serial.println(F("ms"));
+    Serial.print(F("ms"));
+    if (k) {
+      keyAssertedAt = now;
+    } else {
+      Serial.print(F(" (KEY was asserted for "));
+      Serial.print(now - keyAssertedAt);
+      Serial.print(F("ms)"));
+    }
+    Serial.println();
   }
   if (benchRun) {
     Ah4Driver::Result r = driver.takeResult();

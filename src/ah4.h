@@ -16,8 +16,11 @@
 // - so KEY is accepted anywhere from START asserting to AH4_KEY_APPEAR_TIMEOUT_MS
 // after START releases.
 //
-// The caller must NOT key the radio before KEY asserts (the tuner has not yet
-// switched RF through its power divider): when keySeen() turns true, key PTT.
+// When to key the radio is the caller's choice, and it matters: on a genuine AH-4
+// KEY is the cue (RF before it goes through unmatched), but the radio's carrier
+// overshoots at start-up for ~0.7s, and an Alinco EDX-2 that is given the carrier
+// only at KEY measures that overshoot and gives up - keying at START, so it has
+// settled, fixed it. keySeen() is the KEY cue for callers that want it.
 // KEY releasing is "tune complete"; if it re-asserts within AH4_CONFIRM_MS the
 // tune failed (the AH-4's not-tuned signal is KEY released 20ms, asserted 200ms,
 // released). Note that KEY releasing with no RF applied is NOT a tune: the
@@ -29,7 +32,10 @@
 constexpr uint32_t AH4_START_HOLD_MS = 560;
 constexpr uint32_t AH4_START_MIN_HOLD_MS = 150;
 constexpr uint32_t AH4_KEY_APPEAR_TIMEOUT_MS = 500; // after START is released; else "no ATU"
-constexpr uint32_t AH4_BUSY_TIMEOUT_MS = 2500;      // from KEY asserted to KEY released
+// From KEY asserted to KEY released. The documents say 0.5-2.5s, but an Alinco
+// EDX-2 was still tuning at 2.5s (relays switching, SWR moving), so this is
+// generous; the real duration is logged ("KEY released at +Nms") to tighten it.
+constexpr uint32_t AH4_BUSY_TIMEOUT_MS = 15000;
 constexpr uint32_t AH4_CONFIRM_MS = 50; // must comfortably exceed the 20ms not-tuned gap
 
 class Ah4Driver {
@@ -57,6 +63,9 @@ public:
   bool startAsserted() const { return startOn_; }
   // KEY has asserted at some point this cycle: the cue to key the radio.
   bool keySeen() const { return keySeen_; }
+  // KEY has released after asserting: the cue to unkey at once, even though the
+  // result (success or not-tuned) is only known after the confirm window.
+  bool keyReleased() const { return keyReleased_; }
   // A cycle is in progress, or START is still being held after one.
   bool busy() const { return state_ != State::Idle || startOn_; }
 
@@ -73,6 +82,7 @@ private:
   Result result_ = Result::None;
   bool startOn_ = false;
   bool keySeen_ = false;
+  bool keyReleased_ = false;
   uint32_t startedAt_ = 0;
   uint32_t startReleaseAt_ = 0;
   uint32_t keyDeadline_ = 0;

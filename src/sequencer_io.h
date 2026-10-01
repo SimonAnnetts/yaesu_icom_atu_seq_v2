@@ -21,3 +21,11 @@ const SequencerConfig &sequencerIoConfig();
 // Switch to a new configuration. Refused (false) while any band is mid-sequence
 // or transmitting, so a config change can never disturb a live transmission.
 bool sequencerIoApplyConfig(const SequencerConfig &cfg);
+
+// For the tune cycle: drive one band with its *tune* profile, and suppress that
+// band's STBY handling while it does.
+void sequencerIoSetHold(uint8_t band, bool held);
+void sequencerIoRequest(uint8_t band, bool wantTx);
+bool sequencerIoActive(uint8_t band);
+bool sequencerIoIdle(uint8_t band);
+bool sequencerIoAllIdle();

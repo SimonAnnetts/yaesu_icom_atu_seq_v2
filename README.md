@@ -231,33 +231,83 @@ interrupt handler uses, directly and proactively:
    Also claim the CAT bus now (hold PC traffic) so that PTT can go out the
    instant `KEY` asserts, rather than queueing behind a PC poll.
 5. Assert `START` (pull it low via its opto), hold it for about 560ms like
-   an Icom radio does, then release it. **Do not key the radio yet:**
-   until the tuner asserts `KEY` it has not yet switched RF through its
-   power divider, so a carrier now would go straight through to the
-   antenna unmatched.
+   an Icom radio does, then release it. **Key the radio's PTT via CAT right
+   away, at `START`, not later at `KEY`.** The radio's carrier overshoots to
+   2–3× its set power for ~0.7s after keying and an Alinco EDX-2 that is only
+   given RF at `KEY` measures that overshoot, gives up after ≈350ms and
+   leaves the SWR >3:1; keyed at `START` the carrier has settled by the time
+   `KEY` asserts (≈590ms) and the tune runs 3–4s and ends near 1:1. The cost
+   is a few hundred ms of carrier into the unmatched antenna before `KEY`,
+   which is acceptable at ~10W (a genuine AH-4 would route RF through its
+   power divider only after `KEY`; the key-on-`KEY` variant, Serial0 `R`, is
+   kept for tuners that need that). Meanwhile, continue forwarding any other
+   CAT traffic between PC and radio live (see above) — only mode and PTT/TX
+   status queries get answered from the values captured in step 1 instead
+   of the truth.
 6. Wait for the tuner to assert `KEY` (during the `START` hold on a genuine
-   AH-4, ~35ms after `START` is released on the Alinco EDX-2; give up as
-   "no ATU" if it never does). **The moment `KEY` asserts, key the
-   radio's PTT via CAT** — on a real Icom radio `KEY` is what makes the
-   transmitter produce the carrier, and here the Arduino stands in for
-   that. Meanwhile, continue forwarding any other CAT traffic between PC
-   and radio live (see above) — only mode and PTT/TX status queries get
-   answered from the values captured in step 1 instead of the truth.
+   AH-4, ~35ms after `START` is released on the Alinco EDX-2); give up as
+   "no ATU" if it never does (and unkey).
 7. Wait for the ATU to signal that its tune cycle has completed: `KEY`
    releasing and staying released is success; `KEY` releasing for ~20ms,
    re-asserting for ~200ms, then releasing is the AH-4's "not tuned"
-   signal.
+   signal. (An EDX-2 that gives up early looks like a success, only
+   shorter: judge a tune by the SWR and by how long `KEY` was asserted,
+   which the log shows.)
 8. Unkey the radio's PTT **immediately on `KEY`'s first release** (the
    tuner never switches its relays under power, and an Icom radio stops
    transmitting the moment `KEY` goes away).
-9. **Explicitly run that band's *tune* profile down-sequence** — the
-   mirror of step 3, stepping down through whatever stages the tune
-   profile actually engaged. Once complete, release this band from
-   "under explicit tune-profile control" so its STBY interrupt handling
-   resumes normally.
-10. Release the ALC injection (if it was asserted) and restore the
-    radio's original mode (from the value captured in step 1).
+9. Restore the radio's original mode (from the value captured in step 1;
+   retried up to 3 times, and a failure is reported loudly on Serial0), then
+   release the CAT bus so PC traffic can flow again.
+10. **Explicitly run that band's *tune* profile down-sequence** — the
+    mirror of step 3, stepping down through whatever stages the tune
+    profile actually engaged. Once complete, release this band from
+    "under explicit tune-profile control" so its STBY interrupt handling
+    resumes normally. (ALC injection, if used, is released here too; it is
+    not wired into the cycle yet.)
 11. Resume normal passthrough with no faking.
+
+#### Implementation notes (`src/tune.h`, `src/tune_io.cpp`)
+
+- **One tail for every outcome.** Success, refusal, failure, button abort and
+  the 30s watchdog all unwind through the same tail — PTT off (retried until
+  the radio has been told), restore mode, release the bus, sequencer down,
+  drop the STBY hold, wait for START to finish its hold — so no path can
+  skip a cleanup step. It is a pure state machine tested against a fake
+  radio and a fake tuner (both an EDX-2-style and a genuine-AH-4-style
+  timing) with failures injected at every step and an abort swept across the
+  whole cycle.
+- **The cycle owns the CAT bus** from before `START` until the restore: the
+  arbiter's claim holds PC bytes in the Serial2 RX buffer (nothing is
+  dropped) so PTT can go out the instant `KEY` asserts. Consequence for now:
+  the PC sees its traffic *delayed* by the length of the cycle (a few
+  seconds), not answered with faked mode/PTT replies — that is the next
+  phase. A claim also releases itself after 20s so the PC can never be
+  locked out.
+- **Refusals** (nothing is left changed): a band already transmitting, the
+  radio reporting it is transmitting, a frequency in no band, a band the AH-4
+  doesn't cover (only HF and 50MHz for now; `tuneBandSupported()`), no usable
+  answer to a CAT query (including a mode byte that couldn't be restored).
+- **Tune LED (D7):** solid while a cycle runs; three slow blinks on
+  success; fast blinking for about a second on failure or refusal; dark
+  after an abort.
+- **Controls:** the tune button starts a full tune and, pressed during one,
+  aborts it. Serial0 keys: `T` full tune, `E` ATU handshake with the radio
+  *not* keyed, `D` dry run (sequencer and AM mode only — no ATU, no RF), `M`
+  full tune that also logs the radio's PO/ALC meter (about every 60ms while
+  keyed; a diagnostic that can delay PTT off by up to ~100ms, so use it at low
+  power only), `P` carrier test (keys the radio for 2s with *no* tuner and
+  logs the meter — shows the radio's own start-up behaviour on its own), `R`
+  full tune that keys the radio at `START` instead of at `KEY` (so the radio's
+  start-up overshoot, below, has settled before the tuner measures), `1`/`2`/`3`
+  tune mode AM/FM/CW (default AM), `X` abort. The FT-847 cannot report SWR over CAT, and its status byte is a
+  5-bit bar-graph value (not calibrated watts), so SWR and real power need
+  external meters.
+- **Staged bench procedure** (dummy load, low power): `D` first (check the
+  sequencer steps up with the tune profile, the radio goes to AM and comes
+  back), then `E` (START/KEY with the real tuner but no carrier — expect "not
+  a real tune"), then `T` into a dummy load with the radio's power set for
+  about 10W, then onto the antenna.
 
 ### Standalone operation
 
@@ -632,13 +682,14 @@ protocol) and [doumae/fakeFC](https://github.com/doumae/fakeFC) —
      It is never released earlier than 150ms after asserting (also on
      abort), since a `START` pulse of ~70–100ms is the tuner's reset
      command.
-  2. **Do not key the radio yet.** Accept `KEY` asserting anywhere from
-     `START` asserting to 500ms after `START` is released (a genuine AH-4
-     asserts it during the hold; the EDX-2 ~35ms after release); if it
-     never does there is no tuner responding (error case).
-  3. **When `KEY` asserts, key the radio's PTT via CAT** (the tune cycle's
-     job; it must be fast, see the tune cycle above). Wait for `KEY` to
-     release again (busy phase, 2.5s timeout).
+  2. Accept `KEY` asserting anywhere from `START` asserting to 500ms after
+     `START` is released (a genuine AH-4 asserts it during the hold; the
+     EDX-2 ~35ms after release); if it never does there is no tuner
+     responding (error case). When to key the radio is the tune cycle's
+     choice — see the tune cycle above: at `START` by default, so the
+     radio's start-up overshoot has settled by the time `KEY` asserts.
+  3. Wait for `KEY` to release again (busy phase, 15s timeout; an EDX-2 tune
+     took 3–4s, and the actual duration is logged so this can be tightened).
   4. When `KEY` releases, unkey PTT at once, then keep watching `KEY` for
      50ms. Any re-assertion in that window is the AH-4's failure signature
      (its 20ms gap sits inside the window with margin); `KEY` staying
@@ -931,6 +982,22 @@ lines and CAT connected; TUNER Sense unconnected):
 - **CAT with the TUNER connector wired** (pins 1, 2, 8 only): CAT keeps
   working through the Arduino, including while TX INHIBIT is held during a
   sequence and with flrig polling.
+- **Radio carrier start-up overshoot (AM, HF, FT-847)**: keyed alone with
+  the RF power set for 10W (steady, on an external meter and the radio's
+  display), the radio's PO meter via CAT (`0xF7`, bits 4:0, an uncalibrated
+  0–31 bar value) starts at 21–23, falls steadily over about 700ms and then
+  sits flat at 8. So the carrier overshoots to roughly 2.5–3× its steady
+  level and takes ~0.7s to settle (a slow external meter hides this).
+- **Tune cycle on an Alinco EDX-2 (HF, AM, ~10W into the antenna, external
+  SWR meter)**: keyed at `KEY` it released `KEY` after ≈350ms (no longer
+  than with no RF at all) with the SWR still >3:1, even though the tuner was
+  seen starting to switch relays. **Keyed at `START` instead** it holds `KEY`
+  for 3.1s and 4.0s (two runs, 18.14MHz and 14.3MHz) and the SWR ends close
+  to 1.0 — a real tune, and the radio's original mode (AM already, and CW)
+  restored afterwards. The default tune now keys at `START`.
+  Along the way: `KEY` asserts ≈31ms after `START` is released (any hold
+  length), and spurious STBY pulses on the 430M line while HF transmitted
+  (probably RF pickup) are why every band's STBY is held during a tune.
 - **CAT bridge**: transparent passthrough to flrig over an extended
   session with no stray, torn or timed-out frames.
 - **Arduino-originated CAT** on Port 2 (freq/mode, TX status, set mode,

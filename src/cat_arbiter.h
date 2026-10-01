@@ -11,12 +11,19 @@
 // keeps a short quiet gap on either side of it, as the FT-847 dislikes
 // back-to-back writes. With no PC attached the bus is simply always free.
 //
+// A longer-lived claim() holds the bus for a whole multi-command job (the tune
+// cycle): once Held, PC bytes wait in the Serial2 RX buffer and submit() sends
+// at once, spaced from the last bus activity by ARB_QUIET_MS, instead of queueing
+// behind PC traffic each time. releaseClaim() hands the bus back after a quiet gap.
+//
 // Flow: submit() -> WaitBus -> (PC exchange finishes; PC held) -> quiet gap ->
 // Sending -> WaitReply (if the opcode has a reply) -> Hold (quiet gap) -> Idle.
 
 constexpr uint32_t ARB_QUIET_MS = 50;       // bus quiet before sending and after finishing
 constexpr uint32_t ARB_BUS_TIMEOUT_MS = 2000; // give up waiting for the PC to go quiet
 constexpr uint32_t ARB_REPLY_TIMEOUT_MS = 500;
+constexpr uint32_t ARB_CLAIM_TIMEOUT_MS = 2000; // give up waiting to claim the bus
+constexpr uint32_t ARB_CLAIM_MAX_MS = 60000;    // a forgotten claim releases itself (outlasts a whole tune cycle)
 
 class CatArbiter {
 public:
@@ -27,8 +34,15 @@ public:
     BusTimeout, // the bus never became free
   };
 
-  // Start a transaction. False if one is already running.
+  // Start a transaction. False if one is already running (or a claim is still
+  // being acquired).
   bool submit(const uint8_t cmd[CAT_FRAME_LEN], uint32_t now);
+
+  // Claim the bus for a multi-command job. False if already claimed/pending.
+  enum class ClaimState : uint8_t { None, Pending, Held, Failed };
+  bool claim(uint32_t now);
+  void releaseClaim(uint32_t now); // also clears a Failed claim
+  ClaimState claimState() const { return claim_; }
 
   // Note every byte seen on the bus that the arbiter did not send itself.
   void noteBusActivity(uint32_t now) { lastActivity_ = now; }
@@ -59,6 +73,8 @@ private:
 
   State state_ = State::Idle;
   bool gateClosed_ = false; // PC held while we wait out the quiet gap
+  ClaimState claim_ = ClaimState::None;
+  uint32_t claimAt_ = 0; // when claiming started, then when it was acquired
   uint8_t cmd_[CAT_FRAME_LEN] = {};
   uint8_t replyWanted_ = 0;
   uint8_t reply_[CAT_FRAME_LEN] = {};

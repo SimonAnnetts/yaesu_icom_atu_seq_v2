@@ -219,6 +219,18 @@ void test_millis_wraparound() {
   TEST_ASSERT_EQUAL(R::NoAtu, d.takeResult());
 }
 
+void test_key_released_flag_is_the_unkey_cue() {
+  TEST_ASSERT_TRUE(d.begin(false, 0));
+  key = true;
+  run(100, 400);
+  TEST_ASSERT_TRUE(d.keySeen());
+  TEST_ASSERT_FALSE(d.keyReleased());
+  key = false;
+  d.poll(key, 401);
+  TEST_ASSERT_TRUE(d.keyReleased()); // at the first release, before the confirm window ends
+  TEST_ASSERT_EQUAL(R::None, d.takeResult());
+}
+
 int main() {
   UNITY_BEGIN();
   RUN_TEST(test_start_asserted_immediately);
@@ -240,5 +252,6 @@ int main() {
   RUN_TEST(test_begin_rejected_while_running_or_start_held);
   RUN_TEST(test_second_cycle_after_success);
   RUN_TEST(test_millis_wraparound);
+  RUN_TEST(test_key_released_flag_is_the_unkey_cue);
   return UNITY_END();
 }

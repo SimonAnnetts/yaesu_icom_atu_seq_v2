@@ -7,6 +7,7 @@
 #include "pins.h"
 #include "radio.h"
 #include "sequencer_io.h"
+#include "tune_io.h"
 #include "walktest.h"
 
 // Wiring only: pin setup, the ALC charge pump PWM, and the main loop that
@@ -86,6 +87,7 @@ void setup() {
   sequencerIoBegin();
   ah4IoBegin();
   buttonIoBegin();
+  tuneIoBegin();
 
   Serial.println(F("ALC pump PWM on D9: ~14.9kHz, gate (D10) off"));
   Serial.println(F("CAT passthrough: Serial2 (PC) <-> Serial3 (radio), 57600 8N2; c = frame log, ? = radio keys"));
@@ -95,8 +97,10 @@ void loop() {
   while (Serial.available()) {
     char c = Serial.read();
     if (configIoHandleChar(c)) continue; // a config upload is in progress
-    if (walktestHandleChar(c)) continue;
+    if (!tuneIoActive() && walktestHandleChar(c)) continue; // never enter the walk-test mid-tune
+    if (tuneIoHandleChar(c)) continue;
     catBridgeHandleChar(c);
+    if (tuneIoActive()) continue; // the tune cycle owns the CAT bus and the AH-4
     radioHandleChar(c);
     ah4IoHandleChar(c);
   }
@@ -106,7 +110,8 @@ void loop() {
 
   sequencerIoPoll();
   ah4IoPoll();
-  buttonIoPoll();
+  if (buttonIoPoll()) tuneIoButtonPress();
+  tuneIoPoll();
 
   bool moved = catBridgePoll();
   radioPoll();
