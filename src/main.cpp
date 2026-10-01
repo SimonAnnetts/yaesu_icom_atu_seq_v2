@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "pins.h"
+#include "sequencer_io.h"
 #include "walktest.h"
 
 // Basic CAT passthrough: Serial2 (Port 1, PC) <-> Serial3 (Port 2, radio),
@@ -122,13 +123,17 @@ static bool forward(Stream &from, Stream &to, HexLog &log) {
 
 void setup() {
   configurePins();
-  walktestBegin(configurePins);
+  walktestBegin([] {
+    configurePins();
+    sequencerIoInvalidate();
+  });
 
   Serial.begin(115200);
   Serial2.begin(CAT_BAUD, CAT_CONFIG);
   Serial3.begin(CAT_BAUD, CAT_CONFIG);
 
   startAlcPump();
+  sequencerIoBegin();
 
   Serial.println(F("ALC pump PWM on D9: ~14.9kHz, gate (D10) off"));
   Serial.println(F("CAT passthrough: Serial2 (PC) <-> Serial3 (radio), 57600 8N2"));
@@ -137,6 +142,8 @@ void setup() {
 void loop() {
   walktestPoll();
   if (walktestActive()) return; // bench walk-test owns the pins and Serial0
+
+  sequencerIoPoll();
 
   bool moved = forward(Serial2, Serial3, pcToRadio);
   moved |= forward(Serial3, Serial2, radioToPc);

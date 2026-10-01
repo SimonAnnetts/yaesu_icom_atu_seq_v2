@@ -5,7 +5,6 @@
       "freq_min_hz": 1800000,
       "freq_max_hz": 29700000,
       "timing_ms": {
-        "rx_to_seq1": 10,
         "seq1_to_seq2": 50,
         "seq2_to_seq3": 50,
         "seq3_to_tx": 20
@@ -16,7 +15,6 @@
       "freq_min_hz": 50000000,
       "freq_max_hz": 54000000,
       "timing_ms": {
-        "rx_to_seq1": 10,
         "seq1_to_seq2": 50,
         "seq2_to_seq3": 50,
         "seq3_to_tx": 20
@@ -27,7 +25,6 @@
       "freq_min_hz": 144000000,
       "freq_max_hz": 146000000,
       "timing_ms": {
-        "rx_to_seq1": 10,
         "seq1_to_seq2": 50,
         "seq2_to_seq3": 50,
         "seq3_to_tx": 20
@@ -38,7 +35,6 @@
       "freq_min_hz": 430000000,
       "freq_max_hz": 440000000,
       "timing_ms": {
-        "rx_to_seq1": 10,
         "seq1_to_seq2": 50,
         "seq2_to_seq3": 50,
         "seq3_to_tx": 20

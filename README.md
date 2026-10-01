@@ -385,7 +385,7 @@ band's sequencer, configured rather than hardcoded.
   timing with no cross-band trigger rules active, rather than refusing to
   run.
 - **Per-band step timing lives in the same config**: the delay between
-  each of `RX → SEQ1 → SEQ2 → SEQ3 → TX` (and its mirror on the way down)
+  each of `SEQ1 → SEQ2 → SEQ3 → TX` (`SEQ1` itself comes on immediately) (and its mirror on the way down)
   is configurable per band via this same JSON, not a hardcoded constant —
   consistent with the whole reason a runtime config exists at all, and
   lets relay timing be tuned per amplifier without reflashing.
@@ -408,7 +408,7 @@ band's sequencer, configured rather than hardcoded.
   rule above). Top level: `schema_version` (lets firmware reject/fall back
   on a shape it doesn't understand), `bands` (keyed `"HF"`/`"50M"`/
   `"144M"`/`"430M"`, each with `freq_min_hz`/`freq_max_hz`, a `timing_ms`
-  object with the four up-sequence step delays — the down-sequence mirrors
+  object with the three up-sequence step delays (`seq1_to_seq2`, `seq2_to_seq3`, `seq3_to_tx`) — the down-sequence mirrors
   these, so there's nothing separate to configure there — and a
   `tune_profile` object of `seq1`/`seq2`/`seq3` booleans), and
   `cross_band_triggers` (an array of `{source_band, target_band,
