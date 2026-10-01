@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "ah4_io.h"
+#include "button_io.h"
 #include "cat_bridge.h"
 #include "config_io.h"
 #include "pins.h"
@@ -84,6 +85,7 @@ void setup() {
   configIoBegin();
   sequencerIoBegin();
   ah4IoBegin();
+  buttonIoBegin();
 
   Serial.println(F("ALC pump PWM on D9: ~14.9kHz, gate (D10) off"));
   Serial.println(F("CAT passthrough: Serial2 (PC) <-> Serial3 (radio), 57600 8N2; c = frame log, ? = radio keys"));
@@ -104,6 +106,7 @@ void loop() {
 
   sequencerIoPoll();
   ah4IoPoll();
+  buttonIoPoll();
 
   bool moved = catBridgePoll();
   radioPoll();
