@@ -19,7 +19,12 @@
 // restoreIdle puts every pin back to its idle level (configurePins in main).
 void walktestBegin(void (*restoreIdle)());
 
-// Call every loop(); handles Serial0 commands, the inhibit pulse and input echo.
+// Offer a Serial0 character to the walk-test. Returns true if it was consumed:
+// 't' always is, and while active every character is (so the CAT log keys
+// can't fire mid-test).
+bool walktestHandleChar(char c);
+
+// Call every loop(); runs the inhibit pulse timing and the input echo.
 void walktestPoll();
 
 bool walktestActive();

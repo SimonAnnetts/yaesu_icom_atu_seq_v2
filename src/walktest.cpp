@@ -112,32 +112,31 @@ void walktestBegin(void (*restoreIdle)()) {
 
 bool walktestActive() { return active; }
 
+bool walktestHandleChar(char c) {
+  if (c == 't') {
+    setActive(!active);
+    return true;
+  }
+  if (!active) return false;
+  switch (c) {
+    case 'n': lightStep((current + 1) % STEP_COUNT); break;
+    case 'p': lightStep(current <= 0 ? STEP_COUNT - 1 : current - 1); break;
+    case '0': lightStep(-1); break;
+    case 'i':
+      digitalWrite(PIN_TX_INHIBIT, HIGH);
+      inhibitOn = true;
+      inhibitOffAt = millis() + TX_INHIBIT_PULSE_MS;
+      Serial.println(F("walktest: TX_INHIBIT asserted (D4 HIGH)"));
+      break;
+  }
+  return true;
+}
+
 void walktestPoll() {
   if (inhibitOn && (int32_t)(millis() - inhibitOffAt) >= 0) {
     digitalWrite(PIN_TX_INHIBIT, LOW);
     inhibitOn = false;
     Serial.println(F("walktest: TX_INHIBIT released"));
   }
-
-  // Serial0 is only a command port while testing; otherwise it is the log.
-  while (Serial.available()) {
-    char c = Serial.read();
-    if (c == 't') {
-      setActive(!active);
-    } else if (active) {
-      switch (c) {
-        case 'n': lightStep((current + 1) % STEP_COUNT); break;
-        case 'p': lightStep(current <= 0 ? STEP_COUNT - 1 : current - 1); break;
-        case '0': lightStep(-1); break;
-        case 'i':
-          digitalWrite(PIN_TX_INHIBIT, HIGH);
-          inhibitOn = true;
-          inhibitOffAt = millis() + TX_INHIBIT_PULSE_MS;
-          Serial.println(F("walktest: TX_INHIBIT asserted (D4 HIGH)"));
-          break;
-      }
-    }
-  }
-
   if (active) echoInputs(false);
 }
