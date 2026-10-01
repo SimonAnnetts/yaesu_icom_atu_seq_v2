@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "pins.h"
+#include "walktest.h"
 
 // Basic CAT passthrough: Serial2 (Port 1, PC) <-> Serial3 (Port 2, radio),
 // byte for byte in both directions. The activity LED lights while bytes are
@@ -121,6 +122,7 @@ static bool forward(Stream &from, Stream &to, HexLog &log) {
 
 void setup() {
   configurePins();
+  walktestBegin(configurePins);
 
   Serial.begin(115200);
   Serial2.begin(CAT_BAUD, CAT_CONFIG);
@@ -133,6 +135,9 @@ void setup() {
 }
 
 void loop() {
+  walktestPoll();
+  if (walktestActive()) return; // bench walk-test owns the pins and Serial0
+
   bool moved = forward(Serial2, Serial3, pcToRadio);
   moved |= forward(Serial3, Serial2, radioToPc);
   pcToRadio.flushIfIdle();
