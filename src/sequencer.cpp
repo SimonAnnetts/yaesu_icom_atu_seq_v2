@@ -3,13 +3,21 @@
 constexpr uint16_t GAP_MS = 300;
 
 const SequencerConfig DEFAULT_SEQUENCER_CONFIG = {{
+    // Band edges are the placeholder IARU Region 1 values from config/sequencer.json.
     // HF: tune profile skips SEQ3
-    {{GAP_MS, GAP_MS, GAP_MS}, {true, true, false}},
+    {1800000, 29700000, {GAP_MS, GAP_MS, GAP_MS}, {true, true, false}},
     // 50M, 144M, 430M
-    {{GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
-    {{GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
-    {{GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
+    {50000000, 54000000, {GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
+    {144000000, 146000000, {GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
+    {430000000, 440000000, {GAP_MS, GAP_MS, GAP_MS}, {true, true, true}},
 }};
+
+int8_t bandForFrequency(const SequencerConfig &cfg, uint32_t hz) {
+  for (uint8_t b = 0; b < SEQ_BANDS; b++) {
+    if (hz >= cfg.band[b].freqMinHz && hz <= cfg.band[b].freqMaxHz) return b;
+  }
+  return -1;
+}
 
 static bool reached(uint32_t now, uint32_t dueAt) {
   return (int32_t)(now - dueAt) >= 0; // wrap-safe

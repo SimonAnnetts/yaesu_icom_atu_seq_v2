@@ -7,6 +7,7 @@ constexpr uint8_t CAT_CONFIG = SERIAL_8N2; // FT-847: 8 data bits, 2 stop, no pa
 constexpr int LOG_LINE_MAX = 40;           // skip logging rather than block forwarding
 
 static CatFramer framer;
+static CatArbiter arbiter;
 static bool logFrames = false;
 
 static void logBytes(const __FlashStringHelper *label, const uint8_t *d, uint8_t n) {
@@ -41,20 +42,45 @@ void catBridgeBegin() {
 
 bool catBridgePoll() {
   bool moved = false;
-  while (Serial2.available()) {
+
+  // PC -> radio, unless the arbiter is holding the bus for its own command.
+  // Held bytes wait in the Serial2 RX buffer.
+  while (arbiter.pcMayTransmit() && Serial2.available()) {
     uint8_t b = Serial2.read();
     Serial3.write(b);
+    arbiter.noteBusActivity(millis());
     handleEvent(framer.pcByte(b, millis()));
     moved = true;
   }
+
+  // radio -> PC, except replies to the Arduino's own command.
   while (Serial3.available()) {
     uint8_t b = Serial3.read();
+    if (arbiter.ownsRadioReplies()) {
+      arbiter.radioByte(b, millis());
+      continue;
+    }
     Serial2.write(b);
+    arbiter.noteBusActivity(millis());
     handleEvent(framer.radioByte(b, millis()));
     moved = true;
   }
+
   handleEvent(framer.poll(millis()));
+
+  arbiter.poll(millis(), framer.pcBusIdle());
+  if (const uint8_t *cmd = arbiter.pendingSend()) {
+    Serial3.write(cmd, CAT_FRAME_LEN);
+    logBytes(F("ARD>RADIO"), cmd, CAT_FRAME_LEN);
+    arbiter.sent(millis());
+  }
   return moved;
+}
+
+bool catBridgeSubmit(const uint8_t cmd[5]) { return arbiter.submit(cmd, millis()); }
+
+bool catBridgeTakeResult(CatArbiter::Result &r, uint8_t *reply, uint8_t &len) {
+  return arbiter.takeResult(r, reply, len);
 }
 
 void catBridgeHandleChar(char c) {

@@ -52,6 +52,9 @@ public:
 
   bool replyPending() const { return pendingLen_ != 0; }
 
+  // No PC command partly sent and no reply outstanding: a safe moment to take the bus.
+  bool pcBusIdle() const { return cmdLen_ == 0 && pendingLen_ == 0; }
+
 private:
   uint8_t cmd_[CAT_FRAME_LEN] = {};
   uint8_t cmdLen_ = 0;

@@ -171,6 +171,19 @@ void test_default_config_is_300ms() {
   }
 }
 
+void test_band_for_frequency() {
+  const SequencerConfig &c = DEFAULT_SEQUENCER_CONFIG;
+  TEST_ASSERT_EQUAL(0, bandForFrequency(c, 14250000));
+  TEST_ASSERT_EQUAL(0, bandForFrequency(c, 1800000));   // edges are inclusive
+  TEST_ASSERT_EQUAL(0, bandForFrequency(c, 29700000));
+  TEST_ASSERT_EQUAL(1, bandForFrequency(c, 50150000));
+  TEST_ASSERT_EQUAL(2, bandForFrequency(c, 145500000));
+  TEST_ASSERT_EQUAL(3, bandForFrequency(c, 433500000));
+  TEST_ASSERT_EQUAL(-1, bandForFrequency(c, 1799990));
+  TEST_ASSERT_EQUAL(-1, bandForFrequency(c, 100000000)); // between 50M and 144M
+  TEST_ASSERT_EQUAL(-1, bandForFrequency(c, 1296000000));
+}
+
 int main() {
   UNITY_BEGIN();
   RUN_TEST(test_idle_outputs);
@@ -184,5 +197,6 @@ int main() {
   RUN_TEST(test_hold_suppresses_stby_only);
   RUN_TEST(test_millis_wraparound);
   RUN_TEST(test_default_config_is_300ms);
+  RUN_TEST(test_band_for_frequency);
   return UNITY_END();
 }

@@ -14,6 +14,8 @@ constexpr uint8_t SEQ_BANDS = 4;
 constexpr uint8_t SEQ_STAGES = 3; // SEQ1..SEQ3
 
 struct BandConfig {
+  uint32_t freqMinHz; // band edges, used to map the radio's frequency to a band
+  uint32_t freqMaxHz;
   // Delay after stage s (index 0 = SEQ1) has been engaged before the next step
   // (SEQ2, SEQ3, then TX). The down-sequence mirrors these: the same delay is
   // waited before dropping stage s.
@@ -28,6 +30,9 @@ struct SequencerConfig {
 // Built-in defaults. All gaps are 300ms for easy bench visibility; the tune
 // profiles are from config/sequencer.json (HF skips SEQ3).
 extern const SequencerConfig DEFAULT_SEQUENCER_CONFIG;
+
+// Index of the band containing hz, or -1 if it is in none of them.
+int8_t bandForFrequency(const SequencerConfig &cfg, uint32_t hz);
 
 enum class Profile : uint8_t { Normal, Tune };
 

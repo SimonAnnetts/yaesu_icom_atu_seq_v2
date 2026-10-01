@@ -2,6 +2,7 @@
 
 #include "cat_bridge.h"
 #include "pins.h"
+#include "radio.h"
 #include "sequencer_io.h"
 #include "walktest.h"
 
@@ -80,13 +81,15 @@ void setup() {
   sequencerIoBegin();
 
   Serial.println(F("ALC pump PWM on D9: ~14.9kHz, gate (D10) off"));
-  Serial.println(F("CAT passthrough: Serial2 (PC) <-> Serial3 (radio), 57600 8N2; c = toggle frame log"));
+  Serial.println(F("CAT passthrough: Serial2 (PC) <-> Serial3 (radio), 57600 8N2; c = frame log, ? = radio keys"));
 }
 
 void loop() {
   while (Serial.available()) {
     char c = Serial.read();
-    if (!walktestHandleChar(c)) catBridgeHandleChar(c);
+    if (walktestHandleChar(c)) continue;
+    catBridgeHandleChar(c);
+    radioHandleChar(c);
   }
   walktestPoll();
   if (walktestActive()) return; // bench walk-test owns the pins and Serial0
@@ -94,6 +97,7 @@ void loop() {
   sequencerIoPoll();
 
   bool moved = catBridgePoll();
+  radioPoll();
 
   if (moved) {
     digitalWrite(PIN_ACTIVITY_LED, HIGH);
