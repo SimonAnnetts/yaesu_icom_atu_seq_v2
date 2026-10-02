@@ -10,7 +10,7 @@ An Arduino Mega 2560 controller that:
   tune cycle;
 - allows complex **inter-band sequencer and tuner configurations** be defined in
   a **JSON config**;
-- allows a **PC control the radio over CAT**, with none of the tuner and
+- allows a **PC control of the radio over CAT**, with none of the tuner and
   sequencer operations getting in the way.
 
 ## Aims in detail
@@ -37,9 +37,10 @@ An Arduino Mega 2560 controller that:
 3. **Provide an ALC output that can control the radio's power during the tune
    cycle.** A charge pump makes about -4V, gated by an opto-isolator onto the
    radio's EXT ALC jack, so the carrier can be trimmed to what the tuner
-   wants (an AH-4 needs about 10W). The circuit is built and the voltage
-   reaches the jack; the radio is not yet responding to it, so it is optional
-   and off by default.
+   wants (an AH-4 needs about 10W). This ALC voltage should be able to trim the
+   radio's transmit power down to a lever that the ATU is happy with. 
+   YMMV - the Yaesu FT-847 ALC circuit, and the power levels it produces are
+   'unpredictable' at best!
 4. **Allow complex inter-band sequencer and tuner configurations to be defined
    in a JSON config**: per-band delays, tune profiles, band edges, which bands
    the tuner may be used on, and cross-band rules (for example, transmitting
