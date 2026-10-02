@@ -1,18 +1,19 @@
 # Yaesu/Icom ATU Sequencer v2
 
-An Arduino Mega 2560 controller that lets an Icom AH-4-type automatic antenna
-tuner work with a Yaesu FT-847, runs a four-band amplifier/preamp sequencer
-alongside it, and does both without getting in the way of a PC that is
-controlling the radio over CAT.
+An Arduino Mega 2560 controller that:
 
-> `docs/Hamlib` and `docs/fakeFC` are local clones kept only for reference
-> while researching the FT-847 CAT protocol and Icom AH-4 timing (see the
-> reference sections below) — they're excluded via `.gitignore` and are not
-> part of this repo. Their upstream sources are
-> [Hamlib/Hamlib](https://github.com/Hamlib/Hamlib) and
-> [doumae/fakeFC](https://github.com/doumae/fakeFC).
+- lets an **Icom AH-4-type ATU** (or any tuner using the same protocol) work
+  with a **Yaesu FT-847**, from the device's own tune button;
+- provides **three sequencer outputs per band, for four bands** (HF, 50, 144
+  and 430MHz), for preamp and power-amp control;
+- provides an **ALC output** that can control the radio's power during the
+  tune cycle;
+- lets complex **inter-band sequencer and tuner configurations** be defined in
+  a **JSON config**;
+- still lets a **PC control the radio over CAT**, with none of the tuner and
+  sequencer operations getting in the way.
 
-## Aims
+## Aims in detail
 
 1. **Use an Icom AH-4-type ATU with the Yaesu FT-847** (or any tuner that
    speaks the same START/KEY protocol, and possibly other Yaesu radios of the
@@ -655,6 +656,16 @@ local control of the sequencer, independent of the CAT passthrough path.
 This is also the transport for loading the sequencer's JSON config (band
 timing, cross-band trigger rules) at runtime — see "Sequencer
 configuration and cross-band triggers" above.
+
+## Reference clones (for developers)
+
+`docs/Hamlib` and `docs/fakeFC` are local clones kept only as reference while
+researching the FT-847 CAT protocol and the Icom AH-4 timing (see the reference
+sections that follow). They are excluded via `.gitignore` and are not part of
+this repo, so a fresh checkout does not have them; clone them into `docs/` if
+you need the sources (or want to give an AI coding assistant that context).
+Their upstream sources are [Hamlib/Hamlib](https://github.com/Hamlib/Hamlib)
+and [doumae/fakeFC](https://github.com/doumae/fakeFC).
 
 ## Yaesu FT-847 CAT protocol (reference)
 
