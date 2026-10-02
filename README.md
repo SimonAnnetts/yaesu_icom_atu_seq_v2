@@ -17,14 +17,15 @@ An Arduino Mega 2560 controller that:
 
 1. **Use an Icom AH-4-type ATU with the Yaesu FT-847** (or any tuner that
    speaks the same START/KEY protocol, and possibly other Yaesu radios of the
-   same era). The FT-847 has no way to drive such a tuner on its own. At the
-   press of the new tune button this device adds, the Arduino runs the whole
+   same era). 
+   The FT-847 has no way to drive such a tuner on its own. At the
+   press of the TUNE button the Arduino runs the whole
    cycle: it sets the radio up over CAT (tune mode, keying PTT at the right
    moment), drives the tuner's START/KEY lines, watches for it to finish, and
    puts the radio back as it found it. Proven on an Alinco EDX-2, an
    Icom-compatible tuner. **This does not re-purpose the radio's own [TUNER]
-   key** or any of its built-in tuner control: the tune button is a **new,
-   separate button** fitted to this device (with its own tune indicator), and
+   key** or any of its built-in tuner control: the TUNE button is button 
+   fitted to this device (with its own tune indicator), and
    the radio's rear TUNER connector is used only for the TX INHIBIT line and
    its supply and ground. Its tuner-sense pin is deliberately left
    unconnected, so the radio never believes a tuner is attached and CAT keeps
