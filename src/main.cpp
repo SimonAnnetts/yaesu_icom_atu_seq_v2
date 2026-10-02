@@ -6,9 +6,11 @@
 #include "config_io.h"
 #include "pins.h"
 #include "radio.h"
+#include "recovery_io.h"
 #include "sequencer_io.h"
 #include "tune_io.h"
 #include "walktest.h"
+#include "watchdog.h"
 
 // Wiring only: pin setup, the ALC charge pump PWM, and the main loop that
 // drives the sequencer, the CAT bridge and the bench walk-test. The activity LED
@@ -53,7 +55,15 @@ static void configurePins() {
   initOutput(PIN_ALC_PWM, LOW);
   initOutput(PIN_ALC_GATE, LOW);  // gate off: radio's ALC line not connected
   initOutput(PIN_AH4_START, LOW);
-  initOutput(PIN_TX_INHIBIT, LOW); // released
+  // A STBY line already low means the radio is transmitting (we have just rebooted
+  // mid-transmission): hold TX INHIBIT from the first instant, not from whenever the
+  // sequencer gets going. Released otherwise.
+  delayMicroseconds(100); // let the pull-ups settle
+  bool stbyAsserted = false;
+  for (uint8_t band = 0; band < BAND_COUNT; band++) {
+    if (digitalRead(PIN_STBY[band]) == LOW) stbyAsserted = true;
+  }
+  initOutput(PIN_TX_INHIBIT, stbyAsserted ? HIGH : LOW);
   for (uint8_t band = 0; band < BAND_COUNT; band++) {
     const SequencerPins &p = PIN_SEQ[band];
     initOutput(p.rx, HIGH); // RX LED is lit when fully idle
@@ -80,7 +90,9 @@ void setup() {
   });
 
   Serial.begin(115200);
+  watchdogReportBoot();
   catBridgeBegin();
+  recoveryRunIfNeeded(); // undo a tune that a reset interrupted, before anything else uses CAT
 
   startAlcPump();
   configIoBegin();
@@ -91,12 +103,16 @@ void setup() {
 
   Serial.println(F("ALC pump PWM on D9: ~14.9kHz, gate (D10) off"));
   Serial.println(F("CAT passthrough: Serial2 (PC) <-> Serial3 (radio), 57600 8N2; c = frame log, ? = radio keys"));
+  watchdogBegin(); // last: from here the loop must keep feeding it
 }
 
 void loop() {
+  watchdogFeed();
+  watchdogStage(WDT_STAGE_SERIAL);
   while (Serial.available()) {
     char c = Serial.read();
-    if (configIoHandleChar(c)) continue; // a config upload is in progress
+    if (configIoHandleChar(c)) continue; // a config upload is in progress (it may contain any byte)
+    if (watchdogHandleChar(c)) continue;
     if (!tuneIoActive() && walktestHandleChar(c)) continue; // never enter the walk-test mid-tune
     if (tuneIoHandleChar(c)) continue;
     catBridgeHandleChar(c);
@@ -104,16 +120,22 @@ void loop() {
     radioHandleChar(c);
     ah4IoHandleChar(c);
   }
+  watchdogStage(WDT_STAGE_CONFIG);
   configIoPoll();
   walktestPoll();
   if (walktestActive()) return; // bench walk-test owns the pins and Serial0
 
+  watchdogStage(WDT_STAGE_SEQUENCER);
   sequencerIoPoll();
+  watchdogStage(WDT_STAGE_AH4);
   ah4IoPoll();
   if (buttonIoPoll()) tuneIoButtonPress();
+  watchdogStage(WDT_STAGE_TUNE);
   tuneIoPoll();
 
+  watchdogStage(WDT_STAGE_CAT);
   bool moved = catBridgePoll();
+  watchdogStage(WDT_STAGE_RADIO);
   radioPoll();
 
   if (moved) {

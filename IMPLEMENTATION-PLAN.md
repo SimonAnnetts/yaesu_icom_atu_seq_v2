@@ -212,6 +212,11 @@ throughout a tune cycle.
 - Watchdog enabled, with reset-cause logged at boot; make sure a reset mid-tune
   leaves outputs safe (defaults on boot: PTT unkeyed by definition, START
   released, ALC gate off, TX INHIBIT not held, sequencer idle).
+  *Done:* 2s interrupt-then-reset watchdog with a stall note (the bootloader
+  clears MCUSR, so the cause is recorded in EEPROM instead), an EEPROM
+  tune-in-progress record that unkeys the radio and restores its mode at the
+  next boot, and TX INHIBIT held from boot if STBY is already low. See
+  README "Reset safety".
 - Soak test: hours of PC polling, repeated tune cycles, random STBY activity.
 - Stress the config handshake (garbage on Serial0, partial JSON, unplugging).
 - Decide the mic-audio-during-tune question from the README.

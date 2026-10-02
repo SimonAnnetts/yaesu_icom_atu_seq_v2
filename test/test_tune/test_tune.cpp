@@ -69,6 +69,12 @@ struct Fake : TuneEnv, CatBridgeIo {
   uint32_t startAt = 0, keyAssertAt = 0, keyReleaseAt = 0, pttOnAt = 0, pttOffAt = 0;
   uint32_t seqActiveAt = 0, amSetAt = 0, restoreAt = 0, claimReleasedAt = 0;
   int pttOnCount = 0, pttOffCount = 0;
+  bool recArmed = false;
+  uint8_t recMode = 0xFF;
+  int armCount = 0, disarmCount = 0;
+  uint32_t recArmAt = 0, recDisarmAt = 0;
+  int ev = 0; // strict order of events, finer than a millisecond
+  int evArm = 0, evDisarm = 0, evAmSet = 0, evPttOn = 0, evPttOff = 0, evRestore = 0;
   uint8_t modeAtPttOn = 0xFF;
   bool hold[SEQ_BANDS] = {};
   bool seq3EverOnHf = false;
@@ -123,6 +129,8 @@ struct Fake : TuneEnv, CatBridgeIo {
   CatArbiter::ClaimState catClaimState() override { return core.claimState(); }
   void catRelease(uint32_t now) override { core.releaseClaim(now); claimReleasedAt = now; }
   void catSetSnapshot(const CatSnapshot &s) override { core.setSnapshot(s); }
+  void recoveryArm(uint8_t m) override { recArmed = true; recMode = m; armCount++; recArmAt = now_; evArm = ++ev; }
+  void recoveryDisarm() override { recArmed = false; disarmCount++; recDisarmAt = now_; evDisarm = ++ev; }
   bool catSubmit(const uint8_t cmd[5], uint32_t now) override {
     if (blockQueries && (cmd[4] == 0xF7 || cmd[4] == 0x03)) return false;
     if (!core.submit(cmd, now)) return false;
@@ -198,17 +206,18 @@ struct Fake : TuneEnv, CatBridgeIo {
     } else if (op == 0x07) {
       mode = c[0];
       if (modeSetN < 32) modeSets[modeSetN++] = {now, c[0]};
-      if (c[0] == MODE_AM && amSetAt == 0) amSetAt = now;
-      if (c[0] != MODE_AM) restoreAt = now;
+      if (c[0] == MODE_AM && amSetAt == 0) { amSetAt = now; evAmSet = ++ev; }
+      if (c[0] != MODE_AM) { restoreAt = now; evRestore = ++ev; }
     } else if (op == 0x08) {
       tx = true;
       pttOnCount++;
-      if (pttOnCount == 1) { pttOnAt = now; modeAtPttOn = mode; }
+      if (pttOnCount == 1) { pttOnAt = now; modeAtPttOn = mode; evPttOn = ++ev; }
       seq.stby(0, true, now); // the real radio asserts STBY when keyed (HF here)
     } else if (op == 0x88) {
       tx = false;
       pttOffCount++;
       pttOffAt = now;
+      evPttOff = ++ev;
       seq.stby(0, false, now);
     }
   }
@@ -293,6 +302,8 @@ static uint32_t runCycle(Fake &f, TuneCycle &c, TuneOptions o, int32_t abortAt =
 // Whatever happened, the system must be left safe.
 static void expectSafe(Fake &f, uint8_t originalMode) {
   TEST_ASSERT_FALSE_MESSAGE(f.tx, "radio left transmitting");
+  TEST_ASSERT_FALSE_MESSAGE(f.recArmed, "crash-recovery record left armed");
+  TEST_ASSERT_EQUAL_MESSAGE(f.armCount, f.disarmCount, "recovery armed and disarmed a different number of times");
   TEST_ASSERT_EQUAL_MESSAGE(f.pttOnCount > 0 ? 1 : 0, f.pttOnCount > 0 ? f.pttOffCount > 0 : 0,
                             "PTT on without a later PTT off");
   TEST_ASSERT_EQUAL_MESSAGE(CatArbiter::ClaimState::None, f.core.claimState(), "CAT bus still claimed");
@@ -351,6 +362,40 @@ void test_full_tune_on_a_genuine_ah4_style_tuner() {
   expectSafe(f, MODE_USB);
   TEST_ASSERT_LESS_OR_EQUAL(3, f.pttOnAt - f.keyAssertAt);
   TEST_ASSERT_LESS_OR_EQUAL(3, f.pttOffAt - f.keyReleaseAt);
+}
+
+void test_recovery_record_brackets_every_change_to_the_radio() {
+  Fake f;
+  f.mode = MODE_CWN; // a narrow mode, to prove the exact byte is recorded
+  TuneCycle c(f);
+  runCycle(f, c, TUNE_FULL);
+  TuneReason why;
+  TEST_ASSERT_EQUAL(TuneOutcome::Success, outcomeOf(c, why));
+  TEST_ASSERT_EQUAL(1, f.armCount);
+  TEST_ASSERT_EQUAL(1, f.disarmCount);
+  TEST_ASSERT_EQUAL(MODE_CWN, f.recMode);
+  TEST_ASSERT_LESS_THAN(f.evAmSet, f.evArm);         // armed before the mode is changed...
+  TEST_ASSERT_LESS_THAN(f.evPttOn, f.evArm);         // ...and before the radio is keyed
+  TEST_ASSERT_GREATER_THAN(f.evPttOff, f.evDisarm);  // disarmed only after PTT off...
+  TEST_ASSERT_GREATER_THAN(f.evRestore, f.evDisarm); // ...and after the mode is restored
+  expectSafe(f, MODE_CWN);
+}
+
+void test_refusals_before_the_radio_is_touched_never_arm_the_record() {
+  { Fake f; f.tx = true; TuneCycle c(f); runCycle(f, c, TUNE_FULL); TEST_ASSERT_EQUAL(0, f.armCount); }
+  { Fake f; f.freq = 145500000; TuneCycle c(f); runCycle(f, c, TUNE_FULL); TEST_ASSERT_EQUAL(0, f.armCount); }
+  { Fake f; f.dropFreq = true; TuneCycle c(f); runCycle(f, c, TUNE_FULL); TEST_ASSERT_EQUAL(0, f.armCount); }
+  { Fake f; f.seqStuck = true; TuneCycle c(f); runCycle(f, c, TUNE_FULL); TEST_ASSERT_EQUAL(0, f.armCount); }
+}
+
+void test_a_stuck_ptt_off_keeps_the_record_armed_until_it_works() {
+  Fake f;
+  f.failPttOffTimes = 1000; // the radio never acknowledges PTT off
+  TuneCycle c(f);
+  c.start(TUNE_FULL, 0);
+  for (uint32_t t = 1; t < 12000; t++) { f.hw(t); c.poll(t); f.bus(t); }
+  TEST_ASSERT_TRUE(c.active());          // still trying to unkey
+  TEST_ASSERT_TRUE_MESSAGE(f.recArmed, "must stay armed while the radio may still be keyed");
 }
 
 void test_already_in_am_is_left_alone() {
@@ -1161,6 +1206,9 @@ int main() {
   UNITY_BEGIN();
   RUN_TEST(test_full_tune_on_an_edx2_style_tuner);
   RUN_TEST(test_full_tune_on_a_genuine_ah4_style_tuner);
+  RUN_TEST(test_recovery_record_brackets_every_change_to_the_radio);
+  RUN_TEST(test_refusals_before_the_radio_is_touched_never_arm_the_record);
+  RUN_TEST(test_a_stuck_ptt_off_keeps_the_record_armed_until_it_works);
   RUN_TEST(test_already_in_am_is_left_alone);
   RUN_TEST(test_narrow_mode_restored_exactly);
   RUN_TEST(test_spurious_stby_on_another_band_cannot_disturb_the_tune);

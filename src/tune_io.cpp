@@ -5,6 +5,7 @@
 #include "buzzer.h"
 #include "cat_bridge.h"
 #include "pins.h"
+#include "recovery_io.h"
 #include "sequencer_io.h"
 #include "tune.h"
 
@@ -20,6 +21,8 @@ public:
     return catBridgeTakeResult(r, reply, len);
   }
   void catSetSnapshot(const CatSnapshot &s) override { catBridgeSetSnapshot(s); }
+  void recoveryArm(uint8_t mode) override { ::recoveryArm(mode); }
+  void recoveryDisarm() override { ::recoveryDisarm(); }
   bool bandsAllIdle() override { return sequencerIoAllIdle(); }
   void seqHold(uint8_t band, bool held) override { sequencerIoSetHold(band, held); }
   void seqRequest(uint8_t band, bool wantTx, uint32_t) override { sequencerIoRequest(band, wantTx); }

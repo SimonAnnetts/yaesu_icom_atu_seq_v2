@@ -6,9 +6,11 @@
 
 #include "config.h"
 #include "config_json.h"
+#include "eeprom_map.h"
+#include "watchdog.h"
 #include "sequencer_io.h"
 
-constexpr int EEPROM_ADDR = 0;
+constexpr int EEPROM_ADDR = EEPROM_CONFIG_ADDR;
 constexpr size_t JSON_BUF_MAX = 1024;       // whitespace-stripped JSON text
 constexpr uint32_t RECEIVE_TIMEOUT_MS = 3000; // idle gap that abandons a config in flight
 
@@ -30,7 +32,10 @@ static bool lineOverflow = false;
 static void saveToEeprom(const SequencerConfig &cfg) {
   uint8_t buf[CONFIG_IMAGE_MAX];
   size_t n = configSerialize(cfg, buf, sizeof buf);
-  for (size_t i = 0; i < n; i++) EEPROM.update(EEPROM_ADDR + i, buf[i]); // writes only changed bytes
+  for (size_t i = 0; i < n; i++) {
+    EEPROM.update(EEPROM_ADDR + i, buf[i]); // writes only changed bytes, ~3.3ms each
+    watchdogFeed();
+  }
 }
 
 void configIoBegin() {

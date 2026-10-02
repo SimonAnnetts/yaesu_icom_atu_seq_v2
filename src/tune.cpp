@@ -22,7 +22,7 @@ bool TuneCycle::start(TuneOptions options, uint32_t now) {
   origMode_ = 0;
   modeChanged_ = modeRestored_ = modeGaveUp_ = false;
   restoreTries_ = 0;
-  holdSet_ = seqRequested_ = ah4Started_ = false;
+  holdSet_ = seqRequested_ = ah4Started_ = recoveryArmed_ = false;
   pttRequested_ = pttOnSent_ = pttOffWanted_ = pttOffDone_ = false;
   meterNew_ = false;
   haveRx_ = false;
@@ -288,6 +288,10 @@ void TuneCycle::pollHead(uint32_t now) {
     }
     case TuneStep::SeqUp:
       if (env_.seqActive((uint8_t)band_)) {
+        // About to change the radio (mode, then PTT): from here a reset must be able
+        // to put it back, so record the mode to restore first.
+        env_.recoveryArm(origMode_);
+        recoveryArmed_ = true;
         setStep(TuneStep::SetAm, now);
         if (origMode_ != options_.mode) {
           modeChanged_ = true;
@@ -332,6 +336,12 @@ void TuneCycle::pollTail(uint32_t now) {
           want_ = Kind::RestoreMode;
         }
       } else {
+        // The radio is unkeyed and back in its own mode (or the restore gave up and
+        // has been reported): nothing for a reset to undo any more.
+        if (recoveryArmed_) {
+          env_.recoveryDisarm();
+          recoveryArmed_ = false;
+        }
         env_.catRelease(now); // PC traffic can flow again while the sequencer winds down
         if (seqRequested_) env_.seqRequest((uint8_t)band_, false, now);
         setStep(TuneStep::TailSeq, now);

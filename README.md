@@ -315,6 +315,45 @@ interrupt handler uses, directly and proactively:
   a real tune"), then `T` into a dummy load with the radio's power set for
   about 10W, then onto the antenna.
 
+### Reset safety (watchdog and crash recovery)
+
+A reset puts every pin back to an input, so the optos and LEDs go off and TX
+INHIBIT is released, but a CAT PTT stays on until the radio is told otherwise.
+So a reset in the middle of a tune could leave the radio keyed and in AM. Two
+mechanisms cover this (`src/watchdog.h`, `src/recovery.h`):
+
+- **Watchdog, 2s, interrupt-then-reset.** The main loop feeds it every pass
+  (and the slow EEPROM writes feed it too). If the loop stalls, the first
+  expiry runs an interrupt that writes a note to EEPROM with the part of the
+  loop that was running, and the second expiry resets the board. At the next
+  boot, `WATCHDOG: the previous run stalled ... (last in: <stage>)` is
+  printed. The note is needed because the Arduino bootloader clears the
+  reset-cause register, so the cause of a reset can't be read directly. (The
+  stock Mega bootloader handles a watchdog reset correctly - it disables the
+  watchdog and jumps straight to the application - but a clone may differ; see
+  the bench test below.)
+- **Crash recovery.** Just before the tune cycle first changes the radio (the
+  AM mode, then PTT) it records "tune in progress, original mode X" in EEPROM
+  (3 bytes, magic and complement so a torn or blank record never counts); it
+  clears it only once the radio is unkeyed and back in its own mode. If the
+  record is still set at boot, the last run did not finish — whatever the
+  cause: watchdog, brown-out, USB reset or power loss — so before anything
+  else uses CAT the firmware sends CAT on, PTT off, the saved mode, PTT off
+  again, clears the record, and prints `RECOVERY: ...`. It never sends PTT
+  *on*, and does nothing after an ordinary reset, so a PC's own transmission
+  is never cut off.
+- **TX INHIBIT at boot.** If a STBY line is already low when the board comes
+  up (it rebooted mid-transmission), TX INHIBIT is asserted straight away, not
+  when the sequencer gets going.
+
+Bench test (dummy load, low power): 1. Send `!` on Serial0: it stalls the loop
+on purpose; the board should reset about 4s later and report the watchdog. If
+it instead reboots forever, the bootloader does not handle watchdog resets:
+unplug USB to recover and don't use the watchdog (tell me). 2. Start a tune
+(`T`) and send `!` while the radio is keyed: after the reset the radio should
+come off the air, return to its original mode, and the log should show
+`RECOVERY:` - expect a few seconds of carrier first (stall 2s + reset 2s).
+
 ### Standalone operation
 
 The ATU controller functionality must work with no PC connected at all —

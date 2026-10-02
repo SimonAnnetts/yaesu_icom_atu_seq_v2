@@ -30,6 +30,10 @@ public:
   virtual bool catTakeResult(CatArbiter::Result &r, uint8_t *reply, uint8_t &len) = 0;
   // The radio as it was before the tune: from here on the PC is answered from it.
   virtual void catSetSnapshot(const CatSnapshot &s) = 0;
+  // Crash recovery (recovery.h): armed just before the radio is changed, disarmed
+  // once it is safe again. If a reset lands in between, the next boot unkeys it.
+  virtual void recoveryArm(uint8_t originalMode) = 0;
+  virtual void recoveryDisarm() = 0;
   // Sequencer
   virtual bool bandsAllIdle() = 0;
   virtual void seqHold(uint8_t band, bool held) = 0;
@@ -171,6 +175,7 @@ private:
   uint8_t restoreTries_ = 0;
 
   bool holdSet_ = false; // every band's STBY handling is held
+  bool recoveryArmed_ = false;
   bool seqRequested_ = false;
   bool ah4Started_ = false;
   bool pttRequested_ = false; // KEY cue seen, PTT on wanted
