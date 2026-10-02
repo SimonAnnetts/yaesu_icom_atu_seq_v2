@@ -22,7 +22,7 @@ bool TuneCycle::start(TuneOptions options, uint32_t now) {
   origMode_ = 0;
   modeChanged_ = modeRestored_ = modeGaveUp_ = false;
   restoreTries_ = 0;
-  holdSet_ = seqRequested_ = ah4Started_ = recoveryArmed_ = false;
+  holdSet_ = seqRequested_ = ah4Started_ = recoveryArmed_ = alcOn_ = false;
   pttRequested_ = pttOnSent_ = pttOffWanted_ = pttOffDone_ = false;
   meterNew_ = false;
   haveRx_ = false;
@@ -176,7 +176,7 @@ void TuneCycle::onOpDone(Kind k, bool ok, uint32_t now) {
     case Kind::SetAm:
       if (step_ != TuneStep::SetAm) break;
       if (!ok) { enterTail(TuneOutcome::Failed, TuneReason::CatFailed, now); break; }
-      startTuner(now);
+      afterModeSet(now);
       break;
     case Kind::Meter:
       if (ok && replyLen_ >= 1) {
@@ -206,7 +206,19 @@ void TuneCycle::onOpDone(Kind k, bool ok, uint32_t now) {
 
 // ---- head ----
 
-// After the mode is right: start the START/KEY handshake, or just dwell (dry run).
+// The mode is right. If asked, put the ALC voltage on the radio's ALC line and let it
+// settle before anything is keyed; then start the tuner.
+void TuneCycle::afterModeSet(uint32_t now) {
+  if (options_.alc) {
+    env_.alcSet(true);
+    alcOn_ = true;
+    setStep(TuneStep::Alc, now);
+  } else {
+    startTuner(now);
+  }
+}
+
+// After the mode (and ALC) are right: start the START/KEY handshake, or just dwell (dry run).
 void TuneCycle::startTuner(uint32_t now) {
   if (!options_.ah4) {
     setStep(TuneStep::Dwell, now);
@@ -297,11 +309,14 @@ void TuneCycle::pollHead(uint32_t now) {
           modeChanged_ = true;
           want_ = Kind::SetAm;
         } else {
-          startTuner(now); // already AM: nothing to change
+          afterModeSet(now); // already in the tune mode: nothing to change
         }
       } else if (reached(now, stepAt_ + TUNE_SEQ_TIMEOUT_MS)) {
         enterTail(TuneOutcome::Failed, TuneReason::SequencerTimeout, now);
       }
+      break;
+    case TuneStep::Alc:
+      if (reached(now, stepAt_ + TUNE_ALC_SETTLE_MS)) startTuner(now);
       break;
     case TuneStep::Ah4:
       pollAh4(now);
@@ -322,6 +337,10 @@ void TuneCycle::pollHead(uint32_t now) {
 void TuneCycle::pollTail(uint32_t now) {
   switch (step_) {
     case TuneStep::TailPtt:
+      if (alcOn_ && !(pttOnSent_ && !pttOffDone_)) { // unkeyed (or never keyed): ALC off
+        env_.alcSet(false);
+        alcOn_ = false;
+      }
       if (pttOnSent_ && !pttOffDone_) {
         if (want_ == Kind::None && !(op_ == OpState::Pending && kind_ == Kind::PttOff)) {
           want_ = Kind::PttOff; // keep asking until the radio has been told

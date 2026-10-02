@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "ah4_io.h"
+#include "alc_io.h"
 #include "button_io.h"
 #include "cat_bridge.h"
 #include "config_io.h"
@@ -12,23 +13,11 @@
 #include "walktest.h"
 #include "watchdog.h"
 
-// Wiring only: pin setup, the ALC charge pump PWM, and the main loop that
-// drives the sequencer, the CAT bridge and the bench walk-test. The activity LED
-// lights while CAT bytes are flowing.
-// The ALC charge pump PWM (D9) is started at ~15kHz, with its opto gate (D10)
-// left off so nothing reaches the radio's ALC line yet.
+// Wiring only: pin setup and the main loop, which drives the sequencer, the CAT
+// bridge, the tune cycle and the bench walk-test. The activity LED lights while CAT
+// bytes are flowing. The ALC pump and gate live in alc_io.cpp.
 
 constexpr uint32_t LED_HOLD_MS = 20;
-
-// ALC charge pump drive: D9 is OC2B (Timer2). Fast PWM with OCR2A as TOP and
-// a /8 prescaler gives 16MHz / (8 * (133 + 1)) = ~14.9kHz. (Timer2's plain
-// 8-bit modes can't hit 15kHz: /1 is 31.4kHz or more, /8 is 3.9kHz or less.)
-// OCR2A is used as TOP, so D10 loses its PWM function - fine, it's a plain
-// on/off gate. Duty sets the pump's output; 50% is a starting point to tune
-// against the real circuit (measure the -V rail with the gate off).
-constexpr uint8_t ALC_PWM_TOP = 133;                     // f = 16MHz / (8 * (TOP + 1))
-constexpr uint8_t ALC_PWM_DUTY = (ALC_PWM_TOP + 1) / 2;  // OCR2B, 0..TOP+1 = 0..100%
-static_assert(PIN_ALC_PWM == 9, "ALC PWM setup below assumes Timer2 / OC2B on D9");
 
 uint32_t ledOffAt = 0;
 
@@ -74,17 +63,11 @@ static void configurePins() {
   }
 }
 
-static void startAlcPump() {
-  OCR2A = ALC_PWM_TOP;
-  OCR2B = ALC_PWM_DUTY;
-  TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); // fast PWM (mode 7), OC2B non-inverting
-  TCCR2B = _BV(WGM22) | _BV(CS21);                // TOP = OCR2A, prescaler /8
-}
-
 void setup() {
   configurePins();
   walktestBegin([] {
     configurePins();
+    alcResync(); // configurePins() drops D9's PWM output as a side effect
     sequencerIoInvalidate();
     ah4IoResync();
   });
@@ -94,14 +77,13 @@ void setup() {
   catBridgeBegin();
   recoveryRunIfNeeded(); // undo a tune that a reset interrupted, before anything else uses CAT
 
-  startAlcPump();
+  alcBegin();
   configIoBegin();
   sequencerIoBegin();
   ah4IoBegin();
   buttonIoBegin();
   tuneIoBegin();
 
-  Serial.println(F("ALC pump PWM on D9: ~14.9kHz, gate (D10) off"));
   Serial.println(F("CAT passthrough: Serial2 (PC) <-> Serial3 (radio), 57600 8N2; c = frame log, ? = radio keys"));
   watchdogBegin(); // last: from here the loop must keep feeding it
 }
@@ -119,9 +101,11 @@ void loop() {
     if (tuneIoActive()) continue; // the tune cycle owns the CAT bus and the AH-4
     radioHandleChar(c);
     ah4IoHandleChar(c);
+    alcHandleChar(c);
   }
   watchdogStage(WDT_STAGE_CONFIG);
   configIoPoll();
+  alcPoll();
   walktestPoll();
   if (walktestActive()) return; // bench walk-test owns the pins and Serial0
 

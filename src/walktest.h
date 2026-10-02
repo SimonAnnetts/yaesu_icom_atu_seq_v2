@@ -12,7 +12,9 @@
 //   0  all outputs off (no output lit)
 //   i  pulse TX INHIBIT for TX_INHIBIT_PULSE_MS (never part of n/p stepping)
 //
-// D9 (ALC PWM) is left alone: it is running Timer2 PWM, so just scope it.
+// D9 (ALC PWM) is left alone: it is running Timer2 PWM, so just scope it. The ALC
+// gate step (D10) switches the pump voltage onto the radio's ALC line - harmless
+// unless the radio is transmitting.
 // D4 (TX INHIBIT) is the one output wired to the radio; keep the radio in
 // receive while using the test.
 

@@ -34,6 +34,9 @@ public:
   // once it is safe again. If a reset lands in between, the next boot unkeys it.
   virtual void recoveryArm(uint8_t originalMode) = 0;
   virtual void recoveryDisarm() = 0;
+  // ALC injection (the charge pump's negative voltage onto the radio's ALC line, to
+  // trim the carrier). The gate is only ever on while the radio may be keyed.
+  virtual void alcSet(bool on) = 0;
   // Sequencer
   virtual bool bandsAllIdle() = 0;
   virtual void seqHold(uint8_t band, bool held) = 0;
@@ -58,6 +61,7 @@ constexpr uint32_t TUNE_WATCHDOG_MS = 45000;  // whole head, from start(): up-se
 constexpr uint32_t TUNE_SEQ_TIMEOUT_MS = 16000; // 3 stages x 5000ms max + margin
 constexpr uint32_t TUNE_DRY_DWELL_MS = 1000;
 constexpr uint32_t TUNE_CARRIER_MS = 2000;
+constexpr uint32_t TUNE_ALC_SETTLE_MS = 100; // pump output onto the radio's ALC line, before keying
 constexpr uint8_t TUNE_MODE_RESTORE_TRIES = 3;
 
 struct TuneOptions {
@@ -68,16 +72,17 @@ struct TuneOptions {
   bool preKey;  // key the radio when START asserts rather than when KEY does, so the
                 // radio's start-up power overshoot has settled before the tuner measures
   uint8_t mode; // radio mode to tune in (MODE_AM by default)
+  bool alc;     // inject ALC (gate on, settle, before the radio is keyed) to trim the carrier
 };
 // The default keys the radio at START: bench-proven on an Alinco EDX-2, where keying
 // at KEY made the tuner measure the radio's ~0.7s start-up overshoot and give up.
-constexpr TuneOptions TUNE_FULL = {true, true, false, false, true, MODE_AM};
+constexpr TuneOptions TUNE_FULL = {true, true, false, false, true, MODE_AM, false};
 constexpr TuneOptions TUNE_FULL_PREKEY = TUNE_FULL;
-constexpr TuneOptions TUNE_FULL_ONKEY = {true, true, false, false, false, MODE_AM}; // key when KEY asserts
-constexpr TuneOptions TUNE_FULL_METER = {true, true, true, false, true, MODE_AM};
-constexpr TuneOptions TUNE_ATU_NO_RF = {true, false, false, false, false, MODE_AM}; // no carrier
-constexpr TuneOptions TUNE_DRY = {false, false, false, false, false, MODE_AM};      // sequencer + CAT mode
-constexpr TuneOptions TUNE_CARRIER = {false, false, true, true, false, MODE_AM};    // carrier + meter
+constexpr TuneOptions TUNE_FULL_ONKEY = {true, true, false, false, false, MODE_AM, false}; // key at KEY
+constexpr TuneOptions TUNE_FULL_METER = {true, true, true, false, true, MODE_AM, false};
+constexpr TuneOptions TUNE_ATU_NO_RF = {true, false, false, false, false, MODE_AM, false}; // no carrier
+constexpr TuneOptions TUNE_DRY = {false, false, false, false, false, MODE_AM, false}; // sequencer + CAT mode
+constexpr TuneOptions TUNE_CARRIER = {false, false, true, true, false, MODE_AM, false}; // carrier + meter
 
 enum class TuneOutcome : uint8_t { None, Success, Refused, Failed, Aborted };
 
@@ -102,7 +107,7 @@ enum class TuneReason : uint8_t {
 
 enum class TuneStep : uint8_t {
   Idle,
-  Claim, CatOn, QueryTx, QueryRx, QueryFreq, SeqUp, SetAm, Ah4, Dwell, // head
+  Claim, CatOn, QueryTx, QueryRx, QueryFreq, SeqUp, SetAm, Alc, Ah4, Dwell, // head
   TailPtt, TailMode, TailSeq,                                  // tail
 };
 
@@ -147,6 +152,7 @@ private:
   void pollTail(uint32_t now);
   void pollAh4(uint32_t now);
   void startTuner(uint32_t now);
+  void afterModeSet(uint32_t now);
   void pollMeter();
   bool inTail() const { return step_ >= TuneStep::TailPtt; }
 
@@ -176,6 +182,7 @@ private:
 
   bool holdSet_ = false; // every band's STBY handling is held
   bool recoveryArmed_ = false;
+  bool alcOn_ = false;
   bool seqRequested_ = false;
   bool ah4Started_ = false;
   bool pttRequested_ = false; // KEY cue seen, PTT on wanted

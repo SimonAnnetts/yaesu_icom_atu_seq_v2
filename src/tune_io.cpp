@@ -1,6 +1,7 @@
 #include "tune_io.h"
 
 #include "ah4_io.h"
+#include "alc_io.h"
 #include "blinker.h"
 #include "buzzer.h"
 #include "cat_bridge.h"
@@ -23,6 +24,7 @@ public:
   void catSetSnapshot(const CatSnapshot &s) override { catBridgeSetSnapshot(s); }
   void recoveryArm(uint8_t mode) override { ::recoveryArm(mode); }
   void recoveryDisarm() override { ::recoveryDisarm(); }
+  void alcSet(bool on) override { alcTuneSet(on); }
   bool bandsAllIdle() override { return sequencerIoAllIdle(); }
   void seqHold(uint8_t band, bool held) override { sequencerIoSetHold(band, held); }
   void seqRequest(uint8_t band, bool wantTx, uint32_t) override { sequencerIoRequest(band, wantTx); }
@@ -44,6 +46,7 @@ Blinker led; // the tune indicator pattern; sounded on the buzzer (D7)
 bool buzzing = false;
 TuneStep lastStep = TuneStep::Idle;
 TuneOptions lastOptions = TUNE_FULL;
+bool useAlc = false;        // key L toggles: inject ALC during tunes
 uint8_t tuneMode = MODE_AM; // radio mode used for tuning; keys 1/2/3 change it
 
 const __FlashStringHelper *stepName(TuneStep s) {
@@ -55,6 +58,7 @@ const __FlashStringHelper *stepName(TuneStep s) {
     case TuneStep::QueryFreq: return F("reading frequency and mode");
     case TuneStep::SeqUp: return F("sequencer up (tune profile)");
     case TuneStep::SetAm: return F("setting tune mode");
+    case TuneStep::Alc: return F("ALC settling");
     case TuneStep::Ah4: return F("START/KEY handshake");
     case TuneStep::Dwell: return F("dry-run dwell");
     case TuneStep::TailPtt: return F("PTT off");
@@ -94,6 +98,7 @@ void printMHz(uint32_t hz) {
 
 void begin(TuneOptions o) {
   o.mode = tuneMode;
+  o.alc = useAlc;
   lastOptions = o;
   if (cycle.start(o, millis())) {
     Serial.println(o.carrier ? F("TUNE: started (carrier test: radio keyed for 2s, no ATU)")
@@ -128,6 +133,10 @@ bool tuneIoHandleChar(char c) {
     case '1': tuneMode = MODE_AM; Serial.println(F("TUNE: tune mode AM")); return true;
     case '2': tuneMode = MODE_FM; Serial.println(F("TUNE: tune mode FM")); return true;
     case '3': tuneMode = MODE_CW; Serial.println(F("TUNE: tune mode CW (carrier may need a key closure)")); return true;
+    case 'L':
+      useAlc = !useAlc;
+      Serial.println(useAlc ? F("TUNE: ALC injection ON for tunes") : F("TUNE: ALC injection off for tunes"));
+      return true;
     case 'R': begin(TUNE_FULL_ONKEY); return true;
     case 'M': begin(TUNE_FULL_METER); return true;
     case 'P': begin(TUNE_CARRIER); return true;

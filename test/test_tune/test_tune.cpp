@@ -70,6 +70,9 @@ struct Fake : TuneEnv, CatBridgeIo {
   uint32_t seqActiveAt = 0, amSetAt = 0, restoreAt = 0, claimReleasedAt = 0;
   int pttOnCount = 0, pttOffCount = 0;
   bool recArmed = false;
+  bool alcOn = false;
+  int alcOnCount = 0, alcOffCount = 0, evAlcOn = 0, evAlcOff = 0;
+  uint32_t alcOnAt = 0;
   uint8_t recMode = 0xFF;
   int armCount = 0, disarmCount = 0;
   uint32_t recArmAt = 0, recDisarmAt = 0;
@@ -131,6 +134,11 @@ struct Fake : TuneEnv, CatBridgeIo {
   void catSetSnapshot(const CatSnapshot &s) override { core.setSnapshot(s); }
   void recoveryArm(uint8_t m) override { recArmed = true; recMode = m; armCount++; recArmAt = now_; evArm = ++ev; }
   void recoveryDisarm() override { recArmed = false; disarmCount++; recDisarmAt = now_; evDisarm = ++ev; }
+  void alcSet(bool on) override {
+    alcOn = on;
+    if (on) { alcOnCount++; evAlcOn = ++ev; alcOnAt = now_; }
+    else { alcOffCount++; evAlcOff = ++ev; }
+  }
   bool catSubmit(const uint8_t cmd[5], uint32_t now) override {
     if (blockQueries && (cmd[4] == 0xF7 || cmd[4] == 0x03)) return false;
     if (!core.submit(cmd, now)) return false;
@@ -303,6 +311,8 @@ static uint32_t runCycle(Fake &f, TuneCycle &c, TuneOptions o, int32_t abortAt =
 static void expectSafe(Fake &f, uint8_t originalMode) {
   TEST_ASSERT_FALSE_MESSAGE(f.tx, "radio left transmitting");
   TEST_ASSERT_FALSE_MESSAGE(f.recArmed, "crash-recovery record left armed");
+  TEST_ASSERT_FALSE_MESSAGE(f.alcOn, "ALC gate left on");
+  TEST_ASSERT_EQUAL_MESSAGE(f.alcOnCount, f.alcOffCount, "ALC switched on and off a different number of times");
   TEST_ASSERT_EQUAL_MESSAGE(f.armCount, f.disarmCount, "recovery armed and disarmed a different number of times");
   TEST_ASSERT_EQUAL_MESSAGE(f.pttOnCount > 0 ? 1 : 0, f.pttOnCount > 0 ? f.pttOffCount > 0 : 0,
                             "PTT on without a later PTT off");
@@ -396,6 +406,78 @@ void test_a_stuck_ptt_off_keeps_the_record_armed_until_it_works() {
   for (uint32_t t = 1; t < 12000; t++) { f.hw(t); c.poll(t); f.bus(t); }
   TEST_ASSERT_TRUE(c.active());          // still trying to unkey
   TEST_ASSERT_TRUE_MESSAGE(f.recArmed, "must stay armed while the radio may still be keyed");
+}
+
+static TuneOptions withAlc(TuneOptions o) { o.alc = true; return o; }
+
+void test_alc_is_on_before_the_radio_is_keyed_and_off_as_soon_as_it_is_unkeyed() {
+  for (int genuine = 0; genuine < 2; genuine++) {
+    for (int preKey = 0; preKey < 2; preKey++) {
+      Fake f;
+      f.genuine = genuine;
+      TuneCycle c(f);
+      runCycle(f, c, withAlc(preKey ? TUNE_FULL : TUNE_FULL_ONKEY));
+      TuneReason why;
+      TEST_ASSERT_EQUAL(TuneOutcome::Success, outcomeOf(c, why));
+      TEST_ASSERT_EQUAL(1, f.alcOnCount);
+      TEST_ASSERT_LESS_THAN(f.evPttOn, f.evAlcOn);     // ALC first, then the carrier
+      TEST_ASSERT_GREATER_THAN(f.evPttOff, f.evAlcOff); // released right after PTT off
+      TEST_ASSERT_GREATER_OR_EQUAL(TUNE_ALC_SETTLE_MS, f.startAt - f.alcOnAt); // settled before START
+      expectSafe(f, MODE_USB);
+    }
+  }
+}
+
+void test_no_alc_unless_asked_for() {
+  Fake f;
+  TuneCycle c(f);
+  runCycle(f, c, TUNE_FULL);
+  TEST_ASSERT_EQUAL(0, f.alcOnCount);
+}
+
+void test_alc_never_left_on_whatever_goes_wrong() {
+  struct Scn { const char *name; void (*set)(Fake &); };
+  static const Scn scns[] = {
+    {"no atu",        [](Fake &f) { f.noAtu = true; }},
+    {"key stuck",     [](Fake &f) { f.keyStuck = true; }},
+    {"never releases", [](Fake &f) { f.neverRelease = true; }},
+    {"not tuned",     [](Fake &f) { f.failTune = true; }},
+    {"ptt on fails",  [](Fake &f) { f.failPttOn = true; }},
+    {"ptt off retried", [](Fake &f) { f.failPttOffTimes = 3; }},
+    {"seq stuck",     [](Fake &f) { f.seqStuck = true; }},
+  };
+  for (const Scn &sc : scns) {
+    Fake f;
+    sc.set(f);
+    TuneCycle c(f);
+    runCycle(f, c, withAlc(TUNE_FULL));
+    char msg[64];
+    snprintf(msg, sizeof msg, "scenario '%s'", sc.name);
+    TEST_ASSERT_FALSE_MESSAGE(f.alcOn, msg);
+    TEST_ASSERT_EQUAL_MESSAGE(f.alcOnCount, f.alcOffCount, msg);
+    TEST_ASSERT_FALSE_MESSAGE(f.tx, msg);
+  }
+}
+
+void test_abort_sweep_with_alc_leaves_the_gate_off() {
+  for (int32_t at = 1; at < 3600; at += 9) {
+    Fake f;
+    TuneCycle c(f);
+    runCycle(f, c, withAlc(TUNE_FULL), at);
+    char msg[64];
+    snprintf(msg, sizeof msg, "abort at %d ms", (int)at);
+    TEST_ASSERT_FALSE_MESSAGE(f.alcOn, msg);
+    TEST_ASSERT_EQUAL_MESSAGE(f.alcOnCount, f.alcOffCount, msg);
+    TEST_ASSERT_FALSE_MESSAGE(f.tx, msg);
+    TEST_ASSERT_EQUAL_MESSAGE(MODE_USB, f.mode, msg);
+  }
+}
+
+void test_alc_with_the_carrier_test_and_a_radio_already_in_the_tune_mode() {
+  { Fake f; TuneCycle c(f); runCycle(f, c, withAlc(TUNE_CARRIER));
+    TEST_ASSERT_EQUAL(1, f.alcOnCount); TEST_ASSERT_FALSE(f.alcOn); expectSafe(f, MODE_USB); }
+  { Fake f; f.mode = MODE_AM; TuneCycle c(f); runCycle(f, c, withAlc(TUNE_FULL));
+    TEST_ASSERT_EQUAL(1, f.alcOnCount); expectSafe(f, MODE_AM); }
 }
 
 void test_already_in_am_is_left_alone() {
@@ -1209,6 +1291,11 @@ int main() {
   RUN_TEST(test_recovery_record_brackets_every_change_to_the_radio);
   RUN_TEST(test_refusals_before_the_radio_is_touched_never_arm_the_record);
   RUN_TEST(test_a_stuck_ptt_off_keeps_the_record_armed_until_it_works);
+  RUN_TEST(test_alc_is_on_before_the_radio_is_keyed_and_off_as_soon_as_it_is_unkeyed);
+  RUN_TEST(test_no_alc_unless_asked_for);
+  RUN_TEST(test_alc_never_left_on_whatever_goes_wrong);
+  RUN_TEST(test_abort_sweep_with_alc_leaves_the_gate_off);
+  RUN_TEST(test_alc_with_the_carrier_test_and_a_radio_already_in_the_tune_mode);
   RUN_TEST(test_already_in_am_is_left_alone);
   RUN_TEST(test_narrow_mode_restored_exactly);
   RUN_TEST(test_spurious_stby_on_another_band_cannot_disturb_the_tune);

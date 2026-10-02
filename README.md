@@ -786,13 +786,28 @@ protocol) and [doumae/fakeFC](https://github.com/doumae/fakeFC) —
   - **`START`** (Arduino asserts by pulling it low at the AH-4 end): `D12`
     → ~330-470Ω resistor → opto LED anode → cathode → Arduino GND (drives
     the opto). Opto's phototransistor: collector → AH-4 `START` pin,
-    emitter → AH-4-side `GND`; a ~10kΩ pull-up from `START` to the AH-4
-    connector's `+13.8V` provides the idle-high level. Opto off → pull-up
-    holds `START` high; opto on (D12 driven high) → phototransistor pulls
-    `START` near 0V (asserted). **The external pull-up is required:**
-    K9EQ describes `START` as pulled up to 13.8V inside the *radio*, not
-    in the AH-4, so with the Arduino standing in for the radio this circuit
-    has to provide it.
+    emitter → AH-4-side `GND`. If the tuner has no pull-up of its own, a ~10kΩ
+    pull-up from `START` to the AH-4 connector's `+13.8V` provides the
+    idle-high level (see below). Opto off → `START` idles high; opto on (D12
+    driven high) → phototransistor pulls `START` near 0V (asserted). **Whether the 10kΩ pull-up is needed depends
+    on the tuner.** K9EQ describes a genuine AH-4's `START` as pulled up to
+    13.8V inside the *radio*, so a genuine AH-4 needs this circuit to
+    provide it. An **Alinco EDX-2** does not: its `START` input is the 100µH
+    choke and 4k7 to the base of a PNP whose emitter is at 5V, which supplies
+    its own pull-up, so there is no pull-up here at all and the collector
+    carries under 1mA.
+  - **Protect the opto from the cable.** The tuner end of the cable is at the
+    antenna, and the opto's transistor can only stand about 6V *reverse*
+    (collector below emitter) — a negative spike on `START` can damage it
+    while the LED side still works (one opto died this way: LED lit, `START`
+    never pulled low, "no ATU: KEY never asserted"). A **1N4148 in series**
+    with the collector, anode to the `START` cable and cathode to the opto
+    collector (the sink current flows from the line into the collector), blocks
+    any negative excursion. It raises the asserted level at the cable to about
+    0.8V (transistor ≈0.2V + diode ≈0.6V), still far below the ~4.3V the PNP
+    needs. Against *positive* spikes the opto's 35V collector rating is the
+    limit; a ~20V transient suppressor from the cable side to ground would add
+    margin if it is ever needed.
   - **`KEY`** (AH-4 asserts by pulling it low at its own end): AH-4-side
     `+13.8V` → ~1kΩ resistor → opto LED anode → cathode → AH-4 `KEY` pin
     (the AH-4 completes this loop to its own ground when busy). Opto's
@@ -809,6 +824,46 @@ protocol) and [doumae/fakeFC](https://github.com/doumae/fakeFC) —
   - A standard low-speed part (e.g. PC817) is more than adequate — these
     are millisecond-scale control lines, nowhere near a PC817's ~µs-scale
     switching time, and its Vceo (~35V) comfortably clears the 13.8V rail.
+
+### ALC in the firmware (`src/alc_io.h`)
+
+Wired: the opto's LED is fed from D10 through 470Ω (about 8mA), its collector
+goes to the radio's ALC line and its emitter to the charge pump's negative
+output, so the transistor pulls the ALC line towards the pump voltage — the
+direction that only ever reduces power. The pump (Timer2, D9, ~14.9kHz) runs
+all the time; D10 is the gate.
+
+- **Fail-safe:** a reset or a hang turns the gate off (the pin becomes an input,
+  the LED goes dark), a gate switched on by hand releases itself after 30s, and
+  the tune cycle releases it as soon as the radio is unkeyed on every path —
+  success, failure, abort — which the tests check by breaking things in seven
+  ways and sweeping an abort across the whole cycle.
+- **Bench key (no tune running):** `g` gate on/off. The pump duty is fixed at 50%:
+  on the real circuit 5% to 95% moved the output by only ~0.2V (a diode charge
+  pump's voltage is set by its diode drops and the supply, not the duty), so it
+  is not a control. To back the voltage off, put a 100kΩ pot in the circuit.
+  Opening the walk-test and exiting it restarts the pump (leaving it would have
+  stopped it: `configurePins()` disconnects D9's PWM output as a side effect).
+- **In a tune:** `L` toggles "ALC injection for tunes" (off by default until it
+  is calibrated). When on, the gate goes on once the mode is set, is given
+  100ms to settle, and only then does the tuner start and the radio get keyed;
+  it is released in the tail right after PTT off.
+- **Calibrating:** measure the pump's -V with the gate off, then press `g` and
+  watch the radio's ALC/power. With `L` on, run the carrier test (`P`, dummy
+  load) and compare the radio's PO meter and your external wattmeter with and
+  without ALC: the aim is a steady ~10W with the start-up overshoot (above)
+  taken out, adjusting the pot.
+
+- **Status:** the pump and gate work — -4V is measured at the radio's EXT ALC
+  jack during a tune — but the radio's carrier does not change with it, so the
+  ALC injection stays **off by default** (`L`) and the tune does not depend on
+  it: keying at `START` already avoids the start-up overshoot (see the bench
+  results). To find out whether the radio sees the voltage at all, set Menu #24
+  (TX MTR) to ALC: the manual says the ALC meter reading includes "any external
+  ALC voltage", so the meter should deflect when the gate is on while keyed
+  (`P` with `L` on, dummy load). If it doesn't move, the voltage isn't reaching
+  the radio's ALC circuit; if it does, the radio sees it but isn't acting on it
+  in this mode.
 
 ## ALC injection for tune power (reference)
 

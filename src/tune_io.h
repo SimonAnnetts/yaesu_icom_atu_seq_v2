@@ -13,6 +13,7 @@
 //                        (the default keys at START so the radio's start-up power
 //                        overshoot has settled before the tuner measures)
 //                     1/2/3  tune mode AM / FM / CW (default AM)
+//                     L  toggle ALC injection during tunes (default off)
 //                     D  dry run: sequencer + AM mode only, no ATU, no RF
 //                     X  abort
 //
