@@ -2,16 +2,15 @@
 
 An Arduino Mega 2560 controller that:
 
-- lets an **Icom AH-4-type ATU** (or any tuner using the same protocol) work
-  with a **Yaesu FT-847**, tuned by a **new, separate tune button** added by
-  this device (the radio's own [TUNER] key is not used);
+- interfaces an **Icom AH-4-type ATU** (or any tuner using the same protocol) to
+  a **Yaesu FT-847**. Note: the radio's own [TUNER] button is not used - we have our own button that initiates a tuning cycle and keys the radio as necessary;
 - provides **three sequencer outputs per band, for four bands** (HF, 50, 144
   and 430MHz), for preamp and power-amp control;
 - provides an **ALC output** that can control the radio's power during the
   tune cycle;
-- lets complex **inter-band sequencer and tuner configurations** be defined in
+- allows complex **inter-band sequencer and tuner configurations** be defined in
   a **JSON config**;
-- still lets a **PC control the radio over CAT**, with none of the tuner and
+- allows a **PC control the radio over CAT**, with none of the tuner and
   sequencer operations getting in the way.
 
 ## Aims in detail
