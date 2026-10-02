@@ -19,6 +19,7 @@ public:
   bool catTakeResult(CatArbiter::Result &r, uint8_t *reply, uint8_t &len) override {
     return catBridgeTakeResult(r, reply, len);
   }
+  void catSetSnapshot(const CatSnapshot &s) override { catBridgeSetSnapshot(s); }
   bool bandsAllIdle() override { return sequencerIoAllIdle(); }
   void seqHold(uint8_t band, bool held) override { sequencerIoSetHold(band, held); }
   void seqRequest(uint8_t band, bool wantTx, uint32_t) override { sequencerIoRequest(band, wantTx); }
@@ -47,6 +48,7 @@ const __FlashStringHelper *stepName(TuneStep s) {
     case TuneStep::Claim: return F("claiming CAT bus");
     case TuneStep::CatOn: return F("CAT on");
     case TuneStep::QueryTx: return F("checking radio is receiving");
+    case TuneStep::QueryRx: return F("reading RX status");
     case TuneStep::QueryFreq: return F("reading frequency and mode");
     case TuneStep::SeqUp: return F("sequencer up (tune profile)");
     case TuneStep::SetAm: return F("setting tune mode");

@@ -55,6 +55,7 @@ static void block(uint8_t out[5], uint8_t a, uint8_t b, uint8_t c, uint8_t d, ui
 void catCmdCatOn(uint8_t out[5]) { block(out, 0, 0, 0, 0, 0x00); }
 void catCmdGetFreqMode(uint8_t out[5]) { block(out, 0, 0, 0, 0, CAT_OP_GET_FREQ_MODE_MAIN); }
 void catCmdGetTxStatus(uint8_t out[5]) { block(out, 0, 0, 0, 0, CAT_OP_TX_STATUS); }
+void catCmdGetRxStatus(uint8_t out[5]) { block(out, 0, 0, 0, 0, CAT_OP_RX_STATUS); }
 void catCmdSetMode(uint8_t out[5], uint8_t mode) { block(out, mode, 0, 0, 0, CAT_OP_SET_MODE_MAIN); }
 void catCmdPtt(uint8_t out[5], bool on) {
   block(out, 0, 0, 0, 0, on ? CAT_OP_PTT_ON : CAT_OP_PTT_OFF);

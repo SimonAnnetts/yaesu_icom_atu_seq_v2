@@ -34,6 +34,7 @@ inline bool catTxStatusTransmitting(uint8_t status) { return !(status & 0x80); }
 void catCmdCatOn(uint8_t out[5]);
 void catCmdGetFreqMode(uint8_t out[5]); // reply: 4 freq bytes + mode byte
 void catCmdGetTxStatus(uint8_t out[5]); // reply: 1 byte
+void catCmdGetRxStatus(uint8_t out[5]); // reply: 1 byte
 void catCmdSetMode(uint8_t out[5], uint8_t mode);
 void catCmdSetFreq(uint8_t out[5], uint32_t hz);
 void catCmdPtt(uint8_t out[5], bool on);

@@ -25,6 +25,7 @@ bool TuneCycle::start(TuneOptions options, uint32_t now) {
   holdSet_ = seqRequested_ = ah4Started_ = false;
   pttRequested_ = pttOnSent_ = pttOffWanted_ = pttOffDone_ = false;
   meterNew_ = false;
+  haveRx_ = false;
   startedAt_ = now;
 
   if (!env_.bandsAllIdle()) {
@@ -83,6 +84,7 @@ void TuneCycle::trySubmit(uint32_t now) {
     case Kind::CatOn: catCmdCatOn(cmd); break;
     case Kind::QueryTx:
     case Kind::Meter: catCmdGetTxStatus(cmd); break;
+    case Kind::QueryRx: catCmdGetRxStatus(cmd); break;
     case Kind::QueryFreq: catCmdGetFreqMode(cmd); break;
     case Kind::SetAm: catCmdSetMode(cmd, options_.mode); break; // the tune mode
     case Kind::PttOn: catCmdPtt(cmd, true); break;
@@ -123,6 +125,17 @@ void TuneCycle::onOpDone(Kind k, bool ok, uint32_t now) {
         enterTail(TuneOutcome::Refused, TuneReason::RadioTransmitting, now);
         break;
       }
+      txStatus_ = reply_[0];
+      setStep(TuneStep::QueryRx, now);
+      want_ = Kind::QueryRx;
+      break;
+    case Kind::QueryRx:
+      if (step_ != TuneStep::QueryRx) break;
+      // Only used to answer the PC while we tune: not worth failing a tune over.
+      if (ok && replyLen_ >= 1) {
+        rxStatus_ = reply_[0];
+        haveRx_ = true;
+      }
       setStep(TuneStep::QueryFreq, now);
       want_ = Kind::QueryFreq;
       break;
@@ -134,6 +147,16 @@ void TuneCycle::onOpDone(Kind k, bool ok, uint32_t now) {
         break;
       }
       origMode_ = reply_[4];
+      {
+        CatSnapshot snap; // from here the PC is answered with this, not the live radio
+        snap.haveFreqMode = true;
+        for (uint8_t i = 0; i < CAT_FRAME_LEN; i++) snap.freqMode[i] = reply_[i];
+        snap.haveTx = true;
+        snap.tx = txStatus_;
+        snap.haveRx = haveRx_;
+        snap.rx = rxStatus_;
+        env_.catSetSnapshot(snap);
+      }
       band_ = env_.bandForFreq(freqHz_);
       if (band_ < 0) { enterTail(TuneOutcome::Refused, TuneReason::NoBand, now); break; }
       if (!env_.atuAllowed((uint8_t)band_)) {

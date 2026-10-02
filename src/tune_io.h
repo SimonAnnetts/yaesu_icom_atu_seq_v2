@@ -16,8 +16,8 @@
 //                     D  dry run: sequencer + AM mode only, no ATU, no RF
 //                     X  abort
 //
-// While a cycle runs the Arduino owns the CAT bus, so PC traffic waits (a few
-// seconds at most); the PC is not yet shown faked mode/PTT replies.
+// While a cycle runs the Arduino owns the CAT bus, and the PC is answered from a
+// snapshot of the radio taken at the start (see CatBridgeCore), so it cannot tell.
 
 void tuneIoBegin();
 

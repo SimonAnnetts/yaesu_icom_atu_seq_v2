@@ -279,12 +279,10 @@ interrupt handler uses, directly and proactively:
   timing) with failures injected at every step and an abort swept across the
   whole cycle.
 - **The cycle owns the CAT bus** from before `START` until the restore: the
-  arbiter's claim holds PC bytes in the Serial2 RX buffer (nothing is
-  dropped) so PTT can go out the instant `KEY` asserts. Consequence for now:
-  the PC sees its traffic *delayed* by the length of the cycle (a few
-  seconds), not answered with faked mode/PTT replies — that is the next
-  phase. A claim also releases itself after 20s so the PC can never be
-  locked out.
+  arbiter's claim lets PTT go out without queueing behind PC traffic. The PC
+  is not locked out meanwhile — it is answered from a snapshot (see "PC
+  transparency during a tune cycle"). A claim also releases itself after 60s
+  so the PC can never be locked out.
 - **Refusals** (nothing is left changed): a band already transmitting, the
   radio reporting it is transmitting, a frequency in no band, a band the AH-4
   isn't enabled for (the config's per-band `atu` flag), no usable
@@ -337,20 +335,41 @@ this is a first-class use case, not just a side effect of the design:
 ### PC transparency during a tune cycle
 
 While a tune cycle is in progress, the PC must not be able to tell that
-anything unusual is happening:
+anything unusual is happening. The Arduino owns the radio's bus for the whole
+cycle (the PC and the Arduino cannot both talk to it), so rather than forward
+the PC's traffic it keeps reading the PC and answers for the radio, from a
+snapshot taken at the start of the cycle (`CatBridgeCore`, `src/cat_bridge_core.h`):
 
-- Queries for mode or PTT/TX status are answered using the values captured
-  at the start of the cycle (see above), not the radio's true current
-  state.
-- Every other CAT query or command is forwarded to/from the radio live, as
-  normal — nothing needs to be cached or swallowed for these, since the
-  tune cycle doesn't affect them.
-- Commands from the PC that would directly conflict with the in-progress
-  tune sequence (setting mode, or PTT, while the Arduino is mid-cycle) are
-  silently swallowed — not forwarded to the radio — so the PC never sees
-  an error and the tune cycle runs to completion undisturbed.
-- Once the tune cycle completes and the radio is restored, the Arduino
-  resumes transparent passthrough with no faking at all.
+- **Queries are answered at once from the snapshot**, within a few
+  milliseconds: freq/mode (`0x03`) gets the real frequency and the
+  *original* mode — never AM; TX status (`0xF7`) says "not transmitting";
+  RX status (`0xE7`) gives the pre-tune value. The snapshot comes from the
+  cycle's own queries (the radio's state before keying), so it works the
+  same with no PC history at all.
+- **PTT commands (`0x08`, `0x88`) are swallowed** — the PC never sees an
+  error (they have no reply) and cannot key or unkey the radio against the
+  tune. A PC PTT sent during a tune is not replayed afterwards either.
+- **Every other command is queued and replayed after the tune**, in order,
+  once the original mode is restored: a mode or frequency change made in
+  flrig mid-tune still takes effect, applied last, rather than being lost.
+  A query that can't be answered from the snapshot (a satellite VFO, say) is
+  queued the same way and answered live afterwards. The queue holds 8
+  commands; if it overflows the *oldest* is dropped, so the newest request
+  (the latest mode or frequency) always survives.
+- **Mode changes are seamless.** At the start, the claim waits for any PC
+  exchange already in flight to finish (so nothing is cut in half), and for
+  the first few hundred milliseconds — until the snapshot exists — PC bytes
+  simply wait in the port's buffer. At the end the queue is replayed (50ms
+  after a command, 10ms after a query's reply) and any new PC command goes
+  straight through if nothing is queued ahead of it, else queues behind so
+  order is preserved. A command split across any of these moments is never
+  cut in half (tested by sweeping a split frame across a whole cycle).
+- Once the cycle completes, the radio is restored and the queue has drained,
+  the Arduino is back to byte-transparent passthrough.
+
+Bench: with the CAT frame log on (`c`), `PROXY>PC` is a reply made up from
+the snapshot, `PC swallowed` a dropped PTT, `PC queued` a held command and
+`REPLAY>RADIO` its replay.
 
 ### Sequencer
 

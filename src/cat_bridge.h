@@ -3,15 +3,16 @@
 #include <Arduino.h>
 
 #include "cat_arbiter.h"
+#include "cat_intercept.h"
 
-// CAT passthrough between Port 1 (Serial2, PC) and Port 2 (Serial3, radio).
-// Every byte is forwarded immediately and unchanged; a copy is fed through the
-// CatFramer so whole commands/replies can be seen (and, in later phases,
-// intercepted). Frame logging to Serial0 is off by default.
+// CAT passthrough between Port 1 (Serial2, PC) and Port 2 (Serial3, radio), byte
+// for byte in both directions. The logic lives in cat_bridge_core.h (host-tested);
+// this wires it to the serial ports and logs frames to Serial0 (off by default).
 //
-// The Arduino can also run its own commands on Port 2 (catBridgeSubmit). They
-// wait for the PC's current exchange to finish, hold PC bytes in the Serial2
-// RX buffer while they run, and their replies never reach the PC.
+// The Arduino can also run its own commands on Port 2 (catBridgeSubmit), and hold
+// the bus for a whole job (claim). While it holds it the PC is still answered from
+// a snapshot of the radio (catBridgeSetSnapshot) - see CatBridgeCore - so a tune
+// is invisible to it.
 
 void catBridgeBegin();
 
@@ -28,9 +29,10 @@ bool catBridgeSubmit(const uint8_t cmd[5]);
 // True once per finished transaction; reply gets up to 5 bytes.
 bool catBridgeTakeResult(CatArbiter::Result &r, uint8_t *reply, uint8_t &len);
 
-// Claim the bus for a multi-command job (the tune cycle): PC bytes wait in the
-// Serial2 RX buffer until releaseClaim, and commands go out without queueing
-// behind PC traffic. See CatArbiter.
+// Claim the bus for a multi-command job (the tune cycle). See CatArbiter.
 bool catBridgeClaim();
 CatArbiter::ClaimState catBridgeClaimState();
 void catBridgeReleaseClaim();
+
+// The radio's state before the tune: the PC is answered from it until the claim ends.
+void catBridgeSetSnapshot(const CatSnapshot &s);

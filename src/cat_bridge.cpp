@@ -1,90 +1,70 @@
 #include "cat_bridge.h"
 
-#include "cat_frame.h"
+#include "cat_bridge_core.h"
 
 constexpr uint32_t CAT_BAUD = 57600;
 constexpr uint8_t CAT_CONFIG = SERIAL_8N2; // FT-847: 8 data bits, 2 stop, no parity
 constexpr int LOG_LINE_MAX = 40;           // skip logging rather than block forwarding
 
-static CatFramer framer;
-static CatArbiter arbiter;
 static bool logFrames = false;
 
-static void logBytes(const __FlashStringHelper *label, const uint8_t *d, uint8_t n) {
-  // Forwarding matters more than logging: if Serial0's TX buffer is full, drop
-  // this line instead of blocking.
-  if (Serial.availableForWrite() < LOG_LINE_MAX) return;
-  Serial.print(label);
-  for (uint8_t i = 0; i < n; i++) {
-    Serial.print(' ');
-    if (d[i] < 0x10) Serial.print('0');
-    Serial.print(d[i], HEX);
-  }
-  Serial.println();
-}
+namespace {
 
-static void handleEvent(const CatEvent &ev) {
-  if (!logFrames) return;
-  switch (ev.kind) {
-    case CatEvent::Command: logBytes(F("PC>RADIO"), ev.data, ev.len); break;
-    case CatEvent::Reply: logBytes(F("RADIO>PC"), ev.data, ev.len); break;
-    case CatEvent::StrayReply: logBytes(F("RADIO>PC stray"), ev.data, ev.len); break;
-    case CatEvent::CommandAbandoned: logBytes(F("PC>RADIO torn"), ev.data, ev.len); break;
-    case CatEvent::ReplyAbandoned: logBytes(F("RADIO>PC timeout"), ev.data, ev.len); break;
-    default: break;
+class SerialIo : public CatBridgeIo {
+public:
+  int pcRead() override { return Serial2.available() ? Serial2.read() : -1; }
+  int radioRead() override { return Serial3.available() ? Serial3.read() : -1; }
+  void pcWrite(uint8_t b) override { Serial2.write(b); }
+  void radioWrite(uint8_t b) override { Serial3.write(b); }
+
+  void frame(Frame kind, const uint8_t *d, uint8_t n) override {
+    if (!logFrames) return;
+    // Forwarding matters more than logging: if Serial0's TX buffer is full, drop
+    // this line instead of blocking.
+    if (Serial.availableForWrite() < LOG_LINE_MAX) return;
+    switch (kind) {
+      case Frame::PcToRadio: Serial.print(F("PC>RADIO")); break;
+      case Frame::RadioToPc: Serial.print(F("RADIO>PC")); break;
+      case Frame::StrayFromRadio: Serial.print(F("RADIO>PC stray")); break;
+      case Frame::TornFromPc: Serial.print(F("PC>RADIO torn")); break;
+      case Frame::ReplyTimeout: Serial.print(F("RADIO>PC timeout")); break;
+      case Frame::ArduinoToRadio: Serial.print(F("ARD>RADIO")); break;
+      case Frame::SynthToPc: Serial.print(F("PROXY>PC")); break;
+      case Frame::SwallowedFromPc: Serial.print(F("PC swallowed")); break;
+      case Frame::QueuedFromPc: Serial.print(F("PC queued")); break;
+      case Frame::DroppedFromQueue: Serial.print(F("PC queue full, dropped")); break;
+      case Frame::Replayed: Serial.print(F("REPLAY>RADIO")); break;
+    }
+    for (uint8_t i = 0; i < n; i++) {
+      Serial.print(' ');
+      if (d[i] < 0x10) Serial.print('0');
+      Serial.print(d[i], HEX);
+    }
+    Serial.println();
   }
-}
+};
+
+SerialIo io;
+CatBridgeCore core(io);
+
+} // namespace
 
 void catBridgeBegin() {
   Serial2.begin(CAT_BAUD, CAT_CONFIG);
   Serial3.begin(CAT_BAUD, CAT_CONFIG);
 }
 
-bool catBridgePoll() {
-  bool moved = false;
+bool catBridgePoll() { return core.poll(millis()); }
 
-  // PC -> radio, unless the arbiter is holding the bus for its own command.
-  // Held bytes wait in the Serial2 RX buffer.
-  while (arbiter.pcMayTransmit() && Serial2.available()) {
-    uint8_t b = Serial2.read();
-    Serial3.write(b);
-    arbiter.noteBusActivity(millis());
-    handleEvent(framer.pcByte(b, millis()));
-    moved = true;
-  }
+bool catBridgeSubmit(const uint8_t cmd[5]) { return core.submit(cmd, millis()); }
 
-  // radio -> PC, except replies to the Arduino's own command.
-  while (Serial3.available()) {
-    uint8_t b = Serial3.read();
-    if (arbiter.ownsRadioReplies()) {
-      arbiter.radioByte(b, millis());
-      continue;
-    }
-    Serial2.write(b);
-    arbiter.noteBusActivity(millis());
-    handleEvent(framer.radioByte(b, millis()));
-    moved = true;
-  }
-
-  handleEvent(framer.poll(millis()));
-
-  arbiter.poll(millis(), framer.pcBusIdle());
-  if (const uint8_t *cmd = arbiter.pendingSend()) {
-    Serial3.write(cmd, CAT_FRAME_LEN);
-    logBytes(F("ARD>RADIO"), cmd, CAT_FRAME_LEN);
-    arbiter.sent(millis());
-  }
-  return moved;
-}
-
-bool catBridgeSubmit(const uint8_t cmd[5]) { return arbiter.submit(cmd, millis()); }
-
-bool catBridgeClaim() { return arbiter.claim(millis()); }
-CatArbiter::ClaimState catBridgeClaimState() { return arbiter.claimState(); }
-void catBridgeReleaseClaim() { arbiter.releaseClaim(millis()); }
+bool catBridgeClaim() { return core.claim(millis()); }
+CatArbiter::ClaimState catBridgeClaimState() { return core.claimState(); }
+void catBridgeReleaseClaim() { core.releaseClaim(millis()); }
+void catBridgeSetSnapshot(const CatSnapshot &s) { core.setSnapshot(s); }
 
 bool catBridgeTakeResult(CatArbiter::Result &r, uint8_t *reply, uint8_t &len) {
-  return arbiter.takeResult(r, reply, len);
+  return core.takeResult(r, reply, len);
 }
 
 void catBridgeHandleChar(char c) {

@@ -5,6 +5,7 @@
 #include "ah4.h"
 #include "cat_arbiter.h"
 #include "cat_codec.h"
+#include "cat_intercept.h"
 #include "sequencer.h"
 
 // The ATU tune cycle as a pure state machine: no pins, no Serial, time passed in,
@@ -27,6 +28,8 @@ public:
   virtual void catRelease(uint32_t now) = 0;
   virtual bool catSubmit(const uint8_t cmd[5], uint32_t now) = 0; // false: busy, retry
   virtual bool catTakeResult(CatArbiter::Result &r, uint8_t *reply, uint8_t &len) = 0;
+  // The radio as it was before the tune: from here on the PC is answered from it.
+  virtual void catSetSnapshot(const CatSnapshot &s) = 0;
   // Sequencer
   virtual bool bandsAllIdle() = 0;
   virtual void seqHold(uint8_t band, bool held) = 0;
@@ -95,7 +98,7 @@ enum class TuneReason : uint8_t {
 
 enum class TuneStep : uint8_t {
   Idle,
-  Claim, CatOn, QueryTx, QueryFreq, SeqUp, SetAm, Ah4, Dwell, // head
+  Claim, CatOn, QueryTx, QueryRx, QueryFreq, SeqUp, SetAm, Ah4, Dwell, // head
   TailPtt, TailMode, TailSeq,                                  // tail
 };
 
@@ -128,7 +131,7 @@ public:
   uint8_t originalMode() const { return origMode_; }
 
 private:
-  enum class Kind : uint8_t { None, CatOn, QueryTx, QueryFreq, SetAm, PttOn, PttOff, RestoreMode, Meter };
+  enum class Kind : uint8_t { None, CatOn, QueryTx, QueryRx, QueryFreq, SetAm, PttOn, PttOff, RestoreMode, Meter };
   enum class OpState : uint8_t { Idle, Pending, Ok, Failed };
 
   void setStep(TuneStep s, uint32_t now);
@@ -158,6 +161,9 @@ private:
 
   int8_t band_ = -1;
   uint32_t freqHz_ = 0;
+  uint8_t txStatus_ = 0; // radio's own status bytes, as they were before keying
+  uint8_t rxStatus_ = 0;
+  bool haveRx_ = false;
   uint8_t origMode_ = 0;
   bool modeChanged_ = false;
   bool modeRestored_ = false;
