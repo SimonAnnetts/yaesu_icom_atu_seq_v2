@@ -209,7 +209,7 @@ void TuneCycle::onOpDone(Kind k, bool ok, uint32_t now) {
 // The mode is right. If asked, put the ALC voltage on the radio's ALC line and let it
 // settle before anything is keyed; then start the tuner.
 void TuneCycle::afterModeSet(uint32_t now) {
-  if (options_.alc) {
+  if (options_.alc && env_.alcEnabled((uint8_t)band_)) {
     env_.alcSet(true);
     alcOn_ = true;
     setStep(TuneStep::Alc, now);

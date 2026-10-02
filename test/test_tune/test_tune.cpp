@@ -163,6 +163,7 @@ struct Fake : TuneEnv, CatBridgeIo {
   bool seqIdle(uint8_t band) override { return seq.idle(band); }
   int8_t bandForFreq(uint32_t hz) override { return bandForFrequency(cfg, hz); }
   bool atuAllowed(uint8_t band) override { return cfg.band[band].atu; }
+  bool alcEnabled(uint8_t band) override { return cfg.band[band].alc; }
   bool ah4Begin(uint32_t now) override {
     startAt = now;
     return ah4.begin(keyLine(), now);
@@ -428,11 +429,44 @@ void test_alc_is_on_before_the_radio_is_keyed_and_off_as_soon_as_it_is_unkeyed()
   }
 }
 
-void test_no_alc_unless_asked_for() {
-  Fake f;
-  TuneCycle c(f);
-  runCycle(f, c, TUNE_FULL);
-  TEST_ASSERT_EQUAL(0, f.alcOnCount);
+void test_alc_is_on_by_default_and_follows_the_band_config() {
+  { // the default config: every band has it on
+    Fake f;
+    TuneCycle c(f);
+    runCycle(f, c, TUNE_FULL);
+    TEST_ASSERT_EQUAL(1, f.alcOnCount);
+    TEST_ASSERT_TRUE(DEFAULT_SEQUENCER_CONFIG.band[0].alc);
+  }
+  { // switched off for the band being tuned: never touched
+    Fake f;
+    f.cfg.band[0].alc = false;
+    TuneCycle c(f);
+    runCycle(f, c, TUNE_FULL);
+    TuneReason why;
+    TEST_ASSERT_EQUAL(TuneOutcome::Success, outcomeOf(c, why));
+    TEST_ASSERT_EQUAL(0, f.alcOnCount);
+    expectSafe(f, MODE_USB);
+  }
+  { // it is the TUNED band's setting that counts, not some other band's
+    Fake f;
+    f.cfg.band[1].alc = false; // 50M off, but we tune on HF
+    TuneCycle c(f);
+    runCycle(f, c, TUNE_FULL);
+    TEST_ASSERT_EQUAL(1, f.alcOnCount);
+  }
+  { // and on 50M it is that band's flag
+    Fake f;
+    f.freq = 50150000;
+    f.cfg.band[1].alc = false;
+    TuneCycle c(f);
+    runCycle(f, c, TUNE_FULL);
+    TEST_ASSERT_EQUAL(0, f.alcOnCount);
+  }
+}
+
+void test_no_rf_modes_never_use_alc() {
+  { Fake f; TuneCycle c(f); runCycle(f, c, TUNE_ATU_NO_RF); TEST_ASSERT_EQUAL(0, f.alcOnCount); }
+  { Fake f; TuneCycle c(f); runCycle(f, c, TUNE_DRY); TEST_ASSERT_EQUAL(0, f.alcOnCount); }
 }
 
 void test_alc_never_left_on_whatever_goes_wrong() {
@@ -1292,7 +1326,8 @@ int main() {
   RUN_TEST(test_refusals_before_the_radio_is_touched_never_arm_the_record);
   RUN_TEST(test_a_stuck_ptt_off_keeps_the_record_armed_until_it_works);
   RUN_TEST(test_alc_is_on_before_the_radio_is_keyed_and_off_as_soon_as_it_is_unkeyed);
-  RUN_TEST(test_no_alc_unless_asked_for);
+  RUN_TEST(test_alc_is_on_by_default_and_follows_the_band_config);
+  RUN_TEST(test_no_rf_modes_never_use_alc);
   RUN_TEST(test_alc_never_left_on_whatever_goes_wrong);
   RUN_TEST(test_abort_sweep_with_alc_leaves_the_gate_off);
   RUN_TEST(test_alc_with_the_carrier_test_and_a_radio_already_in_the_tune_mode);

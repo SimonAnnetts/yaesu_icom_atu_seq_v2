@@ -45,6 +45,7 @@ public:
   virtual bool seqIdle(uint8_t band) = 0;
   virtual int8_t bandForFreq(uint32_t hz) = 0;
   virtual bool atuAllowed(uint8_t band) = 0; // the config's per-band "atu" flag
+  virtual bool alcEnabled(uint8_t band) = 0; // the config's per-band "alc" flag
   // AH-4
   virtual bool ah4Begin(uint32_t now) = 0;
   virtual bool ah4KeySeen() = 0;
@@ -72,17 +73,17 @@ struct TuneOptions {
   bool preKey;  // key the radio when START asserts rather than when KEY does, so the
                 // radio's start-up power overshoot has settled before the tuner measures
   uint8_t mode; // radio mode to tune in (MODE_AM by default)
-  bool alc;     // inject ALC (gate on, settle, before the radio is keyed) to trim the carrier
+  bool alc;     // may inject ALC (when the band's config says so): gate on, settle, then key
 };
 // The default keys the radio at START: bench-proven on an Alinco EDX-2, where keying
 // at KEY made the tuner measure the radio's ~0.7s start-up overshoot and give up.
-constexpr TuneOptions TUNE_FULL = {true, true, false, false, true, MODE_AM, false};
+constexpr TuneOptions TUNE_FULL = {true, true, false, false, true, MODE_AM, true};
 constexpr TuneOptions TUNE_FULL_PREKEY = TUNE_FULL;
-constexpr TuneOptions TUNE_FULL_ONKEY = {true, true, false, false, false, MODE_AM, false}; // key at KEY
-constexpr TuneOptions TUNE_FULL_METER = {true, true, true, false, true, MODE_AM, false};
+constexpr TuneOptions TUNE_FULL_ONKEY = {true, true, false, false, false, MODE_AM, true}; // key at KEY
+constexpr TuneOptions TUNE_FULL_METER = {true, true, true, false, true, MODE_AM, true};
 constexpr TuneOptions TUNE_ATU_NO_RF = {true, false, false, false, false, MODE_AM, false}; // no carrier
 constexpr TuneOptions TUNE_DRY = {false, false, false, false, false, MODE_AM, false}; // sequencer + CAT mode
-constexpr TuneOptions TUNE_CARRIER = {false, false, true, true, false, MODE_AM, false}; // carrier + meter
+constexpr TuneOptions TUNE_CARRIER = {false, false, true, true, false, MODE_AM, true}; // carrier + meter
 
 enum class TuneOutcome : uint8_t { None, Success, Refused, Failed, Aborted };
 

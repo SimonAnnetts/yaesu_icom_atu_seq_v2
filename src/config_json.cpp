@@ -78,6 +78,18 @@ static bool parseBand(JsonVariantConst v, const char *name, uint8_t index, BandC
     fail(err, n, "band %s: atu is not true/false", name);
     return false;
   }
+
+  // Optional: inject ALC while tuning on this band. Absent means yes - it does no
+  // harm if the radio isn't wired to the ALC output.
+  JsonVariantConst alc = v["alc"];
+  if (alc.isNull()) {
+    out.alc = true;
+  } else if (alc.is<bool>()) {
+    out.alc = alc.as<bool>();
+  } else {
+    fail(err, n, "band %s: alc is not true/false", name);
+    return false;
+  }
   return true;
 }
 

@@ -5,10 +5,10 @@ const SequencerConfig DEFAULT_SEQUENCER_CONFIG = {
         // Band edges are the placeholder IARU Region 1 values.
         // HF: tune profile skips SEQ3
         // A tuner like the AH-4 covers 160-6m, so the ATU is on for HF and 50M only.
-        {1800000, 29700000, {50, 50, 20}, {true, true, false}, true},
-        {50000000, 54000000, {50, 50, 20}, {true, true, true}, true},   // 50M
-        {144000000, 146000000, {50, 50, 20}, {true, true, true}, false}, // 144M
-        {430000000, 440000000, {50, 50, 20}, {true, true, true}, false}, // 430M
+        {1800000, 29700000, {50, 50, 20}, {true, true, false}, true, true},
+        {50000000, 54000000, {50, 50, 20}, {true, true, true}, true, true},   // 50M
+        {144000000, 146000000, {50, 50, 20}, {true, true, true}, false, true}, // 144M
+        {430000000, 440000000, {50, 50, 20}, {true, true, true}, false, true}, // 430M
     },
     0,
     {},

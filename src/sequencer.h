@@ -22,6 +22,7 @@ struct BandConfig {
   uint16_t gapMs[SEQ_STAGES];  // seq1_to_seq2, seq2_to_seq3, seq3_to_tx
   bool tuneProfile[SEQ_STAGES]; // stage engaged during a tune cycle?
   bool atu;                     // may the tune cycle run on this band? (the tuner's coverage)
+  bool alc;                     // inject ALC (pump voltage on the radio's ALC line) when tuning on this band
 };
 
 // Cross-band trigger: while the source band's SEQ1 is on, the target band's

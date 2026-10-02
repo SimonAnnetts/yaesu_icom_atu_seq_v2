@@ -41,7 +41,9 @@ An Arduino Mega 2560 controller that:
    wants (an AH-4 needs about 10W). This ALC voltage should be able to trim the
    radio's transmit power down to a lever that the ATU is happy with. 
    YMMV - the Yaesu FT-847 ALC circuit, and the power levels it produces are
-   'unpredictable' at best!
+   'unpredictable' at best! The ALC output is **part of every tune by
+   default** (it does no harm if the radio's ALC jack isn't connected), and
+   can be switched off per band with `"alc": false` in the JSON config.
 4. **Allow complex inter-band sequencer and tuner configurations to be defined
    in a JSON config**: per-band delays, tune profiles, band edges, which bands
    the tuner may be used on, and cross-band rules (for example, transmitting
@@ -280,7 +282,12 @@ interrupt handler uses, directly and proactively:
    the minimum:** the AH-4 measures the carrier during the tune and aborts
    if it is outside 5–15W (see the [AH-4 reference](#icom-ah-4-atu-interface-reference) below). AM mode alone
    still allows up to 25W on HF, so the radio's RF power setting and/or the
-   ALC injection circuit must bring the carrier into that window.
+   ALC injection circuit must bring the carrier into that window. ALC
+   injection is on by default for every band (the config's per-band `alc`
+   flag can turn it off, and the no-RF test modes never use it): it is applied
+   right after the mode is set — the gate switches the charge pump's -4V onto
+   the radio's ALC line and is given 100ms to settle — before `START` and
+   before the radio is keyed (see [ALC in the firmware](#alc-in-the-firmware-srcalc_ioh)).
    Also claim the CAT bus now (hold PC traffic) so that PTT can go out the
    instant `KEY` asserts, rather than queueing behind a PC poll.
 5. Assert `START` (pull it low via its opto), hold it for about 560ms like
@@ -309,7 +316,8 @@ interrupt handler uses, directly and proactively:
    asserted; the real judge is the SWR afterwards.)
 8. Unkey the radio's PTT **immediately on `KEY`'s first release** (the
    tuner never switches its relays under power, and an Icom radio stops
-   transmitting the moment `KEY` goes away).
+   transmitting the moment `KEY` goes away). If ALC injection is on, its
+   gate is released as soon as the radio is unkeyed.
 9. Restore the radio's original mode (from the value captured in step 1;
    retried up to 3 times, and a failure is reported loudly on Serial0), then
    release the CAT bus so PC traffic can flow again.
@@ -317,8 +325,7 @@ interrupt handler uses, directly and proactively:
     mirror of step 3, stepping down through whatever stages the tune
     profile actually engaged. Once complete, release this band from
     "under explicit tune-profile control" so its STBY interrupt handling
-    resumes normally. (ALC injection, if used, is released here too; it is
-    not wired into the cycle yet.)
+    resumes normally.
 11. Resume normal passthrough with no faking.
 
 #### Implementation notes (`src/tune.h`, `src/tune_io.cpp`)
@@ -336,6 +343,13 @@ interrupt handler uses, directly and proactively:
   is not locked out meanwhile — it is answered from a snapshot (see [PC
   transparency during a tune cycle](#pc-transparency-during-a-tune-cycle)). A claim also releases itself after 60s
   so the PC can never be locked out.
+- **ALC injection is part of the cycle, on by default.** When the tuned band's
+  config has `alc` on (the default), the cycle has an extra `Alc` step between
+  setting the mode and starting the tuner, and releases the gate in the tail
+  right after PTT off on every path (tested: never left on after a failure, an
+  abort at any moment, or a stuck PTT off). The radio does not currently
+  respond to the ALC voltage, so for now it changes nothing, and the tune does
+  not depend on it.
 - **Refusals** (nothing is left changed): a band already transmitting, the
   radio reporting it is transmitting, a frequency in no band, a band the AH-4
   isn't enabled for (the config's per-band `atu` flag), no usable
@@ -601,7 +615,8 @@ band's sequencer, configured rather than hardcoded.
   `atu` boolean saying whether the tune cycle may run on that band — absent
   means on for HF and 50M and off for 144/430MHz, the coverage of an AH-4; an
   Alinco EDX-2, which cannot tune 50MHz, sets `"atu": false` there, as
-  `config/sequencer-bench.json` does), and
+  `config/sequencer-bench.json` does — and an optional `alc` boolean saying
+  whether the tune cycle injects ALC on that band — absent means on), and
   `cross_band_triggers` (an array of `{source_band, target_band,
   target_output}`). The example file's band edges are placeholder IARU
   Region 1 values — adjust for actual license/region.
@@ -633,8 +648,9 @@ band's sequencer, configured rather than hardcoded.
   does (debug logging, etc.) — this is a small carve-out, not a separate
   mode that changes anything else about the port.
 - **EEPROM image**: magic, layout version, length, a field-by-field
-  little-endian payload (the per-band `atu` flags sit at the end, so images
-  saved before they existed still load, with the default coverage) and a
+  little-endian payload (the per-band `atu` flags and then the `alc` flags sit
+  at the end, so images saved before they existed still load, with the
+  default coverage and ALC on) and a
   CRC-16, so padding or compiler changes can't
   matter, and any corruption (or erased EEPROM) is rejected. A loaded
   image is re-validated with the same rules as an uploaded config.
@@ -918,26 +934,29 @@ all the time; D10 is the gate.
   is not a control. To back the voltage off, put a 100kΩ pot in the circuit.
   Opening the walk-test and exiting it restarts the pump (leaving it would have
   stopped it: `configurePins()` disconnects D9's PWM output as a side effect).
-- **In a tune:** `L` toggles "ALC injection for tunes" (off by default until it
-  is calibrated). When on, the gate goes on once the mode is set, is given
-  100ms to settle, and only then does the tuner start and the radio get keyed;
-  it is released in the tail right after PTT off.
+- **In a tune:** on by default, per band (`"alc": false` in the config turns it
+  off for a band). The gate goes on once the mode is set, is given 100ms to
+  settle, and only then does the tuner start and the radio get keyed; it is
+  released in the tail right after PTT off. The carrier test (`P`) uses it too,
+  which is how to see its effect; the no-RF modes (`E`, `D`) never do.
 - **Calibrating:** measure the pump's -V with the gate off, then press `g` and
-  watch the radio's ALC/power. With `L` on, run the carrier test (`P`, dummy
-  load) and compare the radio's PO meter and your external wattmeter with and
-  without ALC: the aim is a steady ~10W with the start-up overshoot (above)
+  watch the radio's ALC/power. Run the carrier test (`P`, dummy load) and
+  compare the radio's PO meter and your external wattmeter with the band's
+  `alc` on and off: the aim is a steady ~10W with the start-up overshoot (above)
   taken out, adjusting the pot.
-
 - **Status:** the pump and gate work — -4V is measured at the radio's EXT ALC
-  jack during a tune — but the radio's carrier does not change with it, so the
-  ALC injection stays **off by default** (`L`) and the tune does not depend on
-  it: keying at `START` already avoids the start-up overshoot (see the bench
-  results). To find out whether the radio sees the voltage at all, set Menu #24
-  (TX MTR) to ALC: the manual says the ALC meter reading includes "any external
-  ALC voltage", so the meter should deflect when the gate is on while keyed
-  (`P` with `L` on, dummy load). If it doesn't move, the voltage isn't reaching
-  the radio's ALC circuit; if it does, the radio sees it but isn't acting on it
-  in this mode.
+  jack during a tune — but the radio's carrier does not change with it, so for
+  now it has no effect and the tune does not depend on it: keying at `START`
+  already avoids the start-up overshoot (see the bench results). To find out
+  whether the radio sees the voltage at all, set Menu #24 (TX MTR) to ALC: the
+  manual says the ALC meter reading includes "any external ALC voltage", so the
+  meter should deflect when the gate is on while keyed (`P`, dummy load). If it
+  doesn't move, the voltage isn't reaching the radio's ALC circuit; if it does,
+  the radio sees it but isn't acting on it in this mode.
+- **Before the radio starts responding:** -4V is *maximum* power reduction, and
+  an AH-4-type tuner aborts below about 5W. So once the radio does respond,
+  set the pot for a carrier of about 10W *before* relying on a tune, or set
+  `"alc": false` for the bands where it would push the power too low.
 
 ## ALC injection for tune power (reference)
 
@@ -1216,8 +1235,8 @@ lines and CAT connected; TUNER Sense unconnected):
   through the CAT PTT path (arbiter quiet gap, radio response) has to land
   well inside the tuner's window. Needs a keyed test into a dummy load.
 - **Tune carrier power**: the AH-4 aborts outside 5–15W, and the radio in
-  AM mode can do 25W. Calibrate the RF power setting and ALC level for
-  about 10W on a power meter. The transmit-status meter bits (`0xF7`,
+  AM mode can do 25W. Calibrate the RF power setting and, once the radio
+  responds to it, the ALC voltage (the pot) for about 10W on a power meter. The transmit-status meter bits (`0xF7`,
   bits 4:0) might allow a sanity check from the Arduino.
 - **Tuner reset on band change**: Icom radios reset the AH-4 (a ~70ms
   `START` pulse) when the band changes so a stale tuning network isn't

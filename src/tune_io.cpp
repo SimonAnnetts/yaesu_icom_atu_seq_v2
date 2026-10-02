@@ -32,6 +32,7 @@ public:
   bool seqIdle(uint8_t band) override { return sequencerIoIdle(band); }
   int8_t bandForFreq(uint32_t hz) override { return bandForFrequency(sequencerIoConfig(), hz); }
   bool atuAllowed(uint8_t band) override { return sequencerIoConfig().band[band].atu; }
+  bool alcEnabled(uint8_t band) override { return sequencerIoConfig().band[band].alc; }
   bool ah4Begin(uint32_t) override { return ::ah4Begin(); }
   bool ah4KeySeen() override { return ::ah4KeySeen(); }
   bool ah4KeyReleased() override { return ::ah4KeyReleased(); }
@@ -46,7 +47,6 @@ Blinker led; // the tune indicator pattern; sounded on the buzzer (D7)
 bool buzzing = false;
 TuneStep lastStep = TuneStep::Idle;
 TuneOptions lastOptions = TUNE_FULL;
-bool useAlc = false;        // key L toggles: inject ALC during tunes
 uint8_t tuneMode = MODE_AM; // radio mode used for tuning; keys 1/2/3 change it
 
 const __FlashStringHelper *stepName(TuneStep s) {
@@ -98,7 +98,6 @@ void printMHz(uint32_t hz) {
 
 void begin(TuneOptions o) {
   o.mode = tuneMode;
-  o.alc = useAlc;
   lastOptions = o;
   if (cycle.start(o, millis())) {
     Serial.println(o.carrier ? F("TUNE: started (carrier test: radio keyed for 2s, no ATU)")
@@ -133,10 +132,6 @@ bool tuneIoHandleChar(char c) {
     case '1': tuneMode = MODE_AM; Serial.println(F("TUNE: tune mode AM")); return true;
     case '2': tuneMode = MODE_FM; Serial.println(F("TUNE: tune mode FM")); return true;
     case '3': tuneMode = MODE_CW; Serial.println(F("TUNE: tune mode CW (carrier may need a key closure)")); return true;
-    case 'L':
-      useAlc = !useAlc;
-      Serial.println(useAlc ? F("TUNE: ALC injection ON for tunes") : F("TUNE: ALC injection off for tunes"));
-      return true;
     case 'R': begin(TUNE_FULL_ONKEY); return true;
     case 'M': begin(TUNE_FULL_METER); return true;
     case 'P': begin(TUNE_CARRIER); return true;
