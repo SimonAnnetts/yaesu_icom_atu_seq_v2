@@ -2,6 +2,7 @@
 
 #include "ah4_io.h"
 #include "blinker.h"
+#include "buzzer.h"
 #include "cat_bridge.h"
 #include "pins.h"
 #include "sequencer_io.h"
@@ -35,7 +36,8 @@ public:
 
 RealEnv env;
 TuneCycle cycle(env);
-Blinker led;
+Blinker led; // the tune indicator pattern; sounded on the buzzer (D7)
+bool buzzing = false;
 TuneStep lastStep = TuneStep::Idle;
 TuneOptions lastOptions = TUNE_FULL;
 uint8_t tuneMode = MODE_AM; // radio mode used for tuning; keys 1/2/3 change it
@@ -99,7 +101,10 @@ void begin(TuneOptions o) {
 
 } // namespace
 
-void tuneIoBegin() { led.set(Blinker::Pattern::Off, millis()); }
+void tuneIoBegin() {
+  buzzerBegin();
+  led.set(Blinker::Pattern::Off, millis());
+}
 
 bool tuneIoActive() { return cycle.active(); }
 
@@ -193,5 +198,9 @@ void tuneIoPoll() {
   } else if (led.finished(now)) {
     led.set(Blinker::Pattern::Off, now);
   }
-  digitalWrite(PIN_TUNE_LED, led.level(now) ? HIGH : LOW);
+  bool sound = led.level(now);
+  if (sound != buzzing) {
+    buzzing = sound;
+    buzzerSet(sound);
+  }
 }

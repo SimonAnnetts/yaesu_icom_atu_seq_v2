@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 // The tune cycle on real hardware: the TuneCycle state machine (tune.h) wired to
-// the CAT bridge, sequencer, AH-4 driver, tune button and tune LED (D7).
+// the CAT bridge, sequencer, AH-4 driver, tune button and tune buzzer (D7).
 //
 //   button press      start a full tune; press again during one to abort it
 //   Serial0 keys:     T  full tune        E  ATU handshake, radio NOT keyed

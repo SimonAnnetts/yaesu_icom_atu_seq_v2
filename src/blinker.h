@@ -2,7 +2,8 @@
 
 #include <stdint.h>
 
-// Pure LED pattern generator for the tune LED: no pins, time passed in.
+// Pure on/off pattern generator for the tune indicator (an LED, or the buzzer on D7
+// today): no pins, time passed in.
 //   On       solid
 //   Off      dark
 //   Success  three slow blinks, then dark

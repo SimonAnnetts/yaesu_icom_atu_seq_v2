@@ -85,7 +85,7 @@ is talking to the Arduino, which brokers the conversation:
 | D16/D17 (Serial2) | Port 1 — CAT to PC, via MAX202CPE |
 | D14/D15 (Serial3) | Port 2 — CAT to radio, via MAX202CPE |
 | D6 | Tune button (input, polled) |
-| D7 | Tune status LED (output) |
+| D7 | Tune indicator: passive buzzer, ~2048Hz PWM from Timer4 (OC4B) |
 | D8 | Generic activity LED (output) |
 | D9 | ALC injection charge pump (PWM output) |
 | D10 | ALC opto-isolator gate (on/off switch) |
@@ -289,9 +289,16 @@ interrupt handler uses, directly and proactively:
   radio reporting it is transmitting, a frequency in no band, a band the AH-4
   isn't enabled for (the config's per-band `atu` flag), no usable
   answer to a CAT query (including a mode byte that couldn't be restored).
-- **Tune LED (D7):** solid while a cycle runs; three slow blinks on
-  success; fast blinking for about a second on failure or refusal; dark
-  after an abort.
+- **Tune indicator (D7, a passive buzzer):** driven at ~2048Hz by Timer4's
+  hardware PWM (not `tone()`, which would take Timer2 from the ALC pump). A
+  continuous tone while a cycle runs; three slow beeps on success; fast
+  beeping for about a second on failure or refusal; silent after an abort.
+  A low-resistance magnetic buzzer must not be driven straight from the pin
+  (a 40Ω coil would draw ~125mA against the Mega's 40mA absolute maximum): put
+  about **330Ω** in series (~13mA peak, moderate volume; 1kΩ is very quiet,
+  not below ~220Ω), optionally a 1N4148 across the buzzer (cathode to the
+  pin side), or use a transistor for more volume. `BUZZER_DUTY_PERCENT` in
+  `src/buzzer.cpp` is a software volume control.
 - **Controls:** the tune button starts a full tune and, pressed during one,
   aborts it. Serial0 keys: `T` full tune, `E` ATU handshake with the radio
   *not* keyed, `D` dry run (sequencer and AM mode only — no ATU, no RF), `M`

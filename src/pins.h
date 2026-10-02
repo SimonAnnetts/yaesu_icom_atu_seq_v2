@@ -13,7 +13,8 @@
 
 // --- Tune control ---
 constexpr uint8_t PIN_TUNE_BUTTON = 6;   // input, polled
-constexpr uint8_t PIN_TUNE_LED = 7;      // output
+constexpr uint8_t PIN_TUNE_LED = 7;      // output: tune indicator, a passive buzzer driven at
+                                         // ~2048Hz by Timer4 PWM (D7 = OC4B), see buzzer.h
 constexpr uint8_t PIN_ACTIVITY_LED = 8;  // output, generic
 
 // --- ALC injection (charge pump gate) ---

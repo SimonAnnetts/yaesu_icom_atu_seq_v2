@@ -1,5 +1,6 @@
 #include "walktest.h"
 
+#include "buzzer.h"
 #include "pins.h"
 
 constexpr uint32_t TX_INHIBIT_PULSE_MS = 200;
@@ -34,7 +35,7 @@ static void addStep(uint8_t &n, const char *name, uint8_t pin) {
 
 static void buildTables() {
   uint8_t n = 0;
-  addStep(n, "TUNE_LED", PIN_TUNE_LED);
+  addStep(n, "TUNE_BUZZER", PIN_TUNE_LED);
   addStep(n, "ACTIVITY_LED", PIN_ACTIVITY_LED);
   addStep(n, "ALC_GATE", PIN_ALC_GATE);
   addStep(n, "AH4_START", PIN_AH4_START);
@@ -59,6 +60,7 @@ static void buildTables() {
 }
 
 static void allStepsOff() {
+  buzzerSet(false);
   for (uint8_t i = 0; i < STEP_COUNT; i++) digitalWrite(stepPins[i], LOW);
 }
 
@@ -69,7 +71,8 @@ static void lightStep(int8_t idx) {
     Serial.println(F("walktest: all off"));
     return;
   }
-  digitalWrite(stepPins[idx], HIGH);
+  if (stepPins[idx] == PIN_TUNE_LED) buzzerSet(true); // the buzzer gets its tone, never DC
+  else digitalWrite(stepPins[idx], HIGH);
   Serial.print(F("walktest: "));
   Serial.print(stepNames[idx]);
   Serial.print(F(" (D"));
