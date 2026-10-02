@@ -1,9 +1,9 @@
 # Yaesu/Icom ATU Sequencer v2
 
-An Arduino Mega 2560 project that sits transparently between a PC running CAT
-control software (e.g. `flrig`) and a Yaesu FT-847 transceiver, so it can
-automatically sequence an Icom automatic antenna tuner (e.g. AH-4) without the
-PC being aware that anything happened.
+An Arduino Mega 2560 controller that lets an Icom AH-4-type automatic antenna
+tuner work with a Yaesu FT-847, runs a four-band amplifier/preamp sequencer
+alongside it, and does both without getting in the way of a PC that is
+controlling the radio over CAT.
 
 > `docs/Hamlib` and `docs/fakeFC` are local clones kept only for reference
 > while researching the FT-847 CAT protocol and Icom AH-4 timing (see the
@@ -12,27 +12,65 @@ PC being aware that anything happened.
 > [Hamlib/Hamlib](https://github.com/Hamlib/Hamlib) and
 > [doumae/fakeFC](https://github.com/doumae/fakeFC).
 
-## Goal
+## Aims
 
-The PC believes it is talking directly to the radio's CAT port. In reality it
-is talking to the Arduino, which brokers the conversation:
+1. **Use an Icom AH-4-type ATU with the Yaesu FT-847** (or any tuner that
+   speaks the same START/KEY protocol, and possibly other Yaesu radios of the
+   same era). The FT-847 has no way to drive such a tuner on its own. At the
+   press of a tune button the Arduino runs the whole cycle: it sets the radio
+   up over CAT (tune mode, keying PTT at the right moment), drives the
+   tuner's START/KEY lines, watches for it to finish, and puts the radio back
+   as it found it. Proven on an Alinco EDX-2, an Icom-compatible tuner.
+2. **Provide three sequencer outputs per band, for four bands** (HF, 50, 144
+   and 430MHz): `SEQ1`–`SEQ3` opto-isolated outputs for preamp and power-amp
+   relays, plus `RX`/`TX` indicator LEDs, driven from the radio's STBY jack,
+   with a shared **TX INHIBIT** line that holds off the transmitter until
+   each band's sequence has finished settling.
+3. **Provide an ALC output that can control the radio's power during the tune
+   cycle.** A charge pump makes about -4V, gated by an opto-isolator onto the
+   radio's EXT ALC jack, so the carrier can be trimmed to what the tuner
+   wants (an AH-4 needs about 10W). The circuit is built and the voltage
+   reaches the jack; the radio is not yet responding to it, so it is optional
+   and off by default.
+4. **Allow complex inter-band sequencer and tuner configurations to be defined
+   in a JSON config**: per-band delays, tune profiles, band edges, which bands
+   the tuner may be used on, and cross-band rules (for example, transmitting
+   on 50MHz switches off a 144MHz masthead preamp). The config is uploaded
+   over USB, validated, and kept in EEPROM; a bad one can never leave the
+   sequencer unable to run.
+5. **Still let a PC control the radio over CAT, with none of the above getting
+   in the way.** The Arduino sits between the PC and the radio and passes CAT
+   traffic through byte for byte. While a tune cycle needs the radio, the PC
+   keeps being answered (from a snapshot of the radio, with the original mode
+   and no PTT), so it cannot tell a tune is happening.
 
-- Under normal conditions, CAT traffic is passed through transparently
-  between the PC and the radio in both directions.
-- The Arduino can intercept and, when needed, modify traffic between the two,
-  or talk to the radio on its own initiative without the PC's knowledge.
-- When a physical tune button is pressed, the Arduino runs a self-contained
-  tune sequence: it drives the Icom ATU interface, temporarily takes over CAT
-  control of the radio to set it up for tuning, and then restores the radio
-  to its prior state — all invisibly to the PC.
-- **The PC is optional.** With no PC connected at all, the tune button and
-  ATU sequencing must still work exactly the same way — the Arduino talks
-  to the radio directly over Port 2 regardless of what is or isn't
-  happening on Port 1. Standalone operation, not just PC-transparent
-  operation, is a first-class requirement.
-- Independently of CAT and the ATU, the Arduino also runs a **4-band
-  amplifier sequencer** (HF/50/144/430MHz), driven from the radio's STBY
-  jack — see "Sequencer" under Behaviour below.
+**The PC is optional.** With no PC connected at all, the tune button, the
+tuner and the sequencer all work exactly the same way. Standalone operation is
+a first-class requirement, not a side effect.
+
+## How it fits together
+
+```
+ PC (flrig etc.) ── Port 1 ──┐                        ┌── CAT ── Port 2 ── FT-847
+                             │                        │
+                       Arduino Mega 2560 ─────────────┼── STBY jack (4 bands in)
+                             │                        ├── TUNER connector: TX INHIBIT out
+   tune button ──────────────┤                        └── EXT ALC jack  ←── charge pump + gate
+   tune buzzer ──────────────┤
+   AH-4-type ATU ─ START/KEY ┤        12 opto outputs (SEQ1-SEQ3 × 4 bands) + RX/TX LEDs
+                             └── USB (Serial0): logging, bench keys, JSON config upload
+```
+
+The CAT proxy is the *means*, not the goal: it is what lets aims 1 and 5 hold
+at the same time (the tune cycle needs the radio's CAT port while the PC is
+still using it). The sequencer (aim 2) does not use CAT at all — it runs from
+the STBY lines, so it works with the CAT link absent.
+
+Where to look in this document: **Hardware** and the **Pin plan** for the
+wiring; **Behaviour** for the tune cycle, the sequencer and the config; the
+**reference** sections for the FT-847 CAT protocol, the AH-4 interface and the
+ALC circuit; **Bench results** for what has been verified on the real radio
+and tuner; **Open questions** for what has not.
 
 ## Hardware
 
