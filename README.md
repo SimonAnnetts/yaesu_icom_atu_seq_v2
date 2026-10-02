@@ -21,6 +21,12 @@ controlling the radio over CAT.
    up over CAT (tune mode, keying PTT at the right moment), drives the
    tuner's START/KEY lines, watches for it to finish, and puts the radio back
    as it found it. Proven on an Alinco EDX-2, an Icom-compatible tuner.
+   **This does not re-purpose the radio's own [TUNER] key** or any of its
+   built-in tuner control: the device has **its own tune button** (and tune
+   indicator), and the radio's rear TUNER connector is used only for the TX
+   INHIBIT line and its supply and ground. Its tuner-sense pin is deliberately
+   left unconnected, so the radio never believes a tuner is attached and CAT
+   keeps working.
 2. **Provide three sequencer outputs per band, for four bands** (HF, 50, 144
    and 430MHz): `SEQ1`–`SEQ3` opto-isolated outputs for preamp and power-amp
    relays, plus `RX`/`TX` indicator LEDs, driven from the radio's STBY jack,
@@ -84,8 +90,9 @@ and tuner; **Open questions** for what has not.
 - **Serial1**: unused, left entirely free — see pin plan below.
 - **Icom ATU interface**: drives an Icom-series automatic antenna tuner (e.g.
   AH-4) using its start/key line(s) and tune-complete signalling.
-- **Tune button**: a physical pushbutton wired to an Arduino input, used to
-  initiate a tune cycle.
+- **Tune button**: the device's own physical pushbutton, wired to an Arduino
+  input, used to initiate a tune cycle. It is separate from the radio's
+  front-panel [TUNER] key, which is not used or intercepted.
 - **ALC injection circuit**: a charge pump driven from an Arduino PWM pin
   (producing roughly -4V), gated onto the radio's ALC line through an
   opto-isolator used purely as a switch. This lets the Arduino trim the
