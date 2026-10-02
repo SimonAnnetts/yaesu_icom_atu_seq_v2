@@ -76,11 +76,14 @@ at the same time (the tune cycle needs the radio's CAT port while the PC is
 still using it). The sequencer (aim 2) does not use CAT at all — it runs from
 the STBY lines, so it works with the CAT link absent.
 
-Where to look in this document: **Hardware** and the **Pin plan** for the
-wiring; **Behaviour** for the tune cycle, the sequencer and the config; the
-**reference** sections for the FT-847 CAT protocol, the AH-4 interface and the
-ALC circuit; **Bench results** for what has been verified on the real radio
-and tuner; **Open questions** for what has not.
+Where to look in this document: [Hardware](#hardware) and the
+[Pin plan](#pin-plan-mega-2560) for the wiring; [Behaviour](#behaviour) for the tune
+cycle, the sequencer and the config; the reference sections for the
+[FT-847 CAT protocol](#yaesu-ft-847-cat-protocol-reference), the [AH-4 interface](#icom-ah-4-atu-interface-reference), the
+[ALC circuit](#alc-injection-for-tune-power-reference) and the
+[STBY jack, TUNER port and TX INHIBIT](#stby-jack-tuner-port-and-tx-inhibit-reference); [Bench results](#bench-results)
+for what has been verified on the real radio and tuner; [Open
+questions](#open-questions--to-be-determined) for what has not.
 
 ## Hardware
 
@@ -91,7 +94,7 @@ and tuner; **Open questions** for what has not.
   of a MAX202CPE (RS-232 level shifter).
 - **Serial3 ("Port 2")**: connects to the Yaesu FT-847's CAT port, via the
   other half of the MAX202CPE.
-- **Serial1**: unused, left entirely free — see pin plan below.
+- **Serial1**: unused, left entirely free — see [pin plan](#pin-plan-mega-2560) below.
 - **Icom ATU interface**: drives an Icom-series automatic antenna tuner (e.g.
   AH-4) using its start/key line(s) and tune-complete signalling.
 - **Tune button**: a new, separate physical pushbutton added by this device,
@@ -102,28 +105,28 @@ and tuner; **Open questions** for what has not.
   (producing roughly -4V), gated onto the radio's ALC line through an
   opto-isolator used purely as a switch. This lets the Arduino trim the
   radio's RF output to the ~10W carrier the AH-4 wants during a tune cycle
-  (it aborts outside 5–15W — see the AH-4 reference below), independent
+  (it aborts outside 5–15W — see the [AH-4 reference](#icom-ah-4-atu-interface-reference) below), independent
   of — and in addition to — the AM-mode power ceiling (see below). Carried over from a prior project; confirmed against the FT-847
-  manual — see the ALC reference section further down.
+  manual — see the [ALC reference section](#alc-injection-for-tune-power-reference) further down.
 - **Amplifier sequencer**: 4 independent relay sequencers, one per band —
   Band 1=HF, Band 2=50MHz, Band 3=144MHz, Band 4=430MHz — each with 5
   distinct outputs —
   `RX`, `SEQ1`, `SEQ2`, `SEQ3`, `TX`. These are cumulative, not mutually
   exclusive: `SEQ1`-`SEQ3` latch on in order and stay on together for the
   whole transmission, while `RX`/`TX` are boundary-condition indicator
-  LEDs (see "Sequencer" under Behaviour for the exact timing). All 5 drive
+  LEDs (see [Sequencer](#sequencer) under [Behaviour](#behaviour) for the exact timing). All 5 drive
   a status LED; only `SEQ1`/`SEQ2`/`SEQ3` also drive an opto-isolator
   (`RX`/`TX` are LED indicators only, no relay/opto function) — 12
-  opto-isolator outputs total, 3 per band (see Pin plan). Triggered by the
+  opto-isolator outputs total, 3 per band (see [Pin plan](#pin-plan-mega-2560)). Triggered by the
   radio's STBY jack (4 closure-to-ground T/R lines, wired to the
-  interrupt-capable pins — see Pin plan). A single, shared **TX INHIBIT**
+  interrupt-capable pins — see [Pin plan](#pin-plan-mega-2560)). A single, shared **TX INHIBIT**
   output (D4) holds off the radio's actual transmit output while each
   band's sequence runs, wired to pin 8 of the radio's TUNER connector.
   Also configurable (JSON-based — see below) so that transmitting on one
   band can partially trigger another band's sequencer, e.g. disabling a
   masthead preamp on an unrelated band while transmitting nearby. See
-  "Sequencer" under Behaviour, and the TUNER-port reference
-  section further down for the confirmed pinout and how the CAT-disable
+  [Sequencer](#sequencer) under [Behaviour](#behaviour), and the [TUNER-port reference
+  section](#stby-jack-tuner-port-and-tx-inhibit-reference) further down for the confirmed pinout and how the CAT-disable
   risk is avoided (by deliberately leaving the TUNER connector's separate
   Tuner Sense pin unconnected).
 
@@ -175,7 +178,7 @@ set. The 20 sequencer outputs (D22-D53) and the shared TX INHIBIT output
 Arduino-side band↔pin mapping for STBY (which of D2/D3/D18/D19
 is HF vs 50 vs 144 vs 430) is likewise our own software's choice; what
 actually matters is wiring it consistently against the STBY jack's real
-per-band wiring (see the STBY jack reference below).
+per-band wiring (see the [STBY jack reference](#stby-jack-tuner-port-and-tx-inhibit-reference) below).
 
 ## Behaviour
 
@@ -186,7 +189,7 @@ per-band wiring (see the STBY jack reference below).
   Port 1 (to the PC).
 - If no PC is connected, Port 1 simply carries no traffic — there is
   nothing to relay. This is a normal, fully supported state, not an error
-  condition; see "Standalone operation" below for how the tune cycle still
+  condition; see [Standalone operation](#standalone-operation) below for how the tune cycle still
   works correctly in this case.
 
 ### What actually needs faking during a tune cycle
@@ -199,7 +202,7 @@ fake two specific things, not maintain a general-purpose cache of
 "everything the PC might ask":
 
 - **Mode** — the mode byte within the `Get freq+mode, Main` reply
-  (opcode `0x03`; see the CAT reference below). This reply packs
+  (opcode `0x03`; see the [CAT reference](#yaesu-ft-847-cat-protocol-reference) below). This reply packs
   frequency and mode into one 5-byte frame, so the Arduino must splice the
   *real, live* frequency (queried from the radio, since it's genuinely
   unchanged) together with the *faked* pre-tune mode byte — not fake the
@@ -228,7 +231,7 @@ transmission, and the sequencer's relay chain has to be up before RF
 appears, exactly as it would for a normal transmission.
 
 A CAT-commanded PTT does assert the radio's STBY line(s) (bench-verified —
-see "Bench results" below), but the lead time before RF is still unmeasured.
+see [Bench results](#bench-results) below), but the lead time before RF is still unmeasured.
 Rather than depend on that, the tune cycle **explicitly drives the
 sequencer itself**, calling the same up/down-sequence logic the STBY
 interrupt handler uses, directly and proactively:
@@ -240,12 +243,12 @@ interrupt handler uses, directly and proactively:
    that will need to be faked and restored, freshly, at the start of
    every cycle — so it works identically whether or not a PC (and any
    snooped history) exists.
-2. Map that frequency to one of the 4 sequencer bands (see "Sequencer
-   configuration" below — band edges live in the same JSON config).
+2. Map that frequency to one of the 4 sequencer bands (see [Sequencer
+   configuration](#sequencer-configuration-and-cross-band-triggers) below — band edges live in the same JSON config).
 3. **Explicitly run that band's *tune* profile up-sequence first, before
    touching the AH-4 at all** — assert TX INHIBIT, step through whichever
    stages the tune profile includes for this band (may stop at `SEQ2`,
-   skipping `SEQ3` — see "Two profiles per band" under Sequencer above),
+   skipping `SEQ3` — see "Two profiles per band" under [Sequencer](#sequencer) above),
    release TX INHIBIT — using the same function the STBY interrupt handler
    calls, but with the tune profile rather than the normal-TX profile.
    - **This band's STBY interrupt handling must be suppressed for the
@@ -273,9 +276,9 @@ interrupt handler uses, directly and proactively:
 4. Take over the CAT link to the radio and select AM mode (there is no CAT
    power-set command on this radio — switching to AM mode is itself the
    main power reduction, since the FT-847 caps AM output much lower than
-   SSB/CW/FM; see the CAT reference below). **The target is about 10W, not
+   SSB/CW/FM; see the [CAT reference](#yaesu-ft-847-cat-protocol-reference) below). **The target is about 10W, not
    the minimum:** the AH-4 measures the carrier during the tune and aborts
-   if it is outside 5–15W (see the AH-4 reference below). AM mode alone
+   if it is outside 5–15W (see the [AH-4 reference](#icom-ah-4-atu-interface-reference) below). AM mode alone
    still allows up to 25W on HF, so the radio's RF power setting and/or the
    ALC injection circuit must bring the carrier into that window.
    Also claim the CAT bus now (hold PC traffic) so that PTT can go out the
@@ -330,8 +333,8 @@ interrupt handler uses, directly and proactively:
   whole cycle.
 - **The cycle owns the CAT bus** from before `START` until the restore: the
   arbiter's claim lets PTT go out without queueing behind PC traffic. The PC
-  is not locked out meanwhile — it is answered from a snapshot (see "PC
-  transparency during a tune cycle"). A claim also releases itself after 60s
+  is not locked out meanwhile — it is answered from a snapshot (see [PC
+  transparency during a tune cycle](#pc-transparency-during-a-tune-cycle)). A claim also releases itself after 60s
   so the PC can never be locked out.
 - **Refusals** (nothing is left changed): a band already transmitting, the
   radio reporting it is transmitting, a frequency in no band, a band the AH-4
@@ -474,7 +477,7 @@ deliberately uses each band's "tune" profile (which may skip stages like
 `SEQ3` — see below), while the STBY-driven path always applies the
 "normal" profile. So while a tune cycle holds explicit control of a
 band, that band's STBY-driven triggering must be suppressed rather than
-left to run alongside it — see the Tune cycle steps above for exactly
+left to run alongside it — see the [Tune cycle steps](#tune-cycle-triggered-by-the-tune-button) above for exactly
 when that hold starts and ends.
 
 - Each band (HF, 50, 144, 430MHz) has its own STBY input line (closure to
@@ -522,7 +525,7 @@ when that hold starts and ends.
   profile?"), not hardcoded to skipping `SEQ3` specifically — a different
   band/installation might need to skip a different stage, or more than
   one. Configured via the same JSON config as everything else below.
-  Cross-band trigger rules (see "Sequencer configuration" below) are
+  Cross-band trigger rules (see [Sequencer configuration](#sequencer-configuration-and-cross-band-triggers) below) are
   assumed to fire the same way regardless of which profile is active —
   RF is present during tuning too, just at reduced power, so protection
   like the masthead-preamp example should still apply. That's a stated
@@ -536,9 +539,9 @@ when that hold starts and ends.
   and ground (pin 2) only. The FT-847 manual warns that CAT cannot be used
   while something is connected to the TUNER port — but that interlock is
   believed to be tripped specifically by the connector's separate Tuner
-  Sense pin, which is deliberately left unconnected. See the reference
+  Sense pin, which is deliberately left unconnected. See the [TUNER-port reference](#stby-jack-tuner-port-and-tx-inhibit-reference)
   section below for the full reasoning. Bench-verified: CAT keeps working
-  with this wiring (see "Bench results").
+  with this wiring (see [Bench results](#bench-results)).
 
 ### Sequencer configuration and cross-band triggers
 
@@ -584,7 +587,7 @@ band's sequencer, configured rather than hardcoded.
   out to be needed later, that's a schema extension, not a redesign.
 - **Band-edge frequency ranges also belong in this config**, not
   hardcoded: the ATU tune cycle needs to map "current frequency" to one of
-  the 4 sequencer bands (see Tune cycle above), and exact sub-band edges
+  the 4 sequencer bands (see [Tune cycle](#tune-cycle-triggered-by-the-tune-button) above), and exact sub-band edges
   can vary by license class/region — so, consistent with everything else
   here, they're configurable rather than baked into firmware.
 - **Concrete schema**: see [`config/sequencer.json`](config/sequencer.json)
@@ -658,8 +661,8 @@ match the radio's CAT-rate menu; Serial0 is a USB virtual serial port with
 no such constraint). Available for logging Arduino/CAT activity and for
 local control of the sequencer, independent of the CAT passthrough path.
 This is also the transport for loading the sequencer's JSON config (band
-timing, cross-band trigger rules) at runtime — see "Sequencer
-configuration and cross-band triggers" above.
+timing, cross-band trigger rules) at runtime — see [Sequencer
+configuration and cross-band triggers](#sequencer-configuration-and-cross-band-triggers) above.
 
 ## Reference clones (for developers)
 
@@ -957,7 +960,7 @@ item 11).
   as above 15W), so the PWM level is a calibration to set against a power
   meter, not "as low as possible".
 - **Relationship to AM mode**: the two are complementary, not
-  alternatives. AM mode is switched to regardless (see the CAT reference
+  alternatives. AM mode is switched to regardless (see the [CAT reference](#yaesu-ft-847-cat-protocol-reference)
   above — the FT-847 offers no other way to run a controlled tune cycle
   over CAT), and the ALC injection is layered on top of that to trim the
   carrier down to about 10W during the keyed window.
@@ -1000,7 +1003,7 @@ inspection/prior documentation of the connectors themselves.
   one per band, rated +24V DC / 100 mA max, **positive DC only** — "not
   compatible with negative DC voltages, nor AC voltages of any
   magnitude." All 4 lines land on the Mega's interrupt-capable pins (see
-  Pin plan) so a TX request can be caught immediately, which matters given
+  [Pin plan](#pin-plan-mega-2560)) so a TX request can be caught immediately, which matters given
   how little lead time there may be before the radio actually transmits.
 - **TUNER connector (rear panel item 5, 8-pin mini-DIN)** — confirmed
   pinout (partial, relevant pins only):
@@ -1087,8 +1090,8 @@ inspection/prior documentation of the connectors themselves.
   By leaving Tuner Sense unconnected and wiring only power, ground, and
   TX INHIBIT, the radio should never detect a tuner as "present" and CAT
   should keep working normally. **Bench-verified on this radio** — with only pins 1, 2 and 8 wired
-  and Tuner Sense unconnected, CAT still responds on Port 2 (see "Bench
-  results").
+  and Tuner Sense unconnected, CAT still responds on Port 2 (see [Bench
+  results](#bench-results)).
 - **The YT-847 precedent** supports this being a reasonable approach: its
   manual's install steps connect its interface cable to *both* the TUNER
   jack and the CAT jack simultaneously, and CAT still works for it — its
