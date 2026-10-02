@@ -565,7 +565,18 @@ band's sequencer, configured rather than hardcoded.
   `ERROR: <reason>\n`, in which case the previous config stays in force.
   `CONFIG` is refused with `ERROR: busy...` (instead of `READY`) while any
   band is transmitting, so a config change can't disturb a live
-  transmission. Outside that handshake Serial0 behaves exactly as it always
+  transmission (and again at the end, if a band started while the upload was
+  arriving: nothing is applied or saved). The handshake line must be exactly
+  `CONFIG` (CR or LF); a half-typed line nobody finishes within 1s is
+  forgotten, so the leftover of a failed upload can't spoil the next attempt.
+  Every way an upload can go wrong ends in an `ERROR:` reply with the previous
+  config untouched and the receiver idle again: a first character that isn't
+  `{`, nesting deeper than 8, more than 1024 characters of JSON (whitespace not
+  counted), a 3s stall (a cable pulled mid-upload), invalid JSON, or valid JSON
+  that isn't a usable config (reason given). The logic is in
+  `src/config_receiver.h`, a pure class tested with a fake host, including
+  randomised fuzzing (random bytes and random whitespace/chunking, run under
+  the address and undefined-behaviour sanitizers). Outside that handshake Serial0 behaves exactly as it always
   does (debug logging, etc.) — this is a small carve-out, not a separate
   mode that changes anything else about the port.
 - **EEPROM image**: magic, layout version, length, a field-by-field

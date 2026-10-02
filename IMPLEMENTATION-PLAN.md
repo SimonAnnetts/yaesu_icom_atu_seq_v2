@@ -219,6 +219,10 @@ throughout a tune cycle.
   README "Reset safety".
 - Soak test: hours of PC polling, repeated tune cycles, random STBY activity.
 - Stress the config handshake (garbage on Serial0, partial JSON, unplugging).
+  *Done on the host:* the upload logic is a pure `ConfigReceiver`, tested with
+  garbage, truncation, oversize, nesting, busy refusals, and fuzzing under
+  ASAN/UBSAN; it found and fixed two bugs (an unbounded nesting counter, and a
+  handshake line that a failed upload's leftovers could silently spoil).
 - Decide the mic-audio-during-tune question from the README.
 - Finalise README (results of the bench questions), and add a short
   build/flash/config section to it.

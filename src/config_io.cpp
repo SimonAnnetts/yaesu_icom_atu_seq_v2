@@ -1,33 +1,14 @@
 #include "config_io.h"
 
-#include <ArduinoJson.h>
 #include <EEPROM.h>
-#include <string.h>
 
 #include "config.h"
-#include "config_json.h"
+#include "config_receiver.h"
 #include "eeprom_map.h"
-#include "watchdog.h"
 #include "sequencer_io.h"
+#include "watchdog.h"
 
 constexpr int EEPROM_ADDR = EEPROM_CONFIG_ADDR;
-constexpr size_t JSON_BUF_MAX = 1024;       // whitespace-stripped JSON text
-constexpr uint32_t RECEIVE_TIMEOUT_MS = 3000; // idle gap that abandons a config in flight
-
-static char json[JSON_BUF_MAX];
-static size_t jsonLen = 0;
-
-enum class Rx : uint8_t { Idle, WaitBrace, Body };
-static Rx rx = Rx::Idle;
-static uint32_t lastByteAt = 0;
-static uint8_t depth = 0;
-static bool inString = false;
-static bool escaped = false;
-
-// While idle, watch for the line "CONFIG".
-static char line[8];
-static uint8_t lineLen = 0;
-static bool lineOverflow = false;
 
 static void saveToEeprom(const SequencerConfig &cfg) {
   uint8_t buf[CONFIG_IMAGE_MAX];
@@ -37,6 +18,40 @@ static void saveToEeprom(const SequencerConfig &cfg) {
     watchdogFeed();
   }
 }
+
+namespace {
+
+class SerialHost : public ConfigHost {
+public:
+  bool idleForUpload() override { return sequencerIoAllIdle(); }
+  bool apply(const SequencerConfig &cfg) override { return sequencerIoApplyConfig(cfg); }
+  void save(const SequencerConfig &cfg) override { saveToEeprom(cfg); }
+
+  void reply(Reply r, const char *detail) override {
+    switch (r) {
+      case Reply::Ready: Serial.println(F("READY")); break;
+      case Reply::Ok: Serial.println(F("OK")); break;
+      case Reply::Busy: Serial.println(F("ERROR: busy, a band is transmitting")); break;
+      case Reply::ExpectedObject: Serial.println(F("ERROR: expected a JSON object")); break;
+      case Reply::TooLarge: Serial.println(F("ERROR: config too large")); break;
+      case Reply::TooDeep: Serial.println(F("ERROR: config nested too deeply")); break;
+      case Reply::Timeout: Serial.println(F("ERROR: timeout waiting for config")); break;
+      case Reply::InvalidJson:
+        Serial.print(F("ERROR: invalid JSON: "));
+        Serial.println(detail);
+        break;
+      case Reply::InvalidConfig:
+        Serial.print(F("ERROR: "));
+        Serial.println(detail);
+        break;
+    }
+  }
+};
+
+SerialHost host;
+ConfigReceiver receiver(host);
+
+} // namespace
 
 void configIoBegin() {
   uint8_t buf[CONFIG_IMAGE_MAX];
@@ -54,113 +69,6 @@ void configIoBegin() {
   }
 }
 
-static void reset() {
-  rx = Rx::Idle;
-  jsonLen = 0;
-  depth = 0;
-  inString = false;
-  escaped = false;
-}
+bool configIoHandleChar(char c) { return receiver.handleChar(c, millis()); }
 
-static void replyError(const char *reason) {
-  Serial.print(F("ERROR: "));
-  Serial.println(reason);
-  reset();
-}
-
-static void replyError(const __FlashStringHelper *reason) {
-  Serial.print(F("ERROR: "));
-  Serial.println(reason);
-  reset();
-}
-
-static void finish() {
-  JsonDocument doc;
-  DeserializationError e = deserializeJson(doc, json, jsonLen);
-  if (e) {
-    Serial.print(F("ERROR: invalid JSON: "));
-    Serial.println(e.c_str());
-    reset();
-    return;
-  }
-  SequencerConfig cfg;
-  char err[96];
-  if (!configFromJson(doc, cfg, err, sizeof err)) {
-    replyError(err);
-    return;
-  }
-  if (!sequencerIoApplyConfig(cfg)) {
-    replyError(F("busy, a band is transmitting"));
-    return;
-  }
-  saveToEeprom(cfg);
-  Serial.println(F("OK"));
-  reset();
-}
-
-static void startReceive() {
-  if (!sequencerIoApplyConfig(sequencerIoConfig())) { // idle check, no change made
-    replyError(F("busy, a band is transmitting"));
-    return;
-  }
-  reset();
-  rx = Rx::WaitBrace;
-  lastByteAt = millis();
-  Serial.println(F("READY"));
-}
-
-// One character of the config text. Returns once the object is complete or on error.
-static void receiveChar(char c) {
-  lastByteAt = millis();
-  bool space = c == ' ' || c == '\t' || c == '\r' || c == '\n';
-
-  if (rx == Rx::WaitBrace) {
-    if (space) return;
-    if (c != '{') {
-      replyError(F("expected a JSON object"));
-      return;
-    }
-    rx = Rx::Body;
-  }
-
-  if (!inString && space) return; // compact as we go
-
-  if (jsonLen >= JSON_BUF_MAX) {
-    replyError(F("config too large"));
-    return;
-  }
-  json[jsonLen++] = c;
-
-  if (inString) {
-    if (escaped) escaped = false;
-    else if (c == '\\') escaped = true;
-    else if (c == '"') inString = false;
-    return;
-  }
-  if (c == '"') inString = true;
-  else if (c == '{' || c == '[') depth++;
-  else if ((c == '}' || c == ']') && --depth == 0) finish();
-}
-
-bool configIoHandleChar(char c) {
-  if (rx != Rx::Idle) {
-    receiveChar(c);
-    return true;
-  }
-  if (c == '\n' || c == '\r') {
-    if (!lineOverflow && lineLen == 6 && memcmp(line, "CONFIG", 6) == 0) startReceive();
-    lineLen = 0;
-    lineOverflow = false;
-  } else if (lineLen < sizeof line) {
-    line[lineLen++] = c;
-  } else {
-    lineOverflow = true;
-  }
-  return false;
-}
-
-void configIoPoll() {
-  if (rx != Rx::Idle && (uint32_t)(millis() - lastByteAt) >= RECEIVE_TIMEOUT_MS) {
-    replyError(F("timeout waiting for config"));
-  }
-}
+void configIoPoll() { receiver.poll(millis()); }
