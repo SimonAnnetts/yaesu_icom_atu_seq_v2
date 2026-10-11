@@ -38721,7 +38721,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "100K"
+		(property "Value" "47K"
 			(at 76.2 179.0699 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -38732,7 +38732,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Potentiometer_THT:Potentiometer_Runtron_RM-065_Vertical"
+		(property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical"
 			(at 73.66 177.8 0)
 			(hide yes)
 			(show_name no)
