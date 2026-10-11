@@ -141,7 +141,7 @@ questions](#open-questions--to-be-determined) for what has not.
 | D14/D15 (Serial3) | Port 2 — CAT to radio, via MAX202CPE |
 | D6 | Tune button (input, polled) |
 | D7 | Tune indicator: passive buzzer, ~2048Hz PWM from Timer4 (OC4B) |
-| D8 | Generic activity LED (output) |
+| D8 | Generic activity LED (output): drives a status LED, lit while CAT bytes flow |
 | D9 | ALC injection charge pump (PWM output) |
 | D10 | ALC opto-isolator gate (on/off switch) |
 | D11 | Icom AH-4 `KEY` input, via opto-isolator, `INPUT_PULLUP` |
@@ -152,10 +152,11 @@ questions](#open-questions--to-be-determined) for what has not.
 | D19 | STBY: 50MHz (input, interrupt) |
 | D4 | Shared TX INHIBIT output → TUNER connector pin 8 |
 | D5 | TUNER connector pin 2 (`TX_GND`) — input, `INPUT_PULLUP`. Open-collector, active-low: asserted (low) when the radio transmits on HF or 50MHz. Logged/cross-check only, not load-bearing (STBY already covers this with more granularity) |
-| D22 / D23 / D24 / D25 / D26 | Sequencer Band 1 (**HF**): `RX` (LED only) / `SEQ1` (LED+opto) / `SEQ2` (LED+opto) / `SEQ3` (LED+opto) / `TX` (LED only) |
-| D27 / D28 / D29 / D30 / D31 | Sequencer Band 2 (**50MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same LED-only/LED+opto pattern as Band 1 |
+| D34 / D35 / D36 / D37 / D38 | Sequencer Band 1 (**HF**): `RX` (LED only) / `SEQ1` (LED+opto) / `SEQ2` (LED+opto) / `SEQ3` (LED+opto) / `TX` (LED only) |
+| D39 / D40 / D41 / D42 / D43 | Sequencer Band 2 (**50MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same LED-only/LED+opto pattern as Band 1 |
 | D44 / D45 / D46 / D47 / D48 | Sequencer Band 3 (**144MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern |
 | D49 / D50 / D51 / D52 / D53 | Sequencer Band 4 (**430MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern; D50-D53 are the Mega's hardware SPI pins (MISO/MOSI/SCK/SS), repurposed as plain digital outputs since SPI isn't needed elsewhere in this project |
+| D22–D33 | **unassigned** — free (the sequencer outputs occupy D34–D53 as one contiguous block) |
 | D20, D21 (I2C: SDA/SCL) | **kept free** — not used by anything, available for a future I2C peripheral (e.g. a status display) |
 
 Sequencer band↔channel mapping (Band 1=HF, Band 2=50MHz, Band 3=144MHz,
@@ -163,7 +164,7 @@ Band 4=430MHz) is independent of, and doesn't follow the same order as,
 the STBY input pin assignment above (D2=HF, D3=430MHz, D18=144MHz,
 D19=50MHz) — each STBY input simply needs to be cross-wired in firmware
 to drive its matching band's sequencer channel, e.g. STBY D2 (HF) drives
-Band 1 (D22-26), STBY D3 (430MHz) drives Band 4 (D49-53), and so on.
+Band 1 (D34-38), STBY D3 (430MHz) drives Band 4 (D49-53), and so on.
 
 Only six Mega 2560 pins support true external interrupts: D2, D3, D18,
 D19, D20, D21. Putting both CAT links on Serial2/Serial3 (rather than
@@ -175,7 +176,7 @@ needs to be caught immediately to start the sequencer); the remaining two
 (D20/D21) stay free of any reservation for I2C. The tune button (D6)
 doesn't need an interrupt-capable pin — it's polled in the main loop — so
 it and the two status LEDs (D7, D8) sit comfortably outside the reserved
-set. The 20 sequencer outputs (D22-D53) and the shared TX INHIBIT output
+set. The 20 sequencer outputs (D34-D53) and the shared TX INHIBIT output
 (D4) are plain digital outputs with no special pin requirements. The
 Arduino-side band↔pin mapping for STBY (which of D2/D3/D18/D19
 is HF vs 50 vs 144 vs 430) is likewise our own software's choice; what
@@ -1192,7 +1193,10 @@ Verified on the real FT-847 with the test jig (TX INHIBIT, the four STBY
 lines and CAT connected; TUNER Sense unconnected):
 
 - **Pin map**: every output and input checked against `src/pins.h`
-  (walk-test, Phase 0). LEDs and optos are active-high; `START` idles low.
+  (walk-test, Phase 0, before the HF and 50MHz sequencer outputs were moved
+  from D22–D31 to D34–D43; the walk-test steps through whatever `pins.h`
+  says, so it re-checks the new wiring). LEDs and optos are active-high;
+  `START` idles low.
 - **STBY**: the radio pulls the correct band's STBY line low on PTT, on
   all four bands, for both manual PTT and **CAT-commanded PTT** (`0x08`).
 - **TX INHIBIT (D4 → TUNER pin 8)**: works as designed. No RF was observed

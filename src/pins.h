@@ -15,7 +15,7 @@
 constexpr uint8_t PIN_TUNE_BUTTON = 6;   // input, polled
 constexpr uint8_t PIN_TUNE_LED = 7;      // output: tune indicator, a passive buzzer driven at
                                          // ~2048Hz by Timer4 PWM (D7 = OC4B), see buzzer.h
-constexpr uint8_t PIN_ACTIVITY_LED = 8;  // output, generic
+constexpr uint8_t PIN_ACTIVITY_LED = 8;  // output, generic, drives a status LED
 
 // --- ALC injection (charge pump gate) ---
 constexpr uint8_t PIN_ALC_PWM = 9;   // charge pump drive, PWM output
@@ -71,8 +71,8 @@ struct SequencerPins {
 // D50-D53 (Band 4) are the Mega's hardware SPI pins (MISO/MOSI/SCK/SS),
 // repurposed here as plain digital outputs since SPI isn't used elsewhere.
 constexpr SequencerPins PIN_SEQ[BAND_COUNT] = {
-    {22, 23, 24, 25, 26}, // BAND_HF
-    {27, 28, 29, 30, 31}, // BAND_50M
+    {34, 35, 36, 37, 38}, // BAND_HF
+    {39, 40, 41, 42, 43}, // BAND_50M
     {44, 45, 46, 47, 48}, // BAND_144M
     {49, 50, 51, 52, 53}, // BAND_430M
 };
