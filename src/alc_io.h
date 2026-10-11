@@ -12,7 +12,7 @@
 // Fail-safe: a reset or a hang turns the gate off (the pin goes to input, the LED
 // dark), and a gate switched on by hand releases itself after 30s.
 //
-// Bench key (when no tune is running):  g  gate on/off
+// Bench keys (when no tune is running):  g  gate on/off   w  pump self-test (see alcPumpSelfTest)
 
 void alcBegin();
 
@@ -27,5 +27,11 @@ void alcPoll();
 void alcTuneSet(bool on);
 
 bool alcGate();
+
+// Dump the Timer2 registers and have the Mega measure its own D9: sample the pin with
+// interrupts off for ~10ms and report its duty and frequency next to what the registers
+// should give. Tells "the pin is not producing 50%" from "it is, and something between
+// the pin and the scope changes how it looks". Refuses while a band is sequencing.
+void alcPumpSelfTest();
 
 bool alcHandleChar(char c);
