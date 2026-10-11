@@ -39,9 +39,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 1.016,
-          "height": 1.7272,
-          "width": 1.7272
+          "drill": 1.0,
+          "height": 2.0,
+          "width": 2.0
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -214,6 +214,8 @@
         0.25,
         0.3,
         0.4,
+        0.5,
+        0.75,
         1.0,
         1.5
       ],
@@ -509,7 +511,9 @@
     "pinned_footprint_libs": [
       "Custom"
     ],
-    "pinned_symbol_libs": []
+    "pinned_symbol_libs": [
+      "Custom"
+    ]
   },
   "meta": {
     "filename": "yaesu_icom_atu_seq_v2.kicad_pro",
@@ -532,8 +536,8 @@
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.5,
         "tuning_profile": "",
-        "via_diameter": 0.6,
-        "via_drill": 0.3,
+        "via_diameter": 0.75,
+        "via_drill": 0.5,
         "wire_width": 6
       },
       {
@@ -563,6 +567,14 @@
       {
         "netclass": "PadDx",
         "pattern": "unconnected-*"
+      },
+      {
+        "netclass": "PadDx",
+        "pattern": "/SEQ-*"
+      },
+      {
+        "netclass": "PadDx",
+        "pattern": "/D*"
       }
     ]
   },
@@ -645,12 +657,42 @@
           "label": "Datasheet",
           "name": "Datasheet",
           "show": true
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Pins",
+          "name": "Sim.Pins",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Type",
+          "name": "Sim.Type",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Sim.Device",
+          "name": "Sim.Device",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Description",
+          "name": "Description",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "#",
+          "name": "${ITEM_NUMBER}",
+          "show": false
         }
       ],
       "filter_string": "",
       "group_symbols": true,
       "include_excluded_from_bom": true,
-      "name": "Default Editing",
+      "name": "",
       "sort_asc": true,
       "sort_field": "Reference"
     },
@@ -695,7 +737,7 @@
         "uuid": "79710842-5cbd-4aa5-8835-fbc996b3cee7"
       }
     ],
-    "used_designators": "SW1,RV1,R1-45,J1-20,#PWR1-4,D1-24,A1,C1-15,U1-17,F1",
+    "used_designators": "PR1-9,J1-29,E1,Q1,F1,A1,C1-36,U1-21,D1-39,#PWR1-5,R1-64,L1-5,RV1,SW1,BZ1",
     "variants": []
   },
   "sheets": [
