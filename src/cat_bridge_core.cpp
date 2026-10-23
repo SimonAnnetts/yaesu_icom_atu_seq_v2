@@ -105,12 +105,13 @@ void CatBridgeCore::sendToRadio(const uint8_t frame[CAT_FRAME_LEN], uint32_t now
 }
 
 // One queued command to the radio, when the bus is ready.
-void CatBridgeCore::replayOne(uint32_t now) {
-  if (queue_.count() == 0 || !busReadyForReplay(now)) return;
+bool CatBridgeCore::replayOne(uint32_t now) {
+  if (queue_.count() == 0 || !busReadyForReplay(now)) return false;
   uint8_t f[CAT_FRAME_LEN];
   queue_.pop(f);
   io_.frame(Frame::Replayed, f, CAT_FRAME_LEN);
   sendToRadio(f, now);
+  return true;
 }
 
 bool CatBridgeCore::poll(uint32_t now) {
@@ -136,12 +137,13 @@ bool CatBridgeCore::poll(uint32_t now) {
     }
     if (asm_.poll(now)) io_.frame(Frame::TornFromPc, nullptr, 0);
   }
-  if (mode_ == Mode::Drain) replayOne(now);
+  if (mode_ == Mode::Drain && replayOne(now)) moved = true;
 
   // radio -> PC, except replies to the Arduino's own command.
   while ((c = io_.radioRead()) >= 0) {
     uint8_t b = (uint8_t)c;
     lastBusAt_ = now;
+    moved = true; // whoever it is for, it is traffic
     if (arbiter_.ownsRadioReplies()) {
       arbiter_.radioByte(b, now);
       continue;
@@ -166,6 +168,7 @@ bool CatBridgeCore::poll(uint32_t now) {
     io_.frame(Frame::ArduinoToRadio, copy, CAT_FRAME_LEN);
     arbiter_.sent(now);
     lastBusAt_ = now;
+    moved = true;
   }
   return moved;
 }

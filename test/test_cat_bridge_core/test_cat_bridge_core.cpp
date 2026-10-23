@@ -58,6 +58,61 @@ void test_poll_reports_whether_bytes_moved() {
   TEST_ASSERT_TRUE(core->poll(3));
 }
 
+void test_the_arduinos_own_traffic_counts_as_activity() {
+  // idle: nothing
+  TEST_ASSERT_FALSE(core->poll(0));
+  // its command going out lights the LED...
+  const uint8_t q[5] = {0, 0, 0, 0, 0x03};
+  TEST_ASSERT_TRUE(core->submit(q, 1));
+  bool sawSend = false;
+  for (uint32_t t = 1; t <= 80; t++) {
+    bool moved = core->poll(t);
+    if (io.toRadio.size() == 5 && !sawSend) { // the poll that wrote the command
+      TEST_ASSERT_TRUE_MESSAGE(moved, "the Arduino's command went out without lighting the LED");
+      sawSend = true;
+    } else if (!sawSend) {
+      TEST_ASSERT_FALSE(moved);
+    }
+  }
+  TEST_ASSERT_TRUE(sawSend);
+  // ...and so does each byte of the radio's reply, which never reaches the PC
+  io.radioIn = {0x14, 0x42, 0x50, 0x00, 0x01};
+  TEST_ASSERT_TRUE(core->poll(81));
+  TEST_ASSERT_EQUAL(0, io.toPc.size());
+  TEST_ASSERT_FALSE(core->poll(82)); // and it is quiet again
+}
+
+void test_a_stray_radio_byte_while_claimed_counts_as_activity() {
+  TEST_ASSERT_TRUE(core->claim(0));
+  run(0, 100);
+  io.radioIn = {0xAA};
+  TEST_ASSERT_TRUE(core->poll(101)); // dropped, not passed to the PC, but seen
+  TEST_ASSERT_EQUAL(0, io.toPc.size());
+}
+
+void test_replaying_a_queued_command_counts_as_activity() {
+  TEST_ASSERT_TRUE(core->claim(0));
+  run(0, 100);
+  CatSnapshot s;
+  s.haveFreqMode = true;
+  core->setSnapshot(s);
+  run(101, 110);
+  io.pcIn = {0x04, 0, 0, 0, 0x07}; // a set-mode: queued during the tune
+  run(111, 130);
+  TEST_ASSERT_EQUAL(0, io.toRadio.size());
+  core->releaseClaim(131);
+  bool replaySeen = false;
+  for (uint32_t t = 131; t < 400 && !replaySeen; t++) {
+    size_t before = io.toRadio.size();
+    bool moved = core->poll(t);
+    if (io.toRadio.size() > before) {
+      TEST_ASSERT_TRUE_MESSAGE(moved, "a replayed command went out without lighting the LED");
+      replaySeen = true;
+    }
+  }
+  TEST_ASSERT_TRUE(replaySeen);
+}
+
 void test_a_torn_pc_command_is_reported_but_still_forwarded() {
   io.pcIn = {1, 2, 3};
   run(0, 300);
@@ -158,6 +213,9 @@ int main() {
   UNITY_BEGIN();
   RUN_TEST(test_passthrough_is_byte_transparent_in_both_directions);
   RUN_TEST(test_poll_reports_whether_bytes_moved);
+  RUN_TEST(test_the_arduinos_own_traffic_counts_as_activity);
+  RUN_TEST(test_a_stray_radio_byte_while_claimed_counts_as_activity);
+  RUN_TEST(test_replaying_a_queued_command_counts_as_activity);
   RUN_TEST(test_a_torn_pc_command_is_reported_but_still_forwarded);
   RUN_TEST(test_the_arduino_command_goes_out_and_its_reply_stays_off_the_pc);
   RUN_TEST(test_claim_holds_pc_bytes_unread_until_there_is_a_snapshot);

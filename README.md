@@ -141,7 +141,7 @@ questions](#open-questions--to-be-determined) for what has not.
 | D14/D15 (Serial3) | Port 2 — CAT to radio, via MAX202CPE |
 | D6 | Tune button (input, polled) |
 | D7 | Tune indicator: passive buzzer, ~2048Hz PWM from Timer4 (OC4B) |
-| D8 | Generic activity LED (output): drives a status LED, lit while CAT bytes flow |
+| D8 | CAT activity LED (output): lit for 20ms after every byte on either CAT port - the PC's, the radio's, and the Arduino's own commands and replies |
 | D9 | ALC injection charge pump (PWM output) |
 | D10 | ALC opto-isolator gate (on/off switch) |
 | D11 | Icom AH-4 `KEY` input, via opto-isolator, `INPUT_PULLUP` |
@@ -355,6 +355,14 @@ interrupt handler uses, directly and proactively:
   radio reporting it is transmitting, a frequency in no band, a band the AH-4
   isn't enabled for (the config's per-band `atu` flag), no usable
   answer to a CAT query (including a mode byte that couldn't be restored).
+- **CAT activity LED (D8):** lights for 20ms after every byte seen on either CAT
+  port, so it flickers with flrig's polling and glows steadily when traffic is
+  dense. It counts the PC's bytes (forwarded to the radio, or read while a tune
+  has the radio), the radio's bytes (forwarded to the PC, or replies to the
+  Arduino's own commands, or strays), the Arduino's own commands, commands
+  replayed after a tune, and the recovery commands sent at boot - so a
+  standalone tune with no PC still lights it. It is off at boot and with no
+  traffic, and the walk-test's `ACTIVITY_LED` step drives it directly.
 - **Tune indicator (D7, a passive buzzer):** driven at ~2048Hz by Timer4's
   hardware PWM (not `tone()`, which would take Timer2 from the ALC pump). A
   continuous tone while a cycle runs; three slow beeps on success; fast
@@ -1247,9 +1255,9 @@ lines and CAT connected; TUNER Sense unconnected):
   left in circuit. Nothing here does that yet; the band is known at each
   PTT from STBY, so resetting when it differs from the last tuned band is
   possible.
-- Debounce/timing behaviour of the physical tune button (D6), exact
-  blink/status patterns for the tune LED (D7), and what the generic
-  activity LED (D8) should actually indicate.
+- What a long press or a double press of the tune button (D6) should do, if
+  anything: a single press starts a tune (debounced, 30ms) and a press during
+  one aborts it, and nothing else is assigned.
 - **Implementation mechanism for "suppress this band's STBY handling
   while a tune cycle holds it"** — likely a simple per-band flag/state the
   interrupt handler checks before acting, but needs designing alongside

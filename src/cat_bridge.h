@@ -16,7 +16,8 @@
 
 void catBridgeBegin();
 
-// Call every loop(). Returns true if any byte moved in either direction.
+// Call every loop(). Returns true if any byte was seen on either port (including the
+// Arduino's own commands), for the activity LED.
 bool catBridgePoll();
 
 // Serial0 command handling: 'c' toggles frame logging.

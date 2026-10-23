@@ -55,7 +55,9 @@ public:
 
   explicit CatBridgeCore(CatBridgeIo &io) : io_(io) {}
 
-  // Call every loop. True if any byte moved in either direction.
+  // Call every loop. True if any byte was seen on either port this pass - the PC's, the
+  // radio's, the Arduino's own commands and their replies, replayed commands, and the
+  // bridge's made-up answers - for the activity LED.
   bool poll(uint32_t now);
 
   // The Arduino's own commands and the long-lived claim (see CatArbiter).
@@ -82,7 +84,7 @@ private:
   void enqueue(const uint8_t frame[CAT_FRAME_LEN]);
   bool busReadyForReplay(uint32_t now) const;
   void sendToRadio(const uint8_t frame[CAT_FRAME_LEN], uint32_t now);
-  void replayOne(uint32_t now);
+  bool replayOne(uint32_t now); // true if it sent a frame
 
   CatBridgeIo &io_;
   CatFramer framer_;      // traffic actually forwarded between PC and radio

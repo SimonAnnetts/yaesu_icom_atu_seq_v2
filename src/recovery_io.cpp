@@ -4,6 +4,7 @@
 
 #include "config.h"
 #include "eeprom_map.h"
+#include "pins.h"
 #include "recovery.h"
 
 static_assert(EEPROM_CONFIG_ADDR + CONFIG_IMAGE_MAX <= EEPROM_RECOVERY_ADDR, "EEPROM regions overlap");
@@ -32,10 +33,12 @@ void recoveryRunIfNeeded() {
   RecoveryStep steps[4];
   uint8_t n = recoveryScript(mode, steps);
   while (Serial3.available()) Serial3.read();
+  digitalWrite(PIN_ACTIVITY_LED, HIGH); // CAT traffic: lit while the recovery commands go out
   for (uint8_t i = 0; i < n; i++) {
     Serial3.write(steps[i].cmd, 5);
     delay(steps[i].delayAfterMs);
   }
+  digitalWrite(PIN_ACTIVITY_LED, LOW);
   while (Serial3.available()) Serial3.read(); // nobody is waiting for these replies
   recoveryDisarm();
   Serial.println(F("RECOVERY: done"));

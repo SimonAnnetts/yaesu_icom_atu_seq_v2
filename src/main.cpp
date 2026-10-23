@@ -14,8 +14,9 @@
 #include "watchdog.h"
 
 // Wiring only: pin setup and the main loop, which drives the sequencer, the CAT
-// bridge, the tune cycle and the bench walk-test. The activity LED lights while CAT
-// bytes are flowing. The ALC pump and gate live in alc_io.cpp.
+// bridge, the tune cycle and the bench walk-test. The activity LED lights for 20ms
+// after every byte on either CAT port - the PC's, the radio's and the Arduino's own.
+// The ALC pump and gate live in alc_io.cpp.
 
 constexpr uint32_t LED_HOLD_MS = 20;
 
