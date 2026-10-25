@@ -103,6 +103,7 @@ void loop() {
     radioHandleChar(c);
     ah4IoHandleChar(c);
     alcHandleChar(c);
+    configIoHandleKey(c);
   }
   watchdogStage(WDT_STAGE_CONFIG);
   configIoPoll();

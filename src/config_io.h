@@ -22,3 +22,7 @@ bool configIoHandleChar(char c);
 
 // Call every loop(): enforces the receive timeout.
 void configIoPoll();
+
+// Serial0 key 'v': print the config the sequencer is running right now (what was loaded
+// from EEPROM or uploaded last, or the built-in defaults). True if the key was 'v'.
+bool configIoHandleKey(char c);

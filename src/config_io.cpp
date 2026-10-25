@@ -69,6 +69,60 @@ void configIoBegin() {
   }
 }
 
+static void printBand(uint8_t b, const char *name) {
+  const BandConfig &c = sequencerIoConfig().band[b];
+  Serial.print(name);
+  Serial.print(F(": "));
+  Serial.print(c.freqMinHz);
+  Serial.print('-');
+  Serial.print(c.freqMaxHz);
+  Serial.print(F(" Hz | gaps "));
+  for (uint8_t i = 0; i < SEQ_STAGES; i++) {
+    Serial.print(c.gapMs[i]);
+    Serial.print(i + 1 < SEQ_STAGES ? '/' : ' ');
+  }
+  Serial.print(F("ms | engaged when tuning: "));
+  for (uint8_t i = 0; i < SEQ_STAGES; i++) {
+    if (c.tuneProfile[i]) {
+      Serial.print(F("SEQ"));
+      Serial.print(i + 1);
+    } else {
+      Serial.print(F("--"));
+    }
+    Serial.print(' ');
+  }
+  Serial.print(F("(all three when transmitting) | atu "));
+  Serial.print(c.atu ? F("on") : F("off"));
+  Serial.print(F(" | alc "));
+  Serial.println(c.alc ? F("on") : F("off"));
+}
+
+bool configIoHandleKey(char c) {
+  if (c == '?') {
+    Serial.println(F("config key: v show the running sequencer config"));
+    return false; // other handlers print their help too
+  }
+  if (c != 'v') return false;
+  Serial.println(F("Running sequencer config:"));
+  static const char *const NAMES[SEQ_BANDS] = {"HF", "50M", "144M", "430M"};
+  for (uint8_t b = 0; b < SEQ_BANDS; b++) {
+    Serial.print(F("  "));
+    printBand(b, NAMES[b]);
+  }
+  const SequencerConfig &cfg = sequencerIoConfig();
+  Serial.print(F("  cross-band rules: "));
+  Serial.println(cfg.triggerCount);
+  for (uint8_t i = 0; i < cfg.triggerCount; i++) {
+    Serial.print(F("    "));
+    Serial.print(NAMES[cfg.trigger[i].sourceBand]);
+    Serial.print(F(" SEQ1 -> "));
+    Serial.print(NAMES[cfg.trigger[i].targetBand]);
+    Serial.print(F(" SEQ"));
+    Serial.println(cfg.trigger[i].targetStage + 1);
+  }
+  return true;
+}
+
 bool configIoHandleChar(char c) { return receiver.handleChar(c, millis()); }
 
 void configIoPoll() { receiver.poll(millis()); }

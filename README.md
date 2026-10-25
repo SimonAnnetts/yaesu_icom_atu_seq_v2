@@ -689,6 +689,14 @@ This is also the transport for loading the sequencer's JSON config (band
 timing, cross-band trigger rules) at runtime — see [Sequencer
 configuration and cross-band triggers](#sequencer-configuration-and-cross-band-triggers) above.
 
+Bench keys on Serial0 (the walk-test, tune, ALC and CAT-radio keys are described
+where they belong): **`v`** prints the sequencer config the board is *actually
+running* right now - per band the frequency range, the three delays, which of
+`SEQ1`–`SEQ3` are engaged during a tune, whether the ATU and ALC are on, and the
+cross-band rules. It is the quickest way to answer "is the board running the config
+I think it is?" (for example, whether `SEQ3` is skipped because of a tune profile,
+or how long a PTT must be held for `SEQ3` to appear: two delays after PTT).
+
 ## Reference clones (for developers)
 
 `docs/Hamlib` and `docs/fakeFC` are local clones kept only as reference while
