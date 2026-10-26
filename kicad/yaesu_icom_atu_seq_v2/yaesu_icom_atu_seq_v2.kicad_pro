@@ -264,7 +264,7 @@
       "internal_id": "",
       "mfg": "",
       "mpn": "",
-      "sch_revision": ""
+      "sch_revision": "v1.2"
     },
     "layer_pairs": [],
     "layer_presets": [],
@@ -695,7 +695,7 @@
           "show": false
         }
       ],
-      "filter_string": "R52",
+      "filter_string": "R",
       "group_symbols": true,
       "include_excluded_from_bom": true,
       "name": "",
@@ -743,7 +743,7 @@
         "uuid": "79710842-5cbd-4aa5-8835-fbc996b3cee7"
       }
     ],
-    "used_designators": "J1-29,PR1-9,SW1,E1,C1-37,A1,D1-39,U1-21,Q1,F1,R1-64,#PWR1-5,RV1,L1-5,BZ1",
+    "used_designators": "J1-30,PR1-9,SW1,E1,C1-39,A1,D1-40,U1-21,Q1,F1,R1-64,#PWR1-5,RV1,L1-5,BZ1",
     "variants": []
   },
   "sheets": [
