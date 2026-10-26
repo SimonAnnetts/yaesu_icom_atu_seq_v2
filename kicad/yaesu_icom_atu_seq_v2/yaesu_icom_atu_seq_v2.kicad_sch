@@ -10263,12 +10263,6 @@
 		(uuid "091d745a-4dc7-4ec4-9a40-a27ad99cd1ca")
 	)
 	(junction
-		(at 72.39 66.04)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "09e0998d-ad6c-466d-9fa7-0fe3f788faf2")
-	)
-	(junction
 		(at 213.36 88.9)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -10467,6 +10461,12 @@
 		(uuid "2d6915b4-db48-4aed-a90a-54bd65afa44f")
 	)
 	(junction
+		(at 49.53 66.04)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2ea04478-a47c-41c4-a13f-956b5bf72daf")
+	)
+	(junction
 		(at 105.41 13.97)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -10549,6 +10549,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "409da150-40a9-46c5-b95e-c24eb77f9212")
+	)
+	(junction
+		(at 49.53 87.63)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "40fef6fc-a7a1-4110-800e-c37b4fac4dc1")
 	)
 	(junction
 		(at 49.53 105.41)
@@ -11131,6 +11137,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b9089441-2320-4f86-81cd-8233892b812f")
+	)
+	(junction
+		(at 72.39 66.04)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "baa7e40d-4edb-468f-8d46-09b523c43bdb")
 	)
 	(junction
 		(at 82.55 66.04)
@@ -11797,6 +11809,16 @@
 			(type default)
 		)
 		(uuid "07c33edc-ae4a-4060-83eb-ce2681b3fc43")
+	)
+	(wire
+		(pts
+			(xy 49.53 76.2) (xy 49.53 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0828d84a-ad7c-4fac-a18b-7805fb69e5ec")
 	)
 	(wire
 		(pts
@@ -14590,6 +14612,16 @@
 	)
 	(wire
 		(pts
+			(xy 49.53 66.04) (xy 72.39 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "698281b7-3fe0-48bc-aa12-02bf5761ebee")
+	)
+	(wire
+		(pts
 			(xy 232.41 55.88) (xy 231.14 55.88)
 		)
 		(stroke
@@ -15307,6 +15339,16 @@
 			(type default)
 		)
 		(uuid "852e4614-9c25-4f3f-84a2-976b74a01c78")
+	)
+	(wire
+		(pts
+			(xy 49.53 66.04) (xy 49.53 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "85e0ff8b-7f85-44a6-bdcb-36a40f52d579")
 	)
 	(wire
 		(pts
@@ -16140,16 +16182,6 @@
 	)
 	(wire
 		(pts
-			(xy 72.39 66.04) (xy 72.39 72.39)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a5998ee6-4df7-47b7-8947-ddc106d8b1fc")
-	)
-	(wire
-		(pts
 			(xy 260.35 111.76) (xy 261.62 111.76)
 		)
 		(stroke
@@ -16770,7 +16802,7 @@
 	)
 	(wire
 		(pts
-			(xy 43.18 66.04) (xy 82.55 66.04)
+			(xy 43.18 66.04) (xy 49.53 66.04)
 		)
 		(stroke
 			(width 0)
@@ -17670,6 +17702,16 @@
 	)
 	(wire
 		(pts
+			(xy 72.39 66.04) (xy 72.39 72.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "df935eb7-e27f-48fc-b400-efa6223d4eef")
+	)
+	(wire
+		(pts
 			(xy 110.49 157.48) (xy 191.77 157.48)
 		)
 		(stroke
@@ -17827,6 +17869,16 @@
 			(type default)
 		)
 		(uuid "e4fb414e-cd2b-4034-a03e-3127cd01db33")
+	)
+	(wire
+		(pts
+			(xy 72.39 66.04) (xy 82.55 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e5cc32f8-235a-4467-8e1f-454188de8c69")
 	)
 	(wire
 		(pts
@@ -25478,9 +25530,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -25575,16 +25626,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 72.136 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 69.596 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -25669,16 +25718,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 114.554 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 114.046 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -25763,16 +25810,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 76.454 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 75.946 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -25863,7 +25908,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -25999,7 +26044,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -26091,7 +26136,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -26228,7 +26273,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -26303,7 +26348,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -26417,9 +26462,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
@@ -26502,7 +26546,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "1288261c-849e-462f-a842-c4284322d563")
-		(property "Reference" "C25"
+		(property "Reference" "C26"
 			(at 258.064 59.436 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -26575,7 +26619,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C25")
+					(reference "C26")
 					(unit 1)
 				)
 			)
@@ -26592,7 +26636,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "12d61658-ee0b-48f1-8a62-0be6f7baa85d")
-		(property "Reference" "C20"
+		(property "Reference" "C21"
 			(at 87.63 107.9438 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -26609,9 +26653,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -26667,7 +26710,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C20")
+					(reference "C21")
 					(unit 1)
 				)
 			)
@@ -26696,16 +26739,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 56.134 118.364 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 56.642 117.856 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -26884,7 +26925,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.524 1.524)
+					(size 1 1)
 				)
 			)
 		)
@@ -27215,7 +27256,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "19eb6aaa-3df9-4ed7-bc9a-b4634788c1ac")
-		(property "Reference" "C36"
+		(property "Reference" "C37"
 			(at 258.064 153.416 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -27288,7 +27329,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C36")
+					(reference "C37")
 					(unit 1)
 				)
 			)
@@ -27324,9 +27365,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal"
@@ -27417,7 +27457,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -27555,7 +27595,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -27676,7 +27716,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "1eb32d5f-4e14-4978-8dd1-36a36c9afe8b")
-		(property "Reference" "C32"
+		(property "Reference" "C33"
 			(at 258.064 120.396 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -27749,7 +27789,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C32")
+					(reference "C33")
 					(unit 1)
 				)
 			)
@@ -27778,16 +27818,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 98.044 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 97.536 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -27878,9 +27916,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
@@ -27977,16 +28014,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 81.026 32.004 0)
-			(hide yes)
+		(property "Value" "47K"
+			(at 80.264 37.846 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -28059,7 +28094,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "21a9096c-c81a-4ec3-8a4a-be589bf07d4e")
-		(property "Reference" "C9"
+		(property "Reference" "C10"
 			(at 59.944 51.816 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -28076,9 +28111,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -28134,7 +28168,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C9")
+					(reference "C10")
 					(unit 1)
 				)
 			)
@@ -28151,7 +28185,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "249d5bcb-e7ef-476c-b971-f6ce70deff19")
-		(property "Reference" "C15"
+		(property "Reference" "C16"
 			(at 76.454 135.89 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -28168,9 +28202,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -28226,7 +28259,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C15")
+					(reference "C16")
 					(unit 1)
 				)
 			)
@@ -28245,7 +28278,7 @@
 		(dnp no)
 		(uuid "258b1e8b-2622-4be5-b1aa-323f844255a3")
 		(property "Reference" "R13"
-			(at 88.9 170.18 90)
+			(at 88.646 165.1 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -28255,12 +28288,12 @@
 			)
 		)
 		(property "Value" "470R"
-			(at 88.9 167.64 90)
+			(at 88.9 166.878 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -28352,9 +28385,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal"
@@ -28434,7 +28466,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "2a7f05a7-966e-4cef-93c5-8f0f38c3de39")
-		(property "Reference" "C22"
+		(property "Reference" "C23"
 			(at 98.806 167.894 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -28451,9 +28483,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
@@ -28509,7 +28540,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C22")
+					(reference "C23")
 					(unit 1)
 				)
 			)
@@ -28538,16 +28569,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 57.404 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 56.896 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -28638,7 +28667,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -28719,16 +28748,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 214.884 35.814 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 215.646 35.306 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -28818,9 +28845,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -28916,16 +28942,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 100.584 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 100.076 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -29016,9 +29040,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-8-3.5-H_1x08_P3.50mm_Horizontal"
@@ -29121,16 +29144,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 138.684 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 138.176 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -29215,16 +29236,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 78.486 32.004 0)
-			(hide yes)
+		(property "Value" "47K"
+			(at 77.47 37.846 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -29315,7 +29334,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -29402,7 +29421,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -29540,9 +29559,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-5-3.5-H_1x05_P3.50mm_Horizontal"
@@ -29641,7 +29659,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -29710,16 +29728,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 147.066 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 144.526 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -29810,7 +29826,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -29931,7 +29947,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "34acbbd0-2d78-4a26-8a7b-74f48f71aaa0")
-		(property "Reference" "C24"
+		(property "Reference" "C25"
 			(at 233.426 30.988 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -29947,7 +29963,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -30004,7 +30020,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C24")
+					(reference "C25")
 					(unit 1)
 				)
 			)
@@ -30034,15 +30050,13 @@
 			)
 		)
 		(property "Value" "1K"
-			(at 109.474 169.926 0)
-			(hide yes)
+			(at 108.458 168.91 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -30126,16 +30140,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 65.786 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 63.246 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -30219,16 +30231,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 93.726 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 91.186 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -30318,9 +30328,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -30422,9 +30431,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
@@ -30509,9 +30517,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -30596,7 +30603,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "3d4433a2-f0cd-4c6e-a126-d383f892c404")
-		(property "Reference" "C31"
+		(property "Reference" "C32"
 			(at 258.064 114.046 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -30669,7 +30676,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C31")
+					(reference "C32")
 					(unit 1)
 				)
 			)
@@ -30703,9 +30710,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -30801,16 +30807,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 151.384 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 150.876 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -30964,6 +30968,98 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:C_Small")
+		(at 49.53 73.66 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4373ad80-92d5-4aea-a09f-b9ecd7034a76")
+		(property "Reference" "C1"
+			(at 52.07 72.3962 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100n"
+			(at 52.07 74.9362 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+			(at 49.53 73.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 49.53 73.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Unpolarized capacitor, small symbol"
+			(at 49.53 73.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "KiLib_Generator" "capacitor/THT/other"
+			(at 49.53 73.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2dc3c479-eae2-4247-bd53-e6b06325567a")
+		)
+		(pin "2"
+			(uuid "38a3b01e-19cf-4921-b2db-d989153c7eb0")
+		)
+		(instances
+			(project "yaesu_icom_atu_seq_v2"
+				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
+					(reference "C1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C_Polarized_Small")
 		(at 87.63 152.4 0)
 		(unit 1)
@@ -30974,7 +31070,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "4459aed5-be11-4b9f-97d0-6ed607fa03da")
-		(property "Reference" "C18"
+		(property "Reference" "C19"
 			(at 90.17 150.5838 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -30991,9 +31087,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
@@ -31049,7 +31144,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C18")
+					(reference "C19")
 					(unit 1)
 				)
 			)
@@ -31085,9 +31180,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal"
@@ -31172,16 +31266,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 49.784 25.654 0)
-			(hide yes)
+		(property "Value" "470R"
+			(at 54.864 27.686 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -31254,7 +31346,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "46bda5f2-f8df-482f-bd04-fc05b23fb827")
-		(property "Reference" "C12"
+		(property "Reference" "C13"
 			(at 65.024 31.496 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -31271,9 +31363,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -31329,7 +31420,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C12")
+					(reference "C13")
 					(unit 1)
 				)
 			)
@@ -31364,7 +31455,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -31444,16 +31535,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 59.436 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 56.896 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -31543,9 +31632,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -31647,7 +31735,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -31785,7 +31873,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -31917,16 +32005,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 145.034 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 144.526 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -32017,7 +32103,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -32148,16 +32234,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 140.716 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 138.176 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -32248,7 +32332,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -32380,16 +32464,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 112.014 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 111.506 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -32474,16 +32556,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 63.754 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 63.246 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -32573,9 +32653,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
@@ -32669,16 +32748,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 54.864 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 54.356 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -32769,9 +32846,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
@@ -32874,9 +32950,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
@@ -32988,7 +33063,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -33063,7 +33138,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -33149,16 +33224,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 85.344 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 84.836 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -33322,7 +33395,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "6635ce42-ef43-48a8-be24-b93ea242497e")
-		(property "Reference" "C27"
+		(property "Reference" "C28"
 			(at 258.064 72.136 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -33395,7 +33468,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C27")
+					(reference "C28")
 					(unit 1)
 				)
 			)
@@ -33429,9 +33502,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -33516,7 +33588,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "694cd787-eff2-48ae-8e95-ee388eb1ca12")
-		(property "Reference" "C10"
+		(property "Reference" "C11"
 			(at 64.77 180.3462 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -33533,9 +33605,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -33591,7 +33662,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C10")
+					(reference "C11")
 					(unit 1)
 				)
 			)
@@ -33625,7 +33696,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -33716,7 +33787,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -33791,9 +33862,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -33878,7 +33948,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "73aa7734-08c2-40a9-ad45-31cd796b9cd6")
-		(property "Reference" "C28"
+		(property "Reference" "C29"
 			(at 258.064 87.376 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -33951,7 +34021,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C28")
+					(reference "C29")
 					(unit 1)
 				)
 			)
@@ -33969,7 +34039,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "73dbbcdb-cbcd-440b-b3d9-9c2d9388552f")
-		(property "Reference" "C17"
+		(property "Reference" "C18"
 			(at 85.09 182.1562 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -33986,9 +34056,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
@@ -34044,7 +34113,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C17")
+					(reference "C18")
 					(unit 1)
 				)
 			)
@@ -34077,7 +34146,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -34146,7 +34215,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "7b66cd98-dab2-4fa5-bb4a-f9f5be15322e")
-		(property "Reference" "C7"
+		(property "Reference" "C8"
 			(at 59.944 31.496 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -34163,9 +34232,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -34221,7 +34289,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C7")
+					(reference "C8")
 					(unit 1)
 				)
 			)
@@ -34238,7 +34306,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "7d94fe5f-ae80-441b-ba47-d5ca9b2b156c")
-		(property "Reference" "C3"
+		(property "Reference" "C4"
 			(at 54.864 31.496 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -34255,9 +34323,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -34313,7 +34380,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C3")
+					(reference "C4")
 					(unit 1)
 				)
 			)
@@ -34347,9 +34414,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
@@ -34440,9 +34506,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-5-3.5-H_1x05_P3.50mm_Horizontal"
@@ -34525,7 +34590,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "8030232b-f0a7-4d85-9d95-7133814351cc")
-		(property "Reference" "C19"
+		(property "Reference" "C20"
 			(at 88.392 86.36 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -34542,9 +34607,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -34600,7 +34664,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C19")
+					(reference "C20")
 					(unit 1)
 				)
 			)
@@ -34628,16 +34692,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 120.396 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 117.856 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -34722,16 +34784,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 141.224 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 140.716 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -34906,16 +34966,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 120.904 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.092 120.396 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -34999,16 +35057,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 100.076 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 97.536 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -35099,9 +35155,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_THT:TO-92L_Wide"
@@ -35208,9 +35263,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -35311,9 +35365,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -35398,7 +35451,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "8acf32c7-0d87-491f-87a5-0d279d49b93a")
-		(property "Reference" "C16"
+		(property "Reference" "C17"
 			(at 80.01 151.1362 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -35415,9 +35468,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -35473,7 +35525,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C16")
+					(reference "C17")
 					(unit 1)
 				)
 			)
@@ -35491,7 +35543,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "8cbce01d-f5d6-4154-a413-bf2bd5e4bedc")
-		(property "Reference" "C33"
+		(property "Reference" "C34"
 			(at 258.064 126.746 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -35564,7 +35616,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C33")
+					(reference "C34")
 					(unit 1)
 				)
 			)
@@ -35599,7 +35651,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -35731,16 +35783,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 72.644 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.092 72.136 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -35831,9 +35881,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
@@ -35902,7 +35951,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "939b6b17-c8b6-484a-92cd-2024430aae3d")
-		(property "Reference" "C11"
+		(property "Reference" "C12"
 			(at 63.246 135.89 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -35919,9 +35968,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -35977,7 +36025,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C11")
+					(reference "C12")
 					(unit 1)
 				)
 			)
@@ -36084,7 +36132,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "945ad6ed-205f-4e36-8f20-d4da52e31187")
-		(property "Reference" "C21"
+		(property "Reference" "C22"
 			(at 88.9 115.5638 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -36101,9 +36149,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -36159,7 +36206,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C21")
+					(reference "C22")
 					(unit 1)
 				)
 			)
@@ -36194,9 +36241,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
@@ -36287,16 +36333,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 147.574 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 147.066 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -36370,7 +36414,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "961b3211-1d8d-49c2-bcc0-8f9d7a3c53e1")
-		(property "Reference" "C23"
+		(property "Reference" "C24"
 			(at 107.95 31.7562 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -36387,9 +36431,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -36445,7 +36488,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C23")
+					(reference "C24")
 					(unit 1)
 				)
 			)
@@ -36479,9 +36522,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -36672,7 +36714,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -36768,7 +36810,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "98640ac4-3c7f-4fe3-961f-891312803266")
-		(property "Reference" "C4"
+		(property "Reference" "C5"
 			(at 52.07 83.8138 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -36785,9 +36827,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -36843,7 +36884,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C4")
+					(reference "C5")
 					(unit 1)
 				)
 			)
@@ -36860,7 +36901,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "9882def9-69e4-420d-a668-0ffe302da5c5")
-		(property "Reference" "C5"
+		(property "Reference" "C6"
 			(at 57.15 151.1362 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -36877,9 +36918,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -36935,7 +36975,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C5")
+					(reference "C6")
 					(unit 1)
 				)
 			)
@@ -36970,9 +37010,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
@@ -37075,9 +37114,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
@@ -37180,9 +37218,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
@@ -37274,7 +37311,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "9a6c9076-9611-4297-9e82-0f5256353e40")
-		(property "Reference" "C30"
+		(property "Reference" "C31"
 			(at 258.064 100.076 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -37347,7 +37384,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C30")
+					(reference "C31")
 					(unit 1)
 				)
 			)
@@ -37365,7 +37402,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "9a8ebe36-f0c5-4000-a4f8-0a900d3c53bf")
-		(property "Reference" "C34"
+		(property "Reference" "C35"
 			(at 258.064 140.716 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -37438,7 +37475,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C34")
+					(reference "C35")
 					(unit 1)
 				)
 			)
@@ -37563,7 +37600,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -37696,15 +37733,13 @@
 			)
 		)
 		(property "Value" "1K"
-			(at 58.674 129.794 0)
-			(hide yes)
+			(at 59.436 129.032 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -37778,7 +37813,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "9e0b37d7-7197-4e86-b921-5600d4155526")
-		(property "Reference" "C29"
+		(property "Reference" "C30"
 			(at 258.064 93.726 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -37851,7 +37886,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C29")
+					(reference "C30")
 					(unit 1)
 				)
 			)
@@ -37880,16 +37915,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 109.474 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 108.966 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -37962,7 +37995,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "a0a5008d-9a98-4556-b93e-879a618db013")
-		(property "Reference" "C14"
+		(property "Reference" "C15"
 			(at 72.39 116.1162 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -37979,9 +38012,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
@@ -38037,7 +38069,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C14")
+					(reference "C15")
 					(unit 1)
 				)
 			)
@@ -38156,16 +38188,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 49.784 23.114 0)
-			(hide yes)
+		(property "Value" "470R"
+			(at 54.864 25.146 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -38255,9 +38285,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -38354,15 +38383,13 @@
 			)
 		)
 		(property "Value" "390R"
-			(at 214.884 30.734 0)
-			(hide yes)
+			(at 215.9 29.972 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -38453,9 +38480,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Buzzer_Beeper:Buzzer_TDK_PS1240P02BT_D12.2mm_H6.5mm"
@@ -38535,9 +38561,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal"
@@ -38617,7 +38642,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "a8e2e6b2-f6c8-4814-88fe-273dfc27ab87")
-		(property "Reference" "C6"
+		(property "Reference" "C7"
 			(at 54.61 180.3462 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -38634,9 +38659,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -38692,7 +38716,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C6")
+					(reference "C7")
 					(unit 1)
 				)
 			)
@@ -38727,9 +38751,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical"
@@ -38838,16 +38861,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 87.376 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 84.836 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -38932,16 +38953,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 66.294 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 65.786 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -39032,9 +39051,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
@@ -39123,7 +39141,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -39210,7 +39228,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -39342,16 +39360,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 118.364 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 117.856 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -39436,16 +39452,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 49.784 28.194 0)
-			(hide yes)
+		(property "Value" "470R"
+			(at 50.8 30.988 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -39535,9 +39549,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
@@ -39726,9 +39739,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -39812,7 +39824,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "b6250b01-09f5-46b6-b20d-ca42a2365859")
-		(property "Reference" "C2"
+		(property "Reference" "C3"
 			(at 51.308 86.36 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -39829,9 +39841,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -39887,7 +39898,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C2")
+					(reference "C3")
 					(unit 1)
 				)
 			)
@@ -39916,16 +39927,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 82.804 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 82.296 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -40015,8 +40024,9 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 0.8 0.8)
 				)
+				(justify left)
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_THT:TO-220-3_Horizontal_TabDown"
@@ -40112,9 +40122,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
@@ -40217,9 +40226,9 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 0.8 0.8)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 		(property "Footprint" "Package_DIP:DIP-16_W7.62mm_Socket_LongPads"
@@ -40352,9 +40361,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -40456,7 +40464,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -40543,7 +40551,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -40626,14 +40634,12 @@
 		)
 		(property "Value" "1K"
 			(at 127.254 159.004 0)
-			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -40706,7 +40712,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "c129a946-cc28-460a-95d7-6163cdd2b3c8")
-		(property "Reference" "C13"
+		(property "Reference" "C14"
 			(at 70.104 31.496 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -40723,9 +40729,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -40781,7 +40786,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C13")
+					(reference "C14")
 					(unit 1)
 				)
 			)
@@ -40798,7 +40803,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "c244f2de-0c23-4965-93f1-3cc99fe07d14")
-		(property "Reference" "C8"
+		(property "Reference" "C9"
 			(at 59.944 46.736 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -40815,9 +40820,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
@@ -40873,7 +40877,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C8")
+					(reference "C9")
 					(unit 1)
 				)
 			)
@@ -40902,16 +40906,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 157.734 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 157.226 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -41176,16 +41178,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 104.394 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 103.886 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -41276,9 +41276,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
@@ -41369,7 +41368,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -41505,7 +41504,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -41632,16 +41631,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 153.416 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 150.876 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -41731,9 +41728,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -41834,7 +41830,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -41909,16 +41905,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 49.784 20.574 0)
-			(hide yes)
+		(property "Value" "470R"
+			(at 54.864 22.86 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -42093,16 +42087,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 214.884 25.654 0)
-			(hide yes)
+		(property "Value" "10K"
+			(at 215.392 24.892 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -42192,9 +42184,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -42279,7 +42270,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "d280a095-06d8-4d92-9b16-95eff6509c33")
-		(property "Reference" "C35"
+		(property "Reference" "C36"
 			(at 258.064 147.066 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -42352,7 +42343,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C35")
+					(reference "C36")
 					(unit 1)
 				)
 			)
@@ -42381,16 +42372,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 70.104 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 69.596 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -42475,16 +42464,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 124.714 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.41 124.206 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -42574,9 +42561,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -42768,7 +42754,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -42906,9 +42892,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"
@@ -43010,7 +42995,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -43090,9 +43075,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -43194,9 +43178,9 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
-				(justify left)
+				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
@@ -43328,14 +43312,12 @@
 		)
 		(property "Value" "1K"
 			(at 118.364 175.006 0)
-			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -43426,7 +43408,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -43563,9 +43545,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -43650,7 +43631,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "dbabf921-65ff-4186-b64c-86e63bc2757d")
-		(property "Reference" "C26"
+		(property "Reference" "C27"
 			(at 258.064 65.786 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -43723,7 +43704,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C26")
+					(reference "C27")
 					(unit 1)
 				)
 			)
@@ -43752,16 +43733,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 49.784 40.894 0)
-			(hide yes)
+		(property "Value" "680R"
+			(at 51.816 40.386 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -43851,9 +43830,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -43949,16 +43927,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 136.144 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.092 135.636 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -44043,16 +44019,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 153.924 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 153.416 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -44126,7 +44100,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "de3ba619-4032-4b08-92c1-05b0feffb4aa")
-		(property "Reference" "C1"
+		(property "Reference" "C2"
 			(at 46.99 150.5838 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -44143,9 +44117,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
@@ -44201,7 +44174,7 @@
 		(instances
 			(project "yaesu_icom_atu_seq_v2"
 				(path "/79710842-5cbd-4aa5-8835-fbc996b3cee7"
-					(reference "C1")
+					(reference "C2")
 					(unit 1)
 				)
 			)
@@ -44235,9 +44208,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
@@ -44328,9 +44300,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
@@ -44437,16 +44408,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 225.044 25.654 0)
-			(hide yes)
+		(property "Value" "470R"
+			(at 225.806 25.146 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -44536,9 +44505,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify right)
 			)
 		)
 		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
@@ -44634,16 +44602,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 83.566 32.004 0)
-			(hide yes)
+		(property "Value" "47K"
+			(at 82.55 37.846 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -44728,16 +44694,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 127.254 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 126.746 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -44822,16 +44786,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 49.784 56.134 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 51.308 58.928 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -44916,16 +44878,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 59.944 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 59.436 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -45010,16 +44970,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 87.884 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 87.376 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -45110,7 +45068,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -45242,16 +45200,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 131.064 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.092 130.556 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -45336,16 +45292,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 227.584 94.234 0)
-			(hide yes)
+		(property "Value" "4K7"
+			(at 228.346 93.726 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -45526,7 +45480,7 @@
 			(do_not_autoplace yes)
 			(effects
 				(font
-					(size 0.635 0.635)
+					(size 0.8 0.8)
 				)
 				(justify left)
 			)
@@ -45663,9 +45617,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
@@ -45754,7 +45707,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -45839,16 +45792,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 114.046 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 111.506 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -45939,9 +45890,8 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
@@ -46032,16 +45982,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 231.394 91.694 0)
-			(hide yes)
+		(property "Value" "1K8"
+			(at 232.156 91.186 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -46125,16 +46073,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 251.714 126.746 0)
-			(hide yes)
+		(property "Value" "100R"
+			(at 252.476 124.206 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
@@ -46225,7 +46171,7 @@
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
 			)
 		)
@@ -46294,16 +46240,14 @@
 				(justify left)
 			)
 		)
-		(property "Value" "1K"
-			(at 75.946 32.004 0)
-			(hide yes)
+		(property "Value" "47K"
+			(at 74.93 37.846 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(justify left)
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
