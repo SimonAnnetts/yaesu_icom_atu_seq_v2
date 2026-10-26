@@ -27,6 +27,12 @@ struct Fake : TuneEnv, CatBridgeIo {
   uint32_t replyFreeAt = 0; // a real radio answers one command at a time
   uint8_t rxn = 0;
   uint32_t now_ = 0;
+  uint32_t radioLastByteAt = 0;
+  // the radio after the Arduino was power-cycled: CAT off, and/or a stray byte in its parser
+  bool catOff = false;
+  uint32_t catOnSettleMs = 0; // it ignores commands for this long after CAT on
+  uint32_t catEnabledAt = 0;
+  int catOnFrames = 0;
   uint8_t lastCmd[5] = {};
   int unknownFrames = 0; // radio saw a frame with an opcode it doesn't know: bytes misaligned
   int pcFramesAtRadio = 0;
@@ -114,6 +120,9 @@ struct Fake : TuneEnv, CatBridgeIo {
   }
   void pcWrite(uint8_t b) override { pcOut[pcOutN++] = {now_, b}; }
   void radioWrite(uint8_t b) override {
+    // like the real radio: a block that stalls for 200ms is dropped, so the next byte starts a new one
+    if (radioFrameLen && now_ - radioLastByteAt >= 200) radioFrameLen = 0;
+    radioLastByteAt = now_;
     radioFrame[radioFrameLen++] = b;
     if (radioFrameLen == 5) {
       radioFrameLen = 0;
@@ -179,6 +188,14 @@ struct Fake : TuneEnv, CatBridgeIo {
 
   void radioHandle(const uint8_t *c, uint32_t now) {
     uint8_t op = c[4];
+    if (op == 0x00) catOnFrames++;
+    if (op == 0x00) { // every CAT on (re)starts the radio's CAT section, which then needs time
+      catOff = false;
+      catEnabledAt = now;
+      return;
+    }
+    if (catOff) return; // nothing works until CAT is switched on
+    if (now < catEnabledAt + catOnSettleMs) return; // still coming up after CAT on
     auto reply = [&](const uint8_t *b, uint8_t n) {
       if (radioMute) return;
       uint32_t t0 = now + 3 > replyFreeAt ? now + 3 : replyFreeAt;
@@ -1091,15 +1108,152 @@ void test_start_rejected_while_running() {
 
 // ---- failures at each step ----
 
-void test_bus_never_free() {
+void test_a_polling_pc_with_a_silent_radio_does_not_stop_the_tune_starting() {
+  // What the user saw after power-cycling the board: flrig keeps polling a radio that is not
+  // answering, and the tune button failed with "could not claim the CAT bus". The claim
+  // must now succeed; the tune then fails for the right reason (no CAT answer), safely.
   Fake f;
-  f.pcNeverPauses = true; // the PC polls constantly and the radio never answers it
-  f.radioMute = true;
+  f.pcNeverPauses = true; // the PC polls constantly...
+  f.radioMute = true;     // ...and the radio never answers
   TuneCycle c(f);
-  runCycle(f, c, TUNE_FULL_ONKEY);
+  runCycle(f, c, TUNE_FULL);
   TuneReason why;
   TEST_ASSERT_EQUAL(TuneOutcome::Failed, outcomeOf(c, why));
-  TEST_ASSERT_EQUAL(TuneReason::BusTimeout, why);
+  TEST_ASSERT_EQUAL_MESSAGE((int)TuneReason::CatFailed, (int)why, "should not be a bus timeout any more");
+  TEST_ASSERT_EQUAL(0, f.amSetAt);
+  expectSafe(f, MODE_USB);
+}
+
+void test_a_radio_left_out_of_step_by_the_power_cycle_is_brought_back() {
+  // The radio holds one stray byte of a half-received block. flrig's polls arrive back to
+  // back (under the radio's 200ms timeout), so every one is misparsed and none is answered.
+  Fake f;
+  f.radioFrameLen = 1;
+  f.radioLastByteAt = 0;
+  uint8_t expect[800];
+  uint16_t en = 0, pn = 0;
+  Poll polls[260];
+  schedulePolling(f, 20, 7000, 37, expect, en, polls, pn);
+  uint32_t t = 1;
+  for (; t < 700; t++) { f.hw(t); f.bus(t); }
+  TEST_ASSERT_EQUAL_MESSAGE(0, f.pcOutN, "precondition: flrig must be getting no answers");
+  TuneCycle c(f);
+  c.start(TUNE_FULL, t);
+  uint32_t t0 = t;
+  for (; t < t0 + 40000 && c.active(); t++) { f.hw(t); c.poll(t); f.bus(t); }
+  TuneReason why;
+  TEST_ASSERT_EQUAL((int)TuneOutcome::Success, (int)outcomeOf(c, why));
+  TEST_ASSERT_GREATER_OR_EQUAL(2, f.catOnFrames); // the first CAT on was eaten; a later one realigned it
+  flushUntil(f, t, 7500);
+  // and flrig can talk to the radio again, without being told to re-initialise
+  TEST_ASSERT_GREATER_THAN(10, f.pcOutN);
+  expectSafe(f, MODE_USB);
+}
+
+static void runPlain(Fake &f, uint32_t from, uint32_t to) {
+  for (uint32_t t = from; t < to; t++) { f.hw(t); f.bus(t); }
+}
+
+void test_without_the_resync_a_radio_left_out_of_step_stays_silent() {
+  // the control: this is what flrig saw after a power cycle, until something paused the bus
+  Fake f;
+  f.radioFrameLen = 1;
+  f.radioLastByteAt = 0;
+  uint8_t expect[800];
+  uint16_t en = 0, pn = 0;
+  Poll polls[260];
+  schedulePolling(f, 20, 3000, 37, expect, en, polls, pn);
+  runPlain(f, 1, 4000);
+  TEST_ASSERT_EQUAL_MESSAGE(0, f.pcOutN, "the radio should never have answered");
+}
+
+void test_the_boot_resync_brings_a_radio_back_without_any_tune() {
+  Fake f;
+  f.core.startResync(0);
+  f.radioFrameLen = 1; // the stray byte from the power-up glitch
+  f.radioLastByteAt = 0;
+  uint8_t expect[800];
+  uint16_t en = 0, pn = 0;
+  Poll polls[260];
+  schedulePolling(f, 20, 3000, 37, expect, en, polls, pn);
+  runPlain(f, 1, 4000);
+  expectPcStream(f, expect, en); // EVERY poll answered, in order, from the very first one
+  TEST_ASSERT_EQUAL(0, f.core.queued());
+  TEST_ASSERT_EQUAL((int)CatBridgeCore::Mode::Normal, (int)f.core.mode());
+}
+
+void test_the_boot_resync_enables_a_radio_whose_cat_was_left_off() {
+  Fake f;
+  f.core.startResync(0);
+  f.catOff = true;
+  f.catOnSettleMs = 120;
+  uint8_t expect[800];
+  uint16_t en = 0, pn = 0;
+  Poll polls[260];
+  schedulePolling(f, 20, 3000, 37, expect, en, polls, pn);
+  runPlain(f, 1, 4000);
+  expectPcStream(f, expect, en);
+  TEST_ASSERT_EQUAL(1, f.catOnFrames);
+}
+
+void test_the_boot_resync_is_harmless_to_a_healthy_radio() {
+  Fake f;
+  f.core.startResync(0);
+  uint8_t expect[800];
+  uint16_t en = 0, pn = 0;
+  Poll polls[260];
+  schedulePolling(f, 20, 3000, 37, expect, en, polls, pn);
+  runPlain(f, 1, 4000);
+  expectPcStream(f, expect, en); // nothing lost, nothing reordered, no extra bytes to flrig
+  TEST_ASSERT_EQUAL(1, f.catOnFrames);
+  TEST_ASSERT_EQUAL(0, f.unknownFrames);
+}
+
+void test_pressing_tune_during_the_resync_still_works() {
+  Fake f;
+  f.core.startResync(0);
+  f.radioFrameLen = 1;
+  f.radioLastByteAt = 0;
+  TuneCycle c(f);
+  c.start(TUNE_FULL, 100); // the button, 100ms after power-up
+  uint32_t t = 101;
+  for (; t < 40000 && c.active(); t++) { f.hw(t); c.poll(t); f.bus(t); }
+  TuneReason why;
+  TEST_ASSERT_EQUAL((int)TuneOutcome::Success, (int)outcomeOf(c, why));
+  runPlain(f, t, t + 800);
+  expectSafe(f, MODE_USB);
+}
+
+void test_a_radio_with_cat_off_that_needs_time_after_cat_on_is_woken_up() {
+  Fake f;
+  f.catOff = true;
+  f.catOnSettleMs = 120; // longer than the normal 50ms gap before the first query
+  TuneCycle c(f);
+  runCycle(f, c, TUNE_FULL);
+  TuneReason why;
+  TEST_ASSERT_EQUAL((int)TuneOutcome::Success, (int)outcomeOf(c, why));
+  TEST_ASSERT_GREATER_OR_EQUAL(2, f.catOnFrames);
+  expectSafe(f, MODE_USB);
+}
+
+void test_the_normal_start_is_not_slowed_down_by_the_wake_up_logic() {
+  Fake f; // a healthy radio: one CAT on, straight to the queries
+  TuneCycle c(f);
+  runCycle(f, c, TUNE_FULL);
+  TEST_ASSERT_EQUAL(1, f.catOnFrames);
+}
+
+void test_a_radio_that_never_answers_is_given_up_on_after_the_retries() {
+  Fake f;
+  f.dropF7 = true; // the status query is never answered, whatever is done
+  TuneCycle c(f);
+  uint32_t end = runCycle(f, c, TUNE_FULL);
+  TuneReason why;
+  TEST_ASSERT_EQUAL((int)TuneOutcome::Failed, (int)outcomeOf(c, why));
+  TEST_ASSERT_EQUAL((int)TuneReason::CatFailed, (int)why);
+  TEST_ASSERT_EQUAL(1 + TUNE_CAT_RETRIES, f.catOnFrames); // woken up each time, then it gives up
+  TEST_ASSERT_LESS_THAN(6000, end);                       // and does not hang about
+  TEST_ASSERT_EQUAL(0, f.amSetAt);                        // the radio was never touched
   expectSafe(f, MODE_USB);
 }
 
@@ -1363,7 +1517,16 @@ int main() {
   RUN_TEST(test_atu_flag_per_band_decides_what_may_be_tuned);
   RUN_TEST(test_refuses_a_frequency_in_no_band);
   RUN_TEST(test_start_rejected_while_running);
-  RUN_TEST(test_bus_never_free);
+  RUN_TEST(test_a_polling_pc_with_a_silent_radio_does_not_stop_the_tune_starting);
+  RUN_TEST(test_a_radio_left_out_of_step_by_the_power_cycle_is_brought_back);
+  RUN_TEST(test_without_the_resync_a_radio_left_out_of_step_stays_silent);
+  RUN_TEST(test_the_boot_resync_brings_a_radio_back_without_any_tune);
+  RUN_TEST(test_the_boot_resync_enables_a_radio_whose_cat_was_left_off);
+  RUN_TEST(test_the_boot_resync_is_harmless_to_a_healthy_radio);
+  RUN_TEST(test_pressing_tune_during_the_resync_still_works);
+  RUN_TEST(test_a_radio_with_cat_off_that_needs_time_after_cat_on_is_woken_up);
+  RUN_TEST(test_the_normal_start_is_not_slowed_down_by_the_wake_up_logic);
+  RUN_TEST(test_a_radio_that_never_answers_is_given_up_on_after_the_retries);
   RUN_TEST(test_tx_status_gets_no_answer);
   RUN_TEST(test_freq_query_gets_no_answer);
   RUN_TEST(test_unreadable_mode_means_the_radio_is_not_touched);

@@ -62,6 +62,14 @@ constexpr uint32_t TUNE_WATCHDOG_MS = 45000;  // whole head, from start(): up-se
 constexpr uint32_t TUNE_SEQ_TIMEOUT_MS = 16000; // 3 stages x 5000ms max + margin
 constexpr uint32_t TUNE_DRY_DWELL_MS = 1000;
 constexpr uint32_t TUNE_CARRIER_MS = 2000;
+// A radio that does not answer the first status query (typically after the Arduino itself
+// was power-cycled: the radio's CAT is off, or its 5-byte parser is out of step with the
+// stream) is woken up and asked again: wait for the bus to go quiet long enough that the
+// radio drops any half-received block (it gives up on one after 200ms), send CAT on again,
+// give it time to settle, and retry.
+constexpr uint8_t TUNE_CAT_RETRIES = 2;
+constexpr uint32_t TUNE_BUS_SILENCE_MS = 300;
+constexpr uint32_t TUNE_CAT_SETTLE_MS = 200;
 constexpr uint32_t TUNE_ALC_SETTLE_MS = 100; // pump output onto the radio's ALC line, before keying
 constexpr uint8_t TUNE_MODE_RESTORE_TRIES = 3;
 
@@ -108,7 +116,7 @@ enum class TuneReason : uint8_t {
 
 enum class TuneStep : uint8_t {
   Idle,
-  Claim, CatOn, QueryTx, QueryRx, QueryFreq, SeqUp, SetAm, Alc, Ah4, Dwell, // head
+  Claim, Resync, CatOn, CatSettle, QueryTx, QueryRx, QueryFreq, SeqUp, SetAm, Alc, Ah4, Dwell, // head
   TailPtt, TailMode, TailSeq,                                  // tail
 };
 
@@ -184,6 +192,7 @@ private:
   bool holdSet_ = false; // every band's STBY handling is held
   bool recoveryArmed_ = false;
   bool alcOn_ = false;
+  uint8_t catRetries_ = 0; // wake-up attempts made after the first status query got no answer
   bool seqRequested_ = false;
   bool ah4Started_ = false;
   bool pttRequested_ = false; // KEY cue seen, PTT on wanted

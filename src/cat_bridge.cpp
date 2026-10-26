@@ -54,6 +54,11 @@ void catBridgeBegin() {
   Serial3.begin(CAT_BAUD, CAT_CONFIG);
 }
 
+void catBridgeResync() {
+  Serial.println(F("CAT: resyncing the radio (quiet bus, then CAT on)"));
+  core.startResync(millis());
+}
+
 bool catBridgePoll() { return core.poll(millis()); }
 
 bool catBridgeSubmit(const uint8_t cmd[5]) { return core.submit(cmd, millis()); }

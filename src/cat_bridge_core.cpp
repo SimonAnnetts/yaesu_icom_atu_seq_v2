@@ -1,6 +1,44 @@
 #include "cat_bridge_core.h"
 
+#include "cat_codec.h"
+
 using Frame = CatBridgeIo::Frame;
+
+void CatBridgeCore::startResync(uint32_t now) {
+  if (mode_ != Mode::Normal) return;
+  mode_ = Mode::Resync;
+  resyncStart_ = now;
+  resyncSent_ = false;
+}
+
+// While resyncing the PC is not read (its bytes wait in the port's buffer), the radio's bytes
+// are dropped, and the arbiter is not run: a claim made now just stays pending until the
+// resync is over.
+bool CatBridgeCore::pollResync(uint32_t now) {
+  bool moved = false;
+  int c;
+  while ((c = io_.radioRead()) >= 0) {
+    uint8_t b = (uint8_t)c;
+    io_.frame(Frame::StrayFromRadio, &b, 1); // nobody asked
+    moved = true;
+  }
+  if (!resyncSent_) {
+    if ((uint32_t)(now - resyncStart_) >= CAT_RESYNC_SILENCE_MS) {
+      uint8_t cmd[CAT_FRAME_LEN];
+      catCmdCatOn(cmd);
+      for (uint8_t i = 0; i < CAT_FRAME_LEN; i++) io_.radioWrite(cmd[i]);
+      io_.frame(Frame::ArduinoToRadio, cmd, CAT_FRAME_LEN);
+      resyncSent_ = true;
+      resyncSentAt_ = now;
+      moved = true;
+    }
+  } else if ((uint32_t)(now - resyncSentAt_) >= CAT_RESYNC_SETTLE_MS) {
+    mode_ = Mode::Normal;
+    arbiter_.noteBusActivity(now);
+    lastBusAt_ = now;
+  }
+  return moved;
+}
 
 void CatBridgeCore::setSnapshot(const CatSnapshot &s) {
   snapshot_ = s;
@@ -52,6 +90,8 @@ void CatBridgeCore::updateMode() {
         mode_ = Mode::Normal;
       }
       break;
+    case Mode::Resync:
+      break; // handled before updateMode() is reached
   }
 }
 
@@ -90,7 +130,7 @@ void CatBridgeCore::interceptByte(uint8_t b, uint32_t now) {
 // flight, and it has been quiet long enough since the last frame (Hamlib leaves
 // 50ms after a write; a query's reply is its own acknowledgement, so 10ms).
 bool CatBridgeCore::busReadyForReplay(uint32_t now) const {
-  return arbiter_.pcMayTransmit() && framer_.pcBusIdle() &&
+  return arbiter_.pcMayTransmit() && framer_.pcBusIdle(now) &&
          (uint32_t)(now - lastBusAt_) >= replayGapMs_;
 }
 
@@ -115,6 +155,7 @@ bool CatBridgeCore::replayOne(uint32_t now) {
 }
 
 bool CatBridgeCore::poll(uint32_t now) {
+  if (mode_ == Mode::Resync) return pollResync(now);
   bool moved = false;
   updateMode();
 
@@ -160,7 +201,7 @@ bool CatBridgeCore::poll(uint32_t now) {
 
   handleEvent(framer_.poll(now));
 
-  arbiter_.poll(now, framer_.pcBusIdle());
+  arbiter_.poll(now, framer_.pcBusIdle(now));
   if (const uint8_t *cmd = arbiter_.pendingSend()) {
     uint8_t copy[CAT_FRAME_LEN];
     for (uint8_t i = 0; i < CAT_FRAME_LEN; i++) copy[i] = cmd[i];

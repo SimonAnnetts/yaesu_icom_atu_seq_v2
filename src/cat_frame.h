@@ -14,6 +14,10 @@
 constexpr uint8_t CAT_FRAME_LEN = 5;
 constexpr uint32_t CAT_BYTE_TIMEOUT_MS = 200;   // manual: max gap between command bytes
 constexpr uint32_t CAT_REPLY_TIMEOUT_MS = 2000; // Hamlib's default FT-847 read timeout
+// The radio answers in a few ms. A request still unanswered after this long means it is not
+// answering at all (CAT off, out of step, powered down), and a PC polling it must not be
+// allowed to hold the bus for ever: see pcBusIdle().
+constexpr uint32_t CAT_STALE_REPLY_MS = 300;
 
 constexpr uint8_t CAT_OP_PTT_ON = 0x08;
 constexpr uint8_t CAT_OP_PTT_OFF = 0x88;
@@ -52,8 +56,11 @@ public:
 
   bool replyPending() const { return pendingLen_ != 0; }
 
-  // No PC command partly sent and no reply outstanding: a safe moment to take the bus.
-  bool pcBusIdle() const { return cmdLen_ == 0 && pendingLen_ == 0; }
+  // No PC command partly sent and no reply outstanding: a safe moment to take the bus. A
+  // reply owed for longer than CAT_STALE_REPLY_MS counts as not outstanding - measured from
+  // the FIRST unanswered request, so a PC that keeps polling a silent radio (each new poll
+  // supersedes the last) cannot keep the bus "busy" for ever.
+  bool pcBusIdle(uint32_t now) const;
 
 private:
   uint8_t cmd_[CAT_FRAME_LEN] = {};
@@ -62,6 +69,7 @@ private:
 
   uint8_t pendingOpcode_ = 0;
   uint8_t pendingLen_ = 0; // bytes the reply should have; 0 = nothing outstanding
+  uint32_t unansweredSince_ = 0; // when the oldest still-unanswered request was made
   uint8_t reply_[CAT_FRAME_LEN] = {};
   uint8_t replyGot_ = 0;
   uint32_t replyDeadline_ = 0;

@@ -186,12 +186,87 @@ void test_the_claim_waits_for_a_pc_exchange_in_flight() {
   run(0, 5);
   TEST_ASSERT_EQUAL(5, io.toRadio.size());
   TEST_ASSERT_TRUE(core->claim(6));
-  run(6, 500);
+  run(6, 250);
   TEST_ASSERT_EQUAL((int)CatArbiter::ClaimState::Pending, (int)core->claimState());
   io.radioIn = {0x14, 0x42, 0x50, 0x00, 0x01}; // the reply arrives: now the bus is free
-  run(501, 700);
+  run(251, 450);
   TEST_ASSERT_EQUAL(5, io.toPc.size()); // and the reply reached the PC
   TEST_ASSERT_EQUAL((int)CatArbiter::ClaimState::Held, (int)core->claimState());
+}
+
+void test_a_pc_polling_a_silent_radio_does_not_keep_the_claim_from_succeeding() {
+  // After the Arduino is power-cycled the radio may not answer; flrig keeps polling anyway.
+  // The tune button then used to fail with "could not claim the CAT bus".
+  TEST_ASSERT_TRUE(core->claim(0));
+  uint32_t t = 0;
+  for (; t < 1500 && core->claimState() == CatArbiter::ClaimState::Pending; t++) {
+    if (t % 37 == 1 && core->mode() == CatBridgeCore::Mode::Normal) {
+      for (uint8_t b : {0, 0, 0, 0, 0x03}) io.pcIn.push_back(b); // a poll every 37ms, never answered
+    }
+    core->poll(t);
+  }
+  TEST_ASSERT_EQUAL((int)CatArbiter::ClaimState::Held, (int)core->claimState());
+  TEST_ASSERT_LESS_THAN(900, t); // stale after 300ms, plus the quiet gap: well inside the 2s claim timeout
+}
+
+static const uint8_t CAT_ON[5] = {0, 0, 0, 0, 0x00};
+
+void test_resync_holds_the_pc_sends_one_cat_on_then_forwards_everything_in_order() {
+  core->startResync(0);
+  io.pcIn = {0, 0, 0, 0, 0x03, 0, 0, 0, 0, 0xF7}; // flrig polling from the moment of power-up
+  run(0, CAT_RESYNC_SILENCE_MS - 1);
+  TEST_ASSERT_EQUAL((int)Mode::Resync, (int)core->mode());
+  TEST_ASSERT_EQUAL(0, io.toRadio.size()); // quiet: nothing at all reaches the radio
+  TEST_ASSERT_EQUAL(10, io.pcUnread());    // and the PC's bytes are waiting, not consumed
+  core->poll(CAT_RESYNC_SILENCE_MS);
+  TEST_ASSERT_EQUAL(5, io.toRadio.size()); // exactly one CAT on
+  TEST_ASSERT_EQUAL_UINT8_ARRAY(CAT_ON, io.toRadio.data(), 5);
+  run(CAT_RESYNC_SILENCE_MS + 1, CAT_RESYNC_SILENCE_MS + CAT_RESYNC_SETTLE_MS - 1);
+  TEST_ASSERT_EQUAL((int)Mode::Resync, (int)core->mode()); // still letting the radio settle
+  TEST_ASSERT_EQUAL(5, io.toRadio.size());
+  run(CAT_RESYNC_SILENCE_MS + CAT_RESYNC_SETTLE_MS, CAT_RESYNC_SILENCE_MS + CAT_RESYNC_SETTLE_MS + 5);
+  TEST_ASSERT_EQUAL((int)Mode::Normal, (int)core->mode());
+  // the held polls now go through, intact and in order, after the CAT on
+  const uint8_t want[15] = {0, 0, 0, 0, 0x00, 0, 0, 0, 0, 0x03, 0, 0, 0, 0, 0xF7};
+  TEST_ASSERT_EQUAL(15, io.toRadio.size());
+  TEST_ASSERT_EQUAL_UINT8_ARRAY(want, io.toRadio.data(), 15);
+}
+
+void test_resync_drops_radio_bytes_and_reports_activity_only_when_something_happens() {
+  core->startResync(0);
+  TEST_ASSERT_FALSE(core->poll(10)); // nothing is happening
+  io.radioIn = {0xAA, 0xBB};
+  TEST_ASSERT_TRUE(core->poll(20)); // bytes seen
+  TEST_ASSERT_EQUAL(0, io.toPc.size()); // but nobody asked for them
+  TEST_ASSERT_FALSE(core->poll(30));
+  TEST_ASSERT_TRUE(core->poll(CAT_RESYNC_SILENCE_MS)); // the CAT on going out lights the LED too
+}
+
+void test_a_claim_made_during_the_resync_waits_for_it_to_finish() {
+  core->startResync(0);
+  TEST_ASSERT_TRUE(core->claim(100));
+  run(100, CAT_RESYNC_SILENCE_MS + CAT_RESYNC_SETTLE_MS - 1);
+  TEST_ASSERT_EQUAL((int)CatArbiter::ClaimState::Pending, (int)core->claimState());
+  TEST_ASSERT_EQUAL(5, io.toRadio.size()); // only the resync's own CAT on: the claim has not sent anything
+  run(CAT_RESYNC_SILENCE_MS + CAT_RESYNC_SETTLE_MS, CAT_RESYNC_SILENCE_MS + CAT_RESYNC_SETTLE_MS + 200);
+  TEST_ASSERT_EQUAL((int)CatArbiter::ClaimState::Held, (int)core->claimState());
+}
+
+void test_resync_only_starts_from_normal_and_only_once() {
+  core->startResync(0);
+  run(0, 100);
+  core->startResync(100); // a second call must not restart the quiet period
+  run(101, CAT_RESYNC_SILENCE_MS);
+  TEST_ASSERT_EQUAL(5, io.toRadio.size());
+}
+
+void test_resync_survives_millis_wraparound() {
+  uint32_t t0 = 0xFFFFFF00u;
+  core->startResync(t0);
+  io.pcIn = {0, 0, 0, 0, 0xF7};
+  for (uint32_t i = 0; i < CAT_RESYNC_SILENCE_MS + CAT_RESYNC_SETTLE_MS + 10; i++) core->poll(t0 + i);
+  TEST_ASSERT_EQUAL((int)Mode::Normal, (int)core->mode());
+  TEST_ASSERT_EQUAL(10, io.toRadio.size()); // CAT on, then the held poll
 }
 
 void test_millis_wraparound() {
@@ -222,6 +297,12 @@ int main() {
   RUN_TEST(test_a_claim_that_ends_with_no_snapshot_just_resumes_normal_traffic);
   RUN_TEST(test_stray_radio_bytes_are_not_passed_to_the_pc_while_the_bus_is_claimed);
   RUN_TEST(test_the_claim_waits_for_a_pc_exchange_in_flight);
+  RUN_TEST(test_a_pc_polling_a_silent_radio_does_not_keep_the_claim_from_succeeding);
+  RUN_TEST(test_resync_holds_the_pc_sends_one_cat_on_then_forwards_everything_in_order);
+  RUN_TEST(test_resync_drops_radio_bytes_and_reports_activity_only_when_something_happens);
+  RUN_TEST(test_a_claim_made_during_the_resync_waits_for_it_to_finish);
+  RUN_TEST(test_resync_only_starts_from_normal_and_only_once);
+  RUN_TEST(test_resync_survives_millis_wraparound);
   RUN_TEST(test_millis_wraparound);
   return UNITY_END();
 }

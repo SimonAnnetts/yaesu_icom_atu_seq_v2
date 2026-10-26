@@ -194,6 +194,19 @@ per-band wiring (see the [STBY jack reference](#stby-jack-tuner-port-and-tx-inhi
   nothing to relay. This is a normal, fully supported state, not an error
   condition; see [Standalone operation](#standalone-operation) below for how the tune cycle still
   works correctly in this case.
+- **Power-up resync.** When the Arduino powers up it puts a glitch on the
+  radio's serial line (the RS-232 level shifter comes up), which can leave the
+  radio's CAT port with CAT off, or with its 5-byte parser out of step by one
+  stray byte. flrig's polls arrive back to back, so the radio never gets the
+  200ms gap it needs to resync and then never answers (flrig shows no
+  communication until Init). So for the first ~0.5s the bridge holds the PC's
+  bytes unread in the serial buffer (nothing is lost: it holds about 50
+  frames), lets the bus go quiet for 300ms, sends one CAT on, waits 200ms for the
+  radio to settle, and only then starts forwarding — the held polls go through
+  intact and in order, so the only visible effect is flrig's first answer
+  arriving about half a second after power-up. A tune requested in that
+  window waits for it. CAT on is idempotent, so a healthy radio is unaffected;
+  with the radio off nothing answers and the bridge simply carries on.
 
 ### What actually needs faking during a tune cycle
 
@@ -351,6 +364,17 @@ interrupt handler uses, directly and proactively:
   abort at any moment, or a stuck PTT off). The radio does not currently
   respond to the ALC voltage, so for now it changes nothing, and the tune does
   not depend on it.
+- **A radio that does not answer is woken up, not given up on at once.** After
+  the Arduino itself has been power-cycled the radio may stop answering CAT (its
+  CAT is off, or its 5-byte parser has been left out of step by a stray byte, and
+  a PC polling back to back never gives it the 200ms gap it needs to resync). flrig
+  then shows no communication until Init, and the tune button used to fail with
+  "could not claim the CAT bus" (the PC's polls of the silent radio kept the bus
+  looking busy). Now the claim succeeds, and if the first status query gets no
+  answer the cycle goes quiet for 300ms, sends CAT on again, lets the radio settle
+  for 200ms and asks again, twice, before failing with "CAT query failed". The
+  normal path is unchanged (one CAT on, straight to the queries). A successful
+  tune leaves the radio's parser aligned, so flrig recovers too.
 - **Refusals** (nothing is left changed): a band already transmitting, the
   radio reporting it is transmitting, a frequency in no band, a band the AH-4
   isn't enabled for (the config's per-band `atu` flag), no usable
@@ -472,7 +496,10 @@ snapshot taken at the start of the cycle (`CatBridgeCore`, `src/cat_bridge_core.
   commands; if it overflows the *oldest* is dropped, so the newest request
   (the latest mode or frequency) always survives.
 - **Mode changes are seamless.** At the start, the claim waits for any PC
-  exchange already in flight to finish (so nothing is cut in half), and for
+  exchange already in flight to finish (so nothing is cut in half; but a reply
+  the radio has not given within 300ms counts as not in flight, measured from
+  the first unanswered request, so a PC that keeps polling a silent radio cannot
+  block the claim for ever), and for
   the first few hundred milliseconds — until the snapshot exists — PC bytes
   simply wait in the port's buffer. At the end the queue is replayed (50ms
   after a command, 10ms after a query's reply) and any new PC command goes
@@ -1269,6 +1296,15 @@ lines and CAT connected; TUNER Sense unconnected):
   470Ω steadied it. Along the way: pump duty (5–95%) moved the output by only
   ~0.2V, so duty is not a control. ALC does not remove the radio's start-up
   carrier overshoot: it still overshoots on initial TX with ALC on.
+- **Power-cycling the Arduino**: with the radio left on, the radio stopped
+  answering CAT (flrig showed no communication until Init, and the tune button
+  failed with "could not claim the CAT bus": flrig's polls of the silent radio
+  kept the bus looking busy). Fixed in the bridge and the tune cycle (see the
+  tune cycle notes); verified on the real radio: the tune then succeeds, and
+  flrig reads the frequency again afterwards without Init. That still needed
+  one nudge (a tune, or Init) after a power-up, so the bridge now resyncs the
+  radio's CAT port itself at power-up (see "Power-up resync" under Normal
+  operation); verified on the radio: after a power cycle flrig recovers by itself, with no Init or tune.
 - **CAT bridge**: transparent passthrough to flrig over an extended
   session with no stray, torn or timed-out frames.
 - **Arduino-originated CAT** on Port 2 (freq/mode, TX status, set mode,

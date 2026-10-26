@@ -34,11 +34,13 @@ CatEvent CatFramer::pcByte(uint8_t b, uint32_t now) {
   ev.opcode = cmd_[CAT_FRAME_LEN - 1];
 
   // A new request supersedes an unfinished reply to an older one.
+  bool hadPending = pendingLen_ != 0;
   pendingLen_ = catReplyLength(ev.opcode);
   if (pendingLen_) {
     pendingOpcode_ = ev.opcode;
     replyGot_ = 0;
     replyDeadline_ = now + CAT_REPLY_TIMEOUT_MS;
+    if (!hadPending) unansweredSince_ = now; // a superseded request keeps its original age
   }
   return ev;
 }
@@ -61,6 +63,11 @@ CatEvent CatFramer::radioByte(uint8_t b, uint32_t now) {
   memcpy(ev.data, reply_, pendingLen_);
   pendingLen_ = 0;
   return ev;
+}
+
+bool CatFramer::pcBusIdle(uint32_t now) const {
+  if (cmdLen_ != 0) return false;
+  return pendingLen_ == 0 || (uint32_t)(now - unansweredSince_) >= CAT_STALE_REPLY_MS;
 }
 
 CatEvent CatFramer::poll(uint32_t now) {

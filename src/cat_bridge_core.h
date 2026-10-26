@@ -17,11 +17,21 @@
 //              unread in the port's buffer (a few hundred ms at the start of a tune).
 //   Intercept  the snapshot is ready: PC bytes are consumed and answered from it
 //              (catIntercept) - queries replied, PTT swallowed, the rest queued.
+//   Resync     at power-up only (startResync): the radio may have been left out of step or
+//              with CAT off by the glitch the Arduino's power-up put on its serial line.
+//              PC bytes wait unread in the port's buffer, the radio's are dropped, and after
+//              CAT_RESYNC_SILENCE_MS of quiet (the radio drops any half-received block after
+//              200ms) one CAT on is sent; CAT_RESYNC_SETTLE_MS later it is Normal. Without it
+//              flrig's back-to-back polls keep a mis-synchronised radio mis-synchronised and it
+//              never answers until something pauses the bus.
 //   Drain      the claim is released: queued commands go to the radio in order,
 //              spaced like Hamlib spaces them (50ms after a command, 10ms after a
 //              query's reply). A new PC command goes straight through if nothing
 //              is queued ahead of it, else queues behind, so order is preserved.
 //              Back to Normal once the queue is empty.
+
+constexpr uint32_t CAT_RESYNC_SILENCE_MS = 300;
+constexpr uint32_t CAT_RESYNC_SETTLE_MS = 200;
 
 class CatBridgeIo {
 public:
@@ -51,9 +61,12 @@ protected:
 
 class CatBridgeCore {
 public:
-  enum class Mode : uint8_t { Normal, Hold, Intercept, Drain };
+  enum class Mode : uint8_t { Normal, Hold, Intercept, Drain, Resync };
 
   explicit CatBridgeCore(CatBridgeIo &io) : io_(io) {}
+
+  // Call once at power-up, after the ports are open: runs the Resync sequence described above.
+  void startResync(uint32_t now);
 
   // Call every loop. True if any byte was seen on either port this pass - the PC's, the
   // radio's, the Arduino's own commands and their replies, replayed commands, and the
@@ -79,6 +92,7 @@ public:
 
 private:
   void updateMode();
+  bool pollResync(uint32_t now);
   void handleEvent(const CatEvent &ev);
   void interceptByte(uint8_t b, uint32_t now);
   void enqueue(const uint8_t frame[CAT_FRAME_LEN]);
@@ -95,5 +109,8 @@ private:
   bool snapshotReady_ = false;
   Mode mode_ = Mode::Normal;
   uint32_t lastBusAt_ = 0;
+  uint32_t resyncStart_ = 0;
+  uint32_t resyncSentAt_ = 0;
+  bool resyncSent_ = false;
   uint32_t replayGapMs_ = 0; // quiet needed after the last forwarded frame before the next
 };

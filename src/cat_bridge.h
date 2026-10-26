@@ -16,6 +16,11 @@
 
 void catBridgeBegin();
 
+// Call once in setup() after catBridgeBegin() (and any boot-time recovery): resyncs the radio's
+// CAT port. After the board has been power-cycled the radio can be left out of step or with CAT
+// off; for ~0.5s PC traffic is held (not lost), the bus goes quiet, and one CAT on is sent.
+void catBridgeResync();
+
 // Call every loop(). Returns true if any byte was seen on either port (including the
 // Arduino's own commands), for the activity LED.
 bool catBridgePoll();

@@ -140,6 +140,40 @@ void test_millis_wraparound() {
   TEST_ASSERT_EQUAL(CatEvent::ReplyAbandoned, f.poll(t + 2004).kind);
 }
 
+void test_a_reply_that_never_comes_stops_blocking_the_bus() {
+  sendCmd(GET_FREQ, 0); // the radio is not answering
+  TEST_ASSERT_FALSE(f.pcBusIdle(10));
+  TEST_ASSERT_FALSE(f.pcBusIdle(4 + CAT_STALE_REPLY_MS - 1));
+  TEST_ASSERT_TRUE(f.pcBusIdle(4 + CAT_STALE_REPLY_MS)); // given up on, for the purpose of taking the bus
+}
+
+void test_continuous_polling_of_a_silent_radio_cannot_hold_the_bus_for_ever() {
+  // flrig keeps polling every 37ms; each poll supersedes the last, but the age of the
+  // OLDEST unanswered request is what counts
+  bool idleSeen = false;
+  for (uint32_t t = 0; t < 2000; t += 37) {
+    sendCmd(GET_FREQ, t);
+    if (f.pcBusIdle(t + 5)) idleSeen = true;
+    TEST_ASSERT_TRUE_MESSAGE(!idleSeen || t >= CAT_STALE_REPLY_MS - 40, "went idle too early");
+  }
+  TEST_ASSERT_TRUE(idleSeen);
+}
+
+void test_an_answer_resets_the_clock() {
+  sendCmd(GET_FREQ, 0);
+  const uint8_t r[5] = {0x14, 0x42, 0x50, 0x00, 0x01};
+  for (int i = 0; i < 5; i++) f.radioByte(r[i], 10 + i);
+  TEST_ASSERT_TRUE(f.pcBusIdle(20)); // answered: idle at once
+  sendCmd(GET_FREQ, 1000);           // a fresh request starts a fresh clock
+  TEST_ASSERT_FALSE(f.pcBusIdle(1000 + CAT_STALE_REPLY_MS - 10));
+}
+
+void test_a_partial_command_is_never_idle_however_stale() {
+  f.pcByte(0x01, 0);
+  f.pcByte(0x02, 1);
+  TEST_ASSERT_FALSE(f.pcBusIdle(150)); // mid-frame: the bus is not ours until it completes or times out
+}
+
 int main() {
   UNITY_BEGIN();
   RUN_TEST(test_reply_lengths);
@@ -154,6 +188,10 @@ int main() {
   RUN_TEST(test_slow_but_legal_command_is_kept);
   RUN_TEST(test_reply_timeout);
   RUN_TEST(test_new_request_supersedes_unfinished_reply);
+  RUN_TEST(test_a_reply_that_never_comes_stops_blocking_the_bus);
+  RUN_TEST(test_continuous_polling_of_a_silent_radio_cannot_hold_the_bus_for_ever);
+  RUN_TEST(test_an_answer_resets_the_clock);
+  RUN_TEST(test_a_partial_command_is_never_idle_however_stale);
   RUN_TEST(test_millis_wraparound);
   return UNITY_END();
 }

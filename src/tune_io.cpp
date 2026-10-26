@@ -52,7 +52,9 @@ uint8_t tuneMode = MODE_AM; // radio mode used for tuning; keys 1/2/3 change it
 const __FlashStringHelper *stepName(TuneStep s) {
   switch (s) {
     case TuneStep::Claim: return F("claiming CAT bus");
+    case TuneStep::Resync: return F("radio not answering: waiting for a quiet bus");
     case TuneStep::CatOn: return F("CAT on");
+    case TuneStep::CatSettle: return F("letting the radio settle after CAT on");
     case TuneStep::QueryTx: return F("checking radio is receiving");
     case TuneStep::QueryRx: return F("reading RX status");
     case TuneStep::QueryFreq: return F("reading frequency and mode");

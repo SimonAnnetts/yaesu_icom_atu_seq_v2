@@ -23,6 +23,7 @@ bool TuneCycle::start(TuneOptions options, uint32_t now) {
   modeChanged_ = modeRestored_ = modeGaveUp_ = false;
   restoreTries_ = 0;
   holdSet_ = seqRequested_ = ah4Started_ = recoveryArmed_ = alcOn_ = false;
+  catRetries_ = 0;
   pttRequested_ = pttOnSent_ = pttOffWanted_ = pttOffDone_ = false;
   meterNew_ = false;
   haveRx_ = false;
@@ -115,12 +116,24 @@ void TuneCycle::onOpDone(Kind k, bool ok, uint32_t now) {
     case Kind::CatOn:
       if (step_ != TuneStep::CatOn) break;
       if (!ok) { enterTail(TuneOutcome::Failed, TuneReason::CatFailed, now); break; }
-      setStep(TuneStep::QueryTx, now);
-      want_ = Kind::QueryTx;
+      if (catRetries_ > 0) {
+        setStep(TuneStep::CatSettle, now); // a wake-up attempt: let the radio settle before asking
+      } else {
+        setStep(TuneStep::QueryTx, now);
+        want_ = Kind::QueryTx;
+      }
       break;
     case Kind::QueryTx:
       if (step_ != TuneStep::QueryTx) break;
-      if (!ok || replyLen_ < 1) { enterTail(TuneOutcome::Failed, TuneReason::CatFailed, now); break; }
+      if (!ok || replyLen_ < 1) {
+        if (catRetries_ < TUNE_CAT_RETRIES) {
+          catRetries_++;
+          setStep(TuneStep::Resync, now); // not answering: go quiet, then wake it up again
+        } else {
+          enterTail(TuneOutcome::Failed, TuneReason::CatFailed, now);
+        }
+        break;
+      }
       if (catTxStatusTransmitting(reply_[0])) {
         enterTail(TuneOutcome::Refused, TuneReason::RadioTransmitting, now);
         break;
@@ -298,6 +311,20 @@ void TuneCycle::pollHead(uint32_t now) {
       }
       break;
     }
+    case TuneStep::Resync:
+      // Silence on the bus: the radio drops a half-received block after 200ms, so its parser
+      // is back at a frame boundary by the time CAT on arrives.
+      if (reached(now, stepAt_ + TUNE_BUS_SILENCE_MS)) {
+        setStep(TuneStep::CatOn, now);
+        want_ = Kind::CatOn;
+      }
+      break;
+    case TuneStep::CatSettle:
+      if (reached(now, stepAt_ + TUNE_CAT_SETTLE_MS)) {
+        setStep(TuneStep::QueryTx, now);
+        want_ = Kind::QueryTx;
+      }
+      break;
     case TuneStep::SeqUp:
       if (env_.seqActive((uint8_t)band_)) {
         // About to change the radio (mode, then PTT): from here a reset must be able

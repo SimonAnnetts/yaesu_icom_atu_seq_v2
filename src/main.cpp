@@ -76,6 +76,7 @@ void setup() {
   watchdogReportBoot();
   catBridgeBegin();
   recoveryRunIfNeeded(); // undo a tune that a reset interrupted, before anything else uses CAT
+  catBridgeResync();     // then put the radio's CAT port in step (see cat_bridge_core.h)
 
   alcBegin();
   configIoBegin();
