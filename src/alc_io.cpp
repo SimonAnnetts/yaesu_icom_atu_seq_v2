@@ -5,8 +5,7 @@
 
 // Timer2 fast PWM with OCR2A as TOP and a /8 prescaler: 16MHz / (8 * (133 + 1)) =
 // ~14.9kHz. (Timer2's plain 8-bit modes can't hit 15kHz: /1 is 31.4kHz or more, /8
-// is 3.9kHz or less.) OCR2A is TOP, so D10 loses its PWM function - fine, it is a
-// plain on/off gate.
+// is 3.9kHz or less.)
 constexpr uint8_t ALC_PWM_TOP = 133;
 constexpr uint8_t DUTY_PERCENT = 50;
 constexpr uint32_t BENCH_GATE_MAX_MS = 30000;

@@ -17,23 +17,20 @@ constexpr uint8_t PIN_TUNE_LED = 7;      // output: tune indicator, a passive bu
                                          // ~2048Hz by Timer4 PWM (D7 = OC4B), see buzzer.h
 constexpr uint8_t PIN_ACTIVITY_LED = 8;  // output, generic, drives a status LED
 
-// --- ALC injection (charge pump gate) ---
-constexpr uint8_t PIN_ALC_PWM = 9;   // charge pump drive, PWM output
-constexpr uint8_t PIN_ALC_GATE = 10; // opto-isolator on/off switch
+// --- ALC injection (charge pump + opto-isolator) ---
+constexpr uint8_t PIN_ALC_PWM = 9;  // charge pump drive, PWM output (Timer2)
+constexpr uint8_t PIN_ALC_GATE = 10; // opto-isolator LED drive: a plain on/off switch
 
 // --- Icom AH-4 ATU interface (both via opto-isolator) ---
 constexpr uint8_t PIN_AH4_KEY = 11;   // input, INPUT_PULLUP
 constexpr uint8_t PIN_AH4_START = 12; // output
 
 // --- Radio TUNER connector (8-pin mini-DIN) ---
-// Pin 1 (+13.8V) and pin 2 wiring, and the deliberately-unconnected Tuner
-// Sense pin, are hardware-only - no GPIO. Pin 8 (TX INHIBIT) and pin 2
-// (TX_GND) are the only TUNER-connector signals this project reads/drives.
+// Pin 1 (+13.8V) and the ground connection, and the deliberately-unconnected
+// Tuner Sense pin, are hardware-only - no GPIO. Pin 8 (TX INHIBIT) is the only
+// TUNER-connector signal this project drives. (Pin 2, TX_GND, is not connected
+// to the Arduino; D5, once reserved for it, is unassigned.)
 constexpr uint8_t PIN_TX_INHIBIT = 4; // output, active-high -> TUNER pin 8
-constexpr uint8_t PIN_TX_GND = 5;     // input, INPUT_PULLUP <- TUNER pin 2
-                                       // (open-collector, active-low; HF/50MHz
-                                       // TX status only - log/cross-check, not
-                                       // load-bearing)
 
 // --- Band index, shared by STBY inputs and sequencer channels below ---
 // NOTE: STBY pin order and sequencer channel order are independently

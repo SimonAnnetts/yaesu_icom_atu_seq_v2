@@ -5,7 +5,7 @@
 
 #include "sequencer.h"
 
-// Turns a parsed config document (see config/sequencer.json) into a
+// Turns a parsed config document (see config/sequencer-example.json) into a
 // SequencerConfig. Checks structure and types, then runs configValidate. On
 // failure returns false with a short human-readable reason in err.
 //

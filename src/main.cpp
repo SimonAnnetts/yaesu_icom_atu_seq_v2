@@ -34,7 +34,6 @@ static void configurePins() {
   // Inputs
   pinMode(PIN_TUNE_BUTTON, INPUT_PULLUP);
   pinMode(PIN_AH4_KEY, INPUT_PULLUP);
-  pinMode(PIN_TX_GND, INPUT_PULLUP);
   for (uint8_t band = 0; band < BAND_COUNT; band++) {
     pinMode(PIN_STBY[band], INPUT_PULLUP);
   }

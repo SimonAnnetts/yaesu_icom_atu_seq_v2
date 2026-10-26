@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Push a sequencer config (default config/sequencer.json) to the Arduino over
-its Serial0 debug link, and report the result.
+"""Push a sequencer config to the Arduino over its Serial0 debug link, and report the
+result. The default is the real radio config, config/sequencer.json; pass
+config/sequencer-bench.json for the bench.
 
 Usage: send_config.py [path/to/config.json] [serial-port]
 Defaults: config/sequencer.json, /dev/ttyACM0

@@ -43,7 +43,7 @@ struct SequencerConfig {
 };
 
 // Built-in fallback, used when EEPROM is empty or invalid: the band edges, timing
-// and tune profiles of config/sequencer.json (a native test keeps them in
+// and tune profiles of config/sequencer-example.json (a native test keeps them in
 // step), with no cross-band triggers.
 extern const SequencerConfig DEFAULT_SEQUENCER_CONFIG;
 

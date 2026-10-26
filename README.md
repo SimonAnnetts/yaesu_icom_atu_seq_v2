@@ -37,13 +37,14 @@ An Arduino Mega 2560 controller that:
    each band's sequence has finished settling.
 3. **Provide an ALC output that can control the radio's power during the tune
    cycle.** A charge pump makes about -4V, gated by an opto-isolator onto the
-   radio's EXT ALC jack, so the carrier can be trimmed to what the tuner
-   wants (an AH-4 needs about 10W). This ALC voltage should be able to trim the
-   radio's transmit power down to a lever that the ATU is happy with. 
-   YMMV - the Yaesu FT-847 ALC circuit, and the power levels it produces are
-   'unpredictable' at best! The ALC output is **part of every tune by
-   default** (it does no harm if the radio's ALC jack isn't connected), and
-   can be switched off per band with `"alc": false` in the JSON config.
+   radio's EXT ALC jack, so the carrier is held at what the tuner wants (an
+   AH-4 needs about 10W). On the prototype one fixed ALC voltage holds the
+   FT-847 between 5 and 10W on every band (once the pump is fed from a
+   regulator: see below). YMMV - the Yaesu FT-847 ALC circuit, and the power
+   levels it produces, are 'unpredictable' at best! The ALC output is **part
+   of every tune by default** (it does no harm if the radio's ALC jack isn't
+   connected), and can be switched off per band with `"alc": false` in the JSON
+   config.
 4. **Allow complex inter-band sequencer and tuner configurations to be defined
    in a JSON config**: per-band delays, tune profiles, band edges, which bands
    the tuner may be used on, and cross-band rules (for example, transmitting
@@ -142,8 +143,8 @@ questions](#open-questions--to-be-determined) for what has not.
 | D6 | Tune button (input, polled) |
 | D7 | Tune indicator: passive buzzer, ~2048Hz PWM from Timer4 (OC4B) |
 | D8 | CAT activity LED (output): lit for 20ms after every byte on either CAT port - the PC's, the radio's, and the Arduino's own commands and replies |
-| D9 | ALC injection charge pump (PWM output) |
-| D10 | ALC opto-isolator gate (on/off switch) |
+| D9 | ALC injection charge pump (PWM output, Timer2) |
+| D10 | ALC opto-isolator LED drive (the "gate"): a plain on/off switch |
 | D11 | Icom AH-4 `KEY` input, via opto-isolator, `INPUT_PULLUP` |
 | D12 | Icom AH-4 `START` output, via opto-isolator |
 | D2 | STBY: HF (input, interrupt) |
@@ -151,12 +152,11 @@ questions](#open-questions--to-be-determined) for what has not.
 | D18 | STBY: 144MHz (input, interrupt) |
 | D19 | STBY: 50MHz (input, interrupt) |
 | D4 | Shared TX INHIBIT output → TUNER connector pin 8 |
-| D5 | TUNER connector pin 2 (`TX_GND`) — input, `INPUT_PULLUP`. Open-collector, active-low: asserted (low) when the radio transmits on HF or 50MHz. Logged/cross-check only, not load-bearing (STBY already covers this with more granularity) |
 | D34 / D35 / D36 / D37 / D38 | Sequencer Band 1 (**HF**): `RX` (LED only) / `SEQ1` (LED+opto) / `SEQ2` (LED+opto) / `SEQ3` (LED+opto) / `TX` (LED only) |
 | D39 / D40 / D41 / D42 / D43 | Sequencer Band 2 (**50MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same LED-only/LED+opto pattern as Band 1 |
 | D44 / D45 / D46 / D47 / D48 | Sequencer Band 3 (**144MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern |
 | D49 / D50 / D51 / D52 / D53 | Sequencer Band 4 (**430MHz**): `RX` / `SEQ1` / `SEQ2` / `SEQ3` / `TX` — same pattern; D50-D53 are the Mega's hardware SPI pins (MISO/MOSI/SCK/SS), repurposed as plain digital outputs since SPI isn't needed elsewhere in this project |
-| D22–D33 | **unassigned** — free (the sequencer outputs occupy D34–D53 as one contiguous block) |
+| D5, D22–D33 | **unassigned** — free (D5 was once reserved for the TUNER connector's `TX_GND`, which is not connected; the sequencer outputs occupy D34–D53 as one contiguous block) |
 | D20, D21 (I2C: SDA/SCL) | **kept free** — not used by anything, available for a future I2C peripheral (e.g. a status display) |
 
 Sequencer band↔channel mapping (Band 1=HF, Band 2=50MHz, Band 3=144MHz,
@@ -613,7 +613,17 @@ band's sequencer, configured rather than hardcoded.
   the 4 sequencer bands (see [Tune cycle](#tune-cycle-triggered-by-the-tune-button) above), and exact sub-band edges
   can vary by license class/region — so, consistent with everything else
   here, they're configurable rather than baked into firmware.
-- **Concrete schema**: see [`config/sequencer.json`](config/sequencer.json)
+- **Config files** (all in `config/`): `sequencer.json` is the **real config
+  for the radio** — what `send_config.py` uploads by default, and the user's to
+  edit freely; `sequencer-bench.json` is the **bench / test-jig config** (slow
+  timings for watching the LEDs, a tuner that can't do 50MHz, and so on);
+  `sequencer-example.json` is the **generic worked example** described here and the
+  stable reference for the host tests. The tests never assume anything about
+  the values in the first two — only that they stay valid, fit the EEPROM image
+  and upload through the real handshake, so a typo in your real config is
+  caught before it reaches the board — and compare the built-in fallback with
+  the example.
+- **Concrete schema**: see [`config/sequencer-example.json`](config/sequencer-example.json)
   for a full worked example (including the 50MHz→144MHz preamp-protection
   rule above). Top level: `schema_version` (lets firmware reject/fall back
   on a shape it doesn't understand), `bands` (keyed `"HF"`/`"50M"`/
@@ -623,8 +633,8 @@ band's sequencer, configured rather than hardcoded.
   `tune_profile` object of `seq1`/`seq2`/`seq3` booleans, and an optional
   `atu` boolean saying whether the tune cycle may run on that band — absent
   means on for HF and 50M and off for 144/430MHz, the coverage of an AH-4; an
-  Alinco EDX-2, which cannot tune 50MHz, sets `"atu": false` there, as
-  `config/sequencer-bench.json` does — and an optional `alc` boolean saying
+  Alinco EDX-2, which cannot tune 50MHz, sets `"atu": false` there, as the
+  bench config does — and an optional `alc` boolean saying
   whether the tune cycle injects ALC on that band — absent means on), and
   `cross_band_triggers` (an array of `{source_band, target_band,
   target_output}`). The example file's band edges are placeholder IARU
@@ -665,17 +675,17 @@ band's sequencer, configured rather than hardcoded.
   image is re-validated with the same rules as an uploaded config.
 - **Built-in fallback**: if EEPROM is empty or invalid, the firmware runs
   from a compiled-in table with the band edges, timing and tune profiles
-  of `config/sequencer.json` and **no** cross-band triggers; a native test
-  keeps the table in step with that file. `config/sequencer-bench.json` is
-  the same config with every timing slowed to 1000ms, for easy visibility
-  on the bench.
+  of `config/sequencer-example.json` and **no** cross-band triggers; a native
+  test keeps the table in step with that file (not with the real or bench
+  config, which are free to differ).
 - **PC-side helper**: [`tools/send_config.py`](tools/send_config.py) —
   validates the JSON is well-formed *before* touching the serial port
   (fails fast with a clear Python error rather than a round-trip to the
   device), waits out the Mega's reset on port open, then runs the
   handshake above (skipping any log lines the firmware prints in between)
   and prints the Arduino's response. Makes a config change a one-command action:
-  `python3 tools/send_config.py config/sequencer.json /dev/ttyACM0`.
+  `python3 tools/send_config.py config/sequencer.json /dev/ttyACM0` (the real
+  config; use `config/sequencer-bench.json` for the bench).
   Requires `pip install pyserial`.
 
 ### Debug/control port
@@ -940,6 +950,16 @@ output, so the transistor pulls the ALC line towards the pump voltage — the
 direction that only ever reduces power. The pump (Timer2, D9, ~14.9kHz) runs
 all the time; D10 is the gate.
 
+**Pump supply (important).** The pump is fed from a **7809** (9V) regulator, with
+R14 (Q1's pull-up) at 470Ω, *not* straight from the radio's 13.8V. The radio's
+13.8V line sags during transmit, and the unregulated pump's rail followed it
+(about -10.9V falling to -9.7V over 5 seconds of TX), which dragged the ALC
+voltage at the radio from 4.77V to 4.23V with it. With a regulated supply the
+ALC voltage is steady, so a single setting (RV1, a 47kΩ pot, set once) holds the
+radio between 5 and 10W on every band, and per-band ALC voltages turned out not
+to be needed. Regulating the supply, not buffering the output, was the fix: the
+radio's ALC input is a high impedance and barely loads the line.
+
 - **Fail-safe:** a reset or a hang turns the gate off (the pin becomes an input,
   the LED goes dark), a gate switched on by hand releases itself after 30s, and
   the tune cycle releases it as soon as the radio is unkeyed on every path —
@@ -948,7 +968,7 @@ all the time; D10 is the gate.
 - **Bench key (no tune running):** `g` gate on/off. The pump duty is fixed at 50%:
   on the real circuit 5% to 95% moved the output by only ~0.2V (a diode charge
   pump's voltage is set by its diode drops and the supply, not the duty), so it
-  is not a control. To back the voltage off, put a 100kΩ pot in the circuit.
+  is not a control; the voltage is set once with RV1.
   Opening the walk-test and exiting it restarts the pump (leaving it would have
   stopped it: `configurePins()` disconnects D9's PWM output as a side effect).
 - **In a tune:** on by default, per band (`"alc": false` in the config turns it
@@ -956,24 +976,19 @@ all the time; D10 is the gate.
   settle, and only then does the tuner start and the radio get keyed; it is
   released in the tail right after PTT off. The carrier test (`P`) uses it too,
   which is how to see its effect; the no-RF modes (`E`, `D`) never do.
-- **Calibrating:** measure the pump's -V with the gate off, then press `g` and
-  watch the radio's ALC/power. Run the carrier test (`P`, dummy load) and
-  compare the radio's PO meter and your external wattmeter with the band's
-  `alc` on and off: the aim is a steady ~10W with the start-up overshoot (above)
-  taken out, adjusting the pot.
-- **Status:** the pump and gate work — -4V is measured at the radio's EXT ALC
-  jack during a tune — but the radio's carrier does not change with it, so for
-  now it has no effect and the tune does not depend on it: keying at `START`
-  already avoids the start-up overshoot (see the bench results). To find out
-  whether the radio sees the voltage at all, set Menu #24 (TX MTR) to ALC: the
-  manual says the ALC meter reading includes "any external ALC voltage", so the
-  meter should deflect when the gate is on while keyed (`P`, dummy load). If it
-  doesn't move, the voltage isn't reaching the radio's ALC circuit; if it does,
-  the radio sees it but isn't acting on it in this mode.
-- **Before the radio starts responding:** -4V is *maximum* power reduction, and
-  an AH-4-type tuner aborts below about 5W. So once the radio does respond,
-  set the pot for a carrier of about 10W *before* relying on a tune, or set
-  `"alc": false` for the bands where it would push the power too low.
+- **Setting it up:** with the gate off measure the ALC wiper (RV1's output), then
+  press `g` and check the radio's carrier with the carrier test (`P`, dummy
+  load) against your wattmeter, with the band's `alc` on and off. The radio's own
+  ALC meter (Menu #24 set to ALC) includes "any external ALC voltage", so it
+  deflects when the gate is on while keyed, which is a quick way to see that the
+  voltage reaches the radio's ALC circuit.
+- **Status:** working. With the pump supply regulated, the radio holds between
+  5 and 10W across all bands with the gate on, so ALC is part of every tune by
+  default. -4V is *maximum* power reduction and an AH-4-type tuner aborts below
+  about 5W, so set RV1 so the carrier stays above 5W (or set `"alc": false` for
+  a band where it would not). Not yet tried with ALC on: keying at `KEY`
+  instead of at `START` (Serial0 `R`), now that ALC may tame the radio's
+  start-up overshoot (see the bench results).
 
 ## ALC injection for tune power (reference)
 
@@ -981,8 +996,8 @@ Carried over from a prior project; the FT-847-specific details below are
 now confirmed against `docs/ft-847_manual.pdf` ("Rear Panel Connectors",
 item 11).
 
-- **Concept**: an Arduino PWM pin drives a charge pump producing roughly
-  -4V. That voltage is gated onto the radio's ALC (Automatic Level
+- **Concept**: an Arduino PWM pin drives a charge pump (supplied through a
+  7809) producing roughly -4V. That voltage is gated onto the radio's ALC (Automatic Level
   Control) input line through an opto-isolator wired as a simple on/off
   switch (not used for linear/analog transfer — just to connect or
   disconnect the -4V rail from the ALC line).
@@ -993,8 +1008,8 @@ item 11).
   output — a genuine hardware-level power reduction, independent of any
   CAT command, and capable of going lower than AM mode's power ceiling
   alone. The goal is the AH-4's ~10W carrier (it aborts below 5W as well
-  as above 15W), so the PWM level is a calibration to set against a power
-  meter, not "as low as possible".
+  as above 15W), so the ALC voltage is a setting to calibrate against a power
+  meter (RV1), not "as low as possible".
 - **Relationship to AM mode**: the two are complementary, not
   alternatives. AM mode is switched to regardless (see the [CAT reference](#yaesu-ft-847-cat-protocol-reference)
   above — the FT-847 offers no other way to run a controlled tune cycle
@@ -1071,6 +1086,8 @@ inspection/prior documentation of the connectors themselves.
   **Decision: wire it as a signal, not ground** — pin 2 is connected to
   Arduino D5 as an input (mirroring fakeFC's own pin choice). It is *not*
   tied to the project's ground rail, precisely because it isn't one.
+  **Update:** in the current build `TX_GND` is not connected to the Arduino
+  at all, and D5 is unassigned (see the pin table).
 - **`TX_GND` function confirmed against the actual FT-847 schematic.** It's
   the collector of a **DTC114EK** digital transistor, emitter to ground —
   so it's an **open-collector, active-low** signal: pulled to ~0V when
@@ -1085,7 +1102,8 @@ inspection/prior documentation of the connectors themselves.
   anything it's less granular (one combined line for 2 of the 4 bands).
   **Conclusion: not load-bearing for the sequencer or tune cycle** — worth
   logging on Serial0 as a cross-check against the STBY-HF/STBY-50MHz
-  lines, but nothing in the core logic needs to depend on it.
+  lines, but nothing in the core logic needs to depend on it (and it is
+  no longer wired to the Arduino).
 - **TX INHIBIT electrical characteristics, per fakeFC's schematic**: their
   `TX_INH` (J1 pin 8) connects directly to a Sparkfun Pro Micro GPIO
   (running at 5V, confirmed by the schematic's onboard 7805 regulator)
@@ -1242,6 +1260,14 @@ lines and CAT connected; TUNER Sense unconnected):
   Along the way: `KEY` asserts ≈31ms after `START` is released (any hold
   length), and spurious STBY pulses on the 430M line while HF transmitted
   (probably RF pickup) are why every band's STBY is held during a tune.
+- **ALC injection (EXT ALC jack)**: with the gate on, the radio holds its AM
+  carrier between 5 and 10W on every HF band, with one fixed ALC voltage.
+  Getting there: with the pump fed from the radio's 13.8V, the ALC voltage at
+  the jack started at 4.75V and fell to 4.23V over 5s of TX (the radio's 13.8V
+  line sags in TX, and the pump rail followed, -10.9V to -9.7V; 4.774V × 9.7/10.923
+  = 4.24V accounts for all of it). Feeding the pump from a 7809 with R14 at
+  470Ω steadied it. Along the way: pump duty (5–95%) moved the output by only
+  ~0.2V, so duty is not a control.
 - **CAT bridge**: transparent passthrough to flrig over an extended
   session with no stray, torn or timed-out frames.
 - **Arduino-originated CAT** on Port 2 (freq/mode, TX status, set mode,
@@ -1255,9 +1281,11 @@ lines and CAT connected; TUNER Sense unconnected):
   through the CAT PTT path (arbiter quiet gap, radio response) has to land
   well inside the tuner's window. Needs a keyed test into a dummy load.
 - **Tune carrier power**: the AH-4 aborts outside 5–15W, and the radio in
-  AM mode can do 25W. Calibrate the RF power setting and, once the radio
-  responds to it, the ALC voltage (the pot) for about 10W on a power meter. The transmit-status meter bits (`0xF7`,
-  bits 4:0) might allow a sanity check from the Arduino.
+  AM mode can do 25W. ALC now holds the radio between 5 and 10W on every band
+  (see the bench results), so what is left is whether ALC also removes the
+  radio's start-up overshoot, which would make keying at `KEY` (Serial0 `R`)
+  viable again for tuners that need it, and whether the transmit-status meter
+  bits (`0xF7`, bits 4:0) can serve as a sanity check from the Arduino.
 - **Tuner reset on band change**: Icom radios reset the AH-4 (a ~70ms
   `START` pulse) when the band changes so a stale tuning network isn't
   left in circuit. Nothing here does that yet; the band is known at each

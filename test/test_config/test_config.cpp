@@ -30,11 +30,19 @@ static bool load(const std::string &text, SequencerConfig &cfg) {
   return configFromJson(doc, cfg, err, sizeof err);
 }
 
-// The shipped example, parsed once, then edited per test.
+// File roles (see README "Config files"): the generic example is the stable reference the
+// value-specific tests use; config/sequencer.json is the real radio config and
+// config/sequencer-bench.json the bench config - both are the user's to edit freely, so
+// tests only check that they stay valid, never what is in them.
+static const char *const EXAMPLE = "config/sequencer-example.json";
+static const char *const REAL = "config/sequencer.json";
+static const char *const BENCH = "config/sequencer-bench.json";
+
+// The generic example, parsed once, then edited per test.
 static JsonDocument goodDoc() {
   JsonDocument doc;
   TEST_ASSERT_EQUAL(DeserializationError::Ok,
-                    deserializeJson(doc, readFile("config/sequencer.json")).code());
+                    deserializeJson(doc, readFile(EXAMPLE)).code());
   return doc;
 }
 
@@ -44,11 +52,11 @@ static bool loadDoc(JsonDocument &doc, SequencerConfig &cfg) {
 
 void setUp() { err[0] = 0; }
 
-// --- the shipped file ---
+// --- the example file, the real config and the bench config ---
 
 void test_example_file_parses() {
   SequencerConfig cfg;
-  TEST_ASSERT_TRUE_MESSAGE(load(readFile("config/sequencer.json"), cfg), err);
+  TEST_ASSERT_TRUE_MESSAGE(load(readFile(EXAMPLE), cfg), err);
   TEST_ASSERT_EQUAL_UINT32(1800000, cfg.band[0].freqMinHz);
   TEST_ASSERT_EQUAL(50, cfg.band[0].gapMs[0]);
   TEST_ASSERT_EQUAL(20, cfg.band[0].gapMs[2]);
@@ -60,21 +68,28 @@ void test_example_file_parses() {
   TEST_ASSERT_EQUAL(0, cfg.trigger[0].targetStage); // seq1
 }
 
-void test_bench_file_parses() {
-  SequencerConfig cfg;
-  TEST_ASSERT_TRUE_MESSAGE(load(readFile("config/sequencer-bench.json"), cfg), err);
-  // Meant for bench visibility: every step the same, and slow enough to watch.
-  uint16_t first = cfg.band[0].gapMs[0];
-  TEST_ASSERT_GREATER_OR_EQUAL(300, first);
-  for (const BandConfig &b : cfg.band) {
-    for (uint16_t g : b.gapMs) TEST_ASSERT_EQUAL(first, g);
+// The user's own configs: no assumptions about their values, only that they can be used.
+void test_the_real_and_bench_configs_are_valid_and_fit_in_eeprom() {
+  for (const char *path : {REAL, BENCH}) {
+    SequencerConfig cfg = {}, back = {};
+    TEST_ASSERT_TRUE_MESSAGE(load(readFile(path), cfg), path); // err holds the reason
+    const char *why;
+    TEST_ASSERT_TRUE_MESSAGE(configValidate(cfg, why), path);
+    uint8_t buf[CONFIG_IMAGE_MAX];
+    size_t n = configSerialize(cfg, buf, sizeof buf);
+    TEST_ASSERT_GREATER_THAN_MESSAGE(0, n, path); // fits the EEPROM image
+    TEST_ASSERT_TRUE_MESSAGE(configDeserialize(buf, n, back, why), path);
+    for (uint8_t b = 0; b < SEQ_BANDS; b++) {
+      TEST_ASSERT_EQUAL_MESSAGE(cfg.band[b].freqMinHz, back.band[b].freqMinHz, path);
+      for (uint8_t i = 0; i < SEQ_STAGES; i++) TEST_ASSERT_EQUAL_MESSAGE(cfg.band[b].gapMs[i], back.band[b].gapMs[i], path);
+    }
   }
 }
 
-// The built-in fallback must match config/sequencer.json (apart from triggers).
+// The built-in fallback must match config/sequencer-example.json (apart from triggers).
 void test_defaults_match_example_file() {
   SequencerConfig cfg;
-  TEST_ASSERT_TRUE_MESSAGE(load(readFile("config/sequencer.json"), cfg), err);
+  TEST_ASSERT_TRUE_MESSAGE(load(readFile(EXAMPLE), cfg), err);
   for (uint8_t b = 0; b < SEQ_BANDS; b++) {
     const BandConfig &d = DEFAULT_SEQUENCER_CONFIG.band[b], &f = cfg.band[b];
     TEST_ASSERT_EQUAL_UINT32(f.freqMinHz, d.freqMinHz);
@@ -271,13 +286,6 @@ void test_alc_flag_parsed_and_defaults_to_on() {
   TEST_ASSERT_FALSE(loadDoc(doc, cfg));
 }
 
-void test_bench_file_has_the_edx2_setup() {
-  SequencerConfig cfg;
-  TEST_ASSERT_TRUE_MESSAGE(load(readFile("config/sequencer-bench.json"), cfg), err);
-  TEST_ASSERT_TRUE(cfg.band[0].atu);
-  TEST_ASSERT_FALSE(cfg.band[1].atu); // the EDX-2 can't tune 50MHz
-}
-
 void test_trigger_count_limit_and_omission() {
   SequencerConfig cfg;
   JsonDocument doc = goodDoc();
@@ -312,7 +320,7 @@ void test_failed_load_leaves_output_untouched() {
 
 static SequencerConfig sampleConfig() {
   SequencerConfig cfg;
-  TEST_ASSERT_TRUE_MESSAGE(load(readFile("config/sequencer.json"), cfg), err);
+  TEST_ASSERT_TRUE_MESSAGE(load(readFile(EXAMPLE), cfg), err);
   cfg.band[2].gapMs[1] = 1234;
   return cfg;
 }
@@ -484,7 +492,7 @@ void test_crc_known_value() {
 int main() {
   UNITY_BEGIN();
   RUN_TEST(test_example_file_parses);
-  RUN_TEST(test_bench_file_parses);
+  RUN_TEST(test_the_real_and_bench_configs_are_valid_and_fit_in_eeprom);
   RUN_TEST(test_defaults_match_example_file);
   RUN_TEST(test_rejects_non_object_and_junk);
   RUN_TEST(test_rejects_wrong_schema_version);
@@ -496,7 +504,6 @@ int main() {
   RUN_TEST(test_trigger_rules);
   RUN_TEST(test_atu_flag_parsed_and_defaults);
   RUN_TEST(test_alc_flag_parsed_and_defaults_to_on);
-  RUN_TEST(test_bench_file_has_the_edx2_setup);
   RUN_TEST(test_trigger_count_limit_and_omission);
   RUN_TEST(test_failed_load_leaves_output_untouched);
   RUN_TEST(test_image_roundtrip);

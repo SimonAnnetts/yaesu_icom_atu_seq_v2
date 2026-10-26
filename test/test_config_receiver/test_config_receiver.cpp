@@ -88,7 +88,8 @@ static void handshake() {
   TEST_ASSERT_EQUAL(1, host->count(Reply::Ready));
 }
 
-static std::string goodConfig() { return readFile("config/sequencer.json"); }
+// A stable reference config for the tests; the user's own files get their own test below.
+static std::string goodConfig() { return readFile("config/sequencer-example.json"); }
 
 // ---- the handshake ----
 
@@ -100,6 +101,24 @@ void test_a_valid_config_is_accepted_pretty_printed() {
   TEST_ASSERT_EQUAL(1, host->saved);
   TEST_ASSERT_FALSE(rx->receiving());
   TEST_ASSERT_FALSE(host->appliedInvalid);
+}
+
+void test_the_real_and_bench_configs_can_be_uploaded() {
+  // Whatever is in them, pretty-printed or compact, they must go through the real upload path.
+  for (const char *path : {"config/sequencer.json", "config/sequencer-bench.json"}) {
+    std::string text = readFile(path);
+    feed("CONFIG\n");
+    feed(text);
+    char msg[80];
+    snprintf(msg, sizeof msg, "%s (pretty)", path);
+    TEST_ASSERT_EQUAL_MESSAGE((int)Reply::Ok, (int)host->last(), msg);
+    feed("CONFIG\n");
+    feed(compact(text));
+    snprintf(msg, sizeof msg, "%s (compact)", path);
+    TEST_ASSERT_EQUAL_MESSAGE((int)Reply::Ok, (int)host->last(), msg);
+    TEST_ASSERT_FALSE(host->appliedInvalid);
+  }
+  TEST_ASSERT_EQUAL(4, host->applied);
 }
 
 void test_a_valid_config_is_accepted_compact_and_with_crlf_everywhere() {
@@ -480,6 +499,7 @@ void test_millis_wraparound_during_an_upload() {
 int main() {
   UNITY_BEGIN();
   RUN_TEST(test_a_valid_config_is_accepted_pretty_printed);
+  RUN_TEST(test_the_real_and_bench_configs_can_be_uploaded);
   RUN_TEST(test_a_valid_config_is_accepted_compact_and_with_crlf_everywhere);
   RUN_TEST(test_whitespace_is_not_counted_so_pretty_files_fit);
   RUN_TEST(test_the_handshake_line_must_be_exactly_CONFIG);

@@ -12,7 +12,7 @@
       "tune_profile": {
         "seq1": true,
         "seq2": true,
-        "seq3": false
+        "seq3": true
       },
       "atu": true,
       "alc": true

@@ -23,10 +23,10 @@ static int8_t current = -1; // index into step table, -1 = none lit
 static uint32_t inhibitOffAt = 0;
 static bool inhibitOn = false;
 
-// Inputs echoed on change: D5, D6, D11 and the four STBY lines.
-static NamedPin inputs[3 + BAND_COUNT];
+// Inputs echoed on change: D6, D11 and the four STBY lines.
+static NamedPin inputs[2 + BAND_COUNT];
 static char inputNames[BAND_COUNT][10];
-static uint8_t inputLast[3 + BAND_COUNT];
+static uint8_t inputLast[2 + BAND_COUNT];
 
 static void addStep(uint8_t &n, const char *name, uint8_t pin) {
   strncpy(stepNames[n], name, sizeof(stepNames[n]) - 1);
@@ -50,12 +50,11 @@ static void buildTables() {
     }
   }
 
-  inputs[0] = {"TX_GND", PIN_TX_GND};
-  inputs[1] = {"TUNE_BTN", PIN_TUNE_BUTTON};
-  inputs[2] = {"AH4_KEY", PIN_AH4_KEY};
+  inputs[0] = {"TUNE_BTN", PIN_TUNE_BUTTON};
+  inputs[1] = {"AH4_KEY", PIN_AH4_KEY};
   for (uint8_t b = 0; b < BAND_COUNT; b++) {
     snprintf(inputNames[b], sizeof(inputNames[b]), "STBY_%s", BAND_NAMES[b]);
-    inputs[3 + b] = {inputNames[b], PIN_STBY[b]};
+    inputs[2 + b] = {inputNames[b], PIN_STBY[b]};
   }
 }
 
@@ -81,7 +80,7 @@ static void lightStep(int8_t idx) {
 }
 
 static void echoInputs(bool force) {
-  for (uint8_t i = 0; i < 3 + BAND_COUNT; i++) {
+  for (uint8_t i = 0; i < 2 + BAND_COUNT; i++) {
     uint8_t v = digitalRead(inputs[i].pin);
     if (!force && v == inputLast[i]) continue;
     inputLast[i] = v;

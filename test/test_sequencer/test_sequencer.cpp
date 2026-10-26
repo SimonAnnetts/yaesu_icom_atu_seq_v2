@@ -169,7 +169,7 @@ void test_default_config_has_no_triggers() {
   TEST_ASSERT_EQUAL(0, DEFAULT_SEQUENCER_CONFIG.triggerCount);
 }
 
-// 50M -> 144M SEQ1, as in config/sequencer.json
+// 50M -> 144M SEQ1, as in config/sequencer-example.json
 static void addPreampRule() {
   cfg.triggerCount = 1;
   cfg.trigger[0] = {M50, 2, 0};

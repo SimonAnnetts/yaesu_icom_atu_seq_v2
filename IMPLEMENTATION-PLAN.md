@@ -65,14 +65,14 @@ with the radio disconnected.
 
 ## Phase 2 — Config: JSON, EEPROM, cross-band triggers
 
-- Schema per [config/sequencer.json](config/sequencer.json): validation,
+- Schema per [config/sequencer-example.json](config/sequencer-example.json): validation,
   `schema_version` check, band edges, timing, tune profile, triggers.
 - `CONFIG` / `READY` / `OK` / `ERROR: <reason>` handshake on Serial0, with a
   timeout so a half-sent config can't wedge the port.
 - EEPROM persistence with magic/version/CRC; fall back to compiled defaults if
   empty or invalid. Resolve the open question of how defaults are produced
   (recommend a hand-written fallback table kept in sync by a native test that
-  compares it with `config/sequencer.json`).
+  compares it with `config/sequencer-example.json`).
 - Cross-band triggers: source `SEQ1` on/off snaps the target output.
   Define what happens when two rules target the same output, or the target band
   is itself active.
