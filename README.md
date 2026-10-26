@@ -986,9 +986,9 @@ radio's ALC input is a high impedance and barely loads the line.
   5 and 10W across all bands with the gate on, so ALC is part of every tune by
   default. -4V is *maximum* power reduction and an AH-4-type tuner aborts below
   about 5W, so set RV1 so the carrier stays above 5W (or set `"alc": false` for
-  a band where it would not). Not yet tried with ALC on: keying at `KEY`
-  instead of at `START` (Serial0 `R`), now that ALC may tame the radio's
-  start-up overshoot (see the bench results).
+  a band where it would not). ALC does **not** remove the radio's start-up
+  carrier overshoot (it still overshoots on initial TX with ALC on), so the tune
+  cycle keeps keying at `START`, not `KEY` (see the bench results).
 
 ## ALC injection for tune power (reference)
 
@@ -1267,7 +1267,8 @@ lines and CAT connected; TUNER Sense unconnected):
   line sags in TX, and the pump rail followed, -10.9V to -9.7V; 4.774V × 9.7/10.923
   = 4.24V accounts for all of it). Feeding the pump from a 7809 with R14 at
   470Ω steadied it. Along the way: pump duty (5–95%) moved the output by only
-  ~0.2V, so duty is not a control.
+  ~0.2V, so duty is not a control. ALC does not remove the radio's start-up
+  carrier overshoot: it still overshoots on initial TX with ALC on.
 - **CAT bridge**: transparent passthrough to flrig over an extended
   session with no stray, torn or timed-out frames.
 - **Arduino-originated CAT** on Port 2 (freq/mode, TX status, set mode,
@@ -1282,10 +1283,10 @@ lines and CAT connected; TUNER Sense unconnected):
   well inside the tuner's window. Needs a keyed test into a dummy load.
 - **Tune carrier power**: the AH-4 aborts outside 5–15W, and the radio in
   AM mode can do 25W. ALC now holds the radio between 5 and 10W on every band
-  (see the bench results), so what is left is whether ALC also removes the
-  radio's start-up overshoot, which would make keying at `KEY` (Serial0 `R`)
-  viable again for tuners that need it, and whether the transmit-status meter
-  bits (`0xF7`, bits 4:0) can serve as a sanity check from the Arduino.
+  (see the bench results). It does not remove the start-up overshoot, so
+  keying at `KEY` (Serial0 `R`) stays unviable for a tuner like the EDX-2.
+  Still open: whether the transmit-status meter bits (`0xF7`, bits 4:0) can
+  serve as a sanity check from the Arduino.
 - **Tuner reset on band change**: Icom radios reset the AH-4 (a ~70ms
   `START` pulse) when the band changes so a stale tuning network isn't
   left in circuit. Nothing here does that yet; the band is known at each

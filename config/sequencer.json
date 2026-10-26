@@ -30,7 +30,7 @@
         "seq2": true,
         "seq3": true
       },
-      "atu": true,
+      "atu": false,
       "alc": true
     },
     "144M": {
