@@ -10,7 +10,7 @@
 		(rev "v1.2")
 	)
 	(lib_symbols
-		(symbol "Connector:Screw_Terminal_01x04"
+		(symbol "Connector_local:Screw_Terminal_01x04"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -322,7 +322,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector:Screw_Terminal_01x05"
+		(symbol "Connector_local:Screw_Terminal_01x05"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -687,7 +687,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector:Screw_Terminal_01x06"
+		(symbol "Connector_local:Screw_Terminal_01x06"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -1105,7 +1105,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector:Screw_Terminal_01x08"
+		(symbol "Connector_local:Screw_Terminal_01x08"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -1629,7 +1629,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector_Generic:Conn_01x02"
+		(symbol "Connector_Generic_local:Conn_01x02"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -1787,7 +1787,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector_Generic:Conn_01x04"
+		(symbol "Connector_Generic_local:Conn_01x04"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -2003,7 +2003,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector_Generic:Conn_01x05"
+		(symbol "Connector_Generic_local:Conn_01x05"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -2248,7 +2248,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector_Generic:Conn_01x06"
+		(symbol "Connector_Generic_local:Conn_01x06"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -2522,7 +2522,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector_Generic:Conn_01x08"
+		(symbol "Connector_Generic_local:Conn_01x08"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -2854,7 +2854,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector_Generic:Conn_01x16"
+		(symbol "Connector_Generic_local:Conn_01x16"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -3418,7 +3418,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Connector_Generic:Conn_02x02_Counter_Clockwise"
+		(symbol "Connector_Generic_local:Conn_02x02_Counter_Clockwise"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -3634,7 +3634,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Custom:C_Smaller"
+		(symbol "Custom_local:C_Smaller"
 			(pin_numbers
 				(hide yes)
 			)
@@ -3790,7 +3790,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Custom:D_TVS_U_Small"
+		(symbol "Custom_local:D_TVS_U_Small"
 			(pin_numbers
 				(hide yes)
 			)
@@ -3956,7 +3956,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Custom:Enclosure"
+		(symbol "Custom_local:Enclosure"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -4030,7 +4030,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Custom:Prototype_Area"
+		(symbol "Custom_local:Prototype_Area"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
@@ -4198,7 +4198,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:Buzzer"
+		(symbol "Device_local:Buzzer"
 			(pin_names
 				(offset 0.0254)
 				(hide yes)
@@ -4375,7 +4375,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:C_Polarized_Small"
+		(symbol "Device_local:C_Polarized_Small"
 			(pin_numbers
 				(hide yes)
 			)
@@ -4553,7 +4553,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:C_Small"
+		(symbol "Device_local:C_Small"
 			(pin_numbers
 				(hide yes)
 			)
@@ -4709,7 +4709,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:Fuse_Small"
+		(symbol "Device_local:Fuse_Small"
 			(pin_numbers
 				(hide yes)
 			)
@@ -4862,7 +4862,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:LED_Small"
+		(symbol "Device_local:LED_Small"
 			(pin_numbers
 				(hide yes)
 			)
@@ -5065,7 +5065,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:L_Small"
+		(symbol "Device_local:L_Small"
 			(pin_numbers
 				(hide yes)
 			)
@@ -5245,7 +5245,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:R_Potentiometer_Trim"
+		(symbol "Device_local:R_Potentiometer_Trim"
 			(pin_names
 				(offset 1.016)
 				(hide yes)
@@ -5458,7 +5458,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:R_Small"
+		(symbol "Device_local:R_Small"
 			(pin_numbers
 				(hide yes)
 			)
@@ -5599,7 +5599,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Diode:1N4148"
+		(symbol "Diode_local:1N4148"
 			(pin_numbers
 				(hide yes)
 			)
@@ -5786,7 +5786,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "MCU_Custom:MAX202CPE"
+		(symbol "MCU_Custom_local:MAX202CPE"
 			(pin_names
 				(offset 1.016)
 			)
@@ -6384,7 +6384,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Misc_Custom:PC817_smallx3"
+		(symbol "Misc_Custom_local:PC817_smallx3"
 			(pin_names
 				(offset 1.016)
 			)
@@ -7158,7 +7158,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "PCM_arduino-library:Arduino_Mega2560_R3_Shield"
+		(symbol "PCM_arduino-library_local:Arduino_Mega2560_R3_Shield"
 			(pin_names
 				(offset 1.016)
 			)
@@ -9332,7 +9332,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Regulator_Linear:L7805"
+		(symbol "Regulator_Linear_local:L7805"
 			(pin_names
 				(offset 0.254)
 			)
@@ -9490,7 +9490,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Regulator_Linear:L78L09_TO92"
+		(symbol "Regulator_Linear_local:L78L09_TO92"
 			(pin_names
 				(offset 0.254)
 			)
@@ -9853,7 +9853,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Switch:SW_Push"
+		(symbol "Switch_local:SW_Push"
 			(pin_numbers
 				(hide yes)
 			)
@@ -10017,7 +10017,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Transistor_BJT:BC547"
+		(symbol "Transistor_BJT_local:BC547"
 			(pin_names
 				(offset 0)
 				(hide yes)
@@ -10260,7 +10260,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "power:GND"
+		(symbol "power_local:GND"
 			(power global)
 			(pin_numbers
 				(hide yes)
@@ -25937,7 +25937,7 @@
 		(uuid "fd7e5186-43b1-4b01-8b09-ca6156c10d72")
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 101.6 180)
 		(unit 1)
 		(body_style 1)
@@ -25968,7 +25968,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 101.6 90)
 			(hide yes)
 			(show_name no)
@@ -26039,7 +26039,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 71.12 270)
 		(unit 1)
 		(body_style 1)
@@ -26070,7 +26070,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 71.12 0)
 			(hide yes)
 			(show_name no)
@@ -26130,7 +26130,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 115.57 270)
 		(mirror x)
 		(unit 1)
@@ -26162,7 +26162,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 115.57 0)
 			(hide yes)
 			(show_name no)
@@ -26222,7 +26222,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 77.47 270)
 		(mirror x)
 		(unit 1)
@@ -26254,7 +26254,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 77.47 0)
 			(hide yes)
 			(show_name no)
@@ -26314,7 +26314,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 257.81 133.35 0)
 		(unit 4)
 		(body_style 1)
@@ -26347,7 +26347,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 243.078 136.652 0)
 			(hide yes)
 			(show_name no)
@@ -26452,7 +26452,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:L_Small")
+		(lib_id "Device_local:L_Small")
 		(at 72.39 121.92 90)
 		(unit 1)
 		(body_style 1)
@@ -26482,7 +26482,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Inductor_THT:L_Axial_L9.5mm_D4.0mm_P5.08mm_Vertical_Fastron_SMCC"
+		(property "Footprint" "Inductor_THT_local:L_Axial_L9.5mm_D4.0mm_P5.08mm_Vertical_Fastron_SMCC"
 			(at 72.39 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -26542,7 +26542,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 66.04 0)
 		(unit 2)
 		(body_style 1)
@@ -26575,7 +26575,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 69.342 0)
 			(hide yes)
 			(show_name no)
@@ -26680,7 +26680,7 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
+		(lib_id "power_local:GND")
 		(at 238.76 160.02 0)
 		(unit 1)
 		(body_style 1)
@@ -26755,7 +26755,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:1N4148")
+		(lib_id "Diode_local:1N4148")
 		(at 87.63 172.72 0)
 		(mirror y)
 		(unit 1)
@@ -26786,7 +26786,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-35_SOD27_P7.62mm_Horizontal"
 			(at 87.63 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -26868,7 +26868,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x05")
+		(lib_id "Connector_Generic_local:Conn_01x05")
 		(at 38.1 24.13 0)
 		(mirror y)
 		(unit 1)
@@ -26900,7 +26900,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x05_P2.54mm_Vertical"
 			(at 38.1 24.13 0)
 			(hide yes)
 			(show_name no)
@@ -26969,7 +26969,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 57.15 270)
 		(mirror x)
 		(unit 1)
@@ -27000,7 +27000,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 57.15 0)
 			(hide yes)
 			(show_name no)
@@ -27060,7 +27060,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 90.17 106.68 180)
 		(unit 1)
 		(body_style 1)
@@ -27091,7 +27091,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 90.17 106.68 0)
 			(hide yes)
 			(show_name no)
@@ -27151,7 +27151,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 57.15 119.38 270)
 		(mirror x)
 		(unit 1)
@@ -27183,7 +27183,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 57.15 119.38 0)
 			(hide yes)
 			(show_name no)
@@ -27243,7 +27243,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 138.43 180)
 		(unit 1)
 		(body_style 1)
@@ -27273,7 +27273,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 138.43 0)
 			(hide yes)
 			(show_name no)
@@ -27333,7 +27333,7 @@
 		)
 	)
 	(symbol
-		(lib_id "PCM_arduino-library:Arduino_Mega2560_R3_Shield")
+		(lib_id "PCM_arduino-library_local:Arduino_Mega2560_R3_Shield")
 		(at 146.05 95.25 0)
 		(unit 1)
 		(body_style 1)
@@ -27363,7 +27363,7 @@
 				)
 			)
 		)
-		(property "Footprint" "PCM_arduino-library:Arduino_Mega2560_R3_Shield"
+		(property "Footprint" "PCM_arduino-library_local:Arduino_Mega2560_R3_Shield"
 			(at 146.05 168.91 0)
 			(hide yes)
 			(show_name no)
@@ -27679,7 +27679,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 151.13 270)
 		(mirror x)
 		(unit 1)
@@ -27710,7 +27710,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 151.13 0)
 			(hide yes)
 			(show_name no)
@@ -27771,7 +27771,7 @@
 	)
 	(symbol
 		(lib_name "Screw_Terminal_01x02_1")
-		(lib_id "Connector:Screw_Terminal_01x02")
+		(lib_id "Connector_local:Screw_Terminal_01x02")
 		(at 22.86 114.3 0)
 		(mirror y)
 		(unit 1)
@@ -27803,7 +27803,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal"
 			(at 22.86 114.3 0)
 			(hide yes)
 			(show_name no)
@@ -27863,7 +27863,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 87.63 0)
 		(unit 3)
 		(body_style 1)
@@ -27896,7 +27896,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 90.932 0)
 			(hide yes)
 			(show_name no)
@@ -28001,7 +28001,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 59.69 0)
 		(unit 3)
 		(body_style 1)
@@ -28034,7 +28034,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 62.992 0)
 			(hide yes)
 			(show_name no)
@@ -28139,7 +28139,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 118.11 270)
 		(mirror x)
 		(unit 1)
@@ -28170,7 +28170,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 118.11 0)
 			(hide yes)
 			(show_name no)
@@ -28230,7 +28230,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 99.06 270)
 		(mirror x)
 		(unit 1)
@@ -28262,7 +28262,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 99.06 0)
 			(hide yes)
 			(show_name no)
@@ -28322,7 +28322,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x06")
+		(lib_id "Connector_local:Screw_Terminal_01x06")
 		(at 271.78 64.77 0)
 		(unit 1)
 		(body_style 1)
@@ -28354,7 +28354,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
 			(at 271.78 64.77 0)
 			(hide yes)
 			(show_name no)
@@ -28426,7 +28426,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 80.01 33.02 0)
 		(mirror x)
 		(unit 1)
@@ -28458,7 +28458,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 80.01 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -28518,7 +28518,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 59.69 53.34 0)
 		(unit 1)
 		(body_style 1)
@@ -28549,7 +28549,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 59.69 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -28609,7 +28609,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 76.2 137.16 0)
 		(unit 1)
 		(body_style 1)
@@ -28640,7 +28640,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 76.2 137.16 0)
 			(hide yes)
 			(show_name no)
@@ -28700,7 +28700,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 88.9 165.1 270)
 		(mirror x)
 		(unit 1)
@@ -28731,7 +28731,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 88.9 165.1 0)
 			(hide yes)
 			(show_name no)
@@ -28791,7 +28791,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x04")
+		(lib_id "Connector_local:Screw_Terminal_01x04")
 		(at 22.86 63.5 0)
 		(mirror y)
 		(unit 1)
@@ -28823,7 +28823,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal"
 			(at 22.86 63.5 0)
 			(hide yes)
 			(show_name no)
@@ -28889,7 +28889,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Polarized_Small")
+		(lib_id "Device_local:C_Polarized_Small")
 		(at 97.79 172.72 270)
 		(mirror x)
 		(unit 1)
@@ -28921,7 +28921,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT_local:CP_Radial_D5.0mm_P2.50mm"
 			(at 97.79 172.72 0)
 			(hide yes)
 			(show_name no)
@@ -28981,7 +28981,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 58.42 270)
 		(mirror x)
 		(unit 1)
@@ -29013,7 +29013,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 58.42 0)
 			(hide yes)
 			(show_name no)
@@ -29073,7 +29073,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:Prototype_Area")
+		(lib_id "Custom_local:Prototype_Area")
 		(at 144.78 173.99 0)
 		(unit 1)
 		(body_style 1)
@@ -29105,7 +29105,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
+		(property "Footprint" "Custom_local:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
 			(at 144.78 173.99 0)
 			(hide yes)
 			(show_name no)
@@ -29160,7 +29160,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 215.9 36.83 270)
 		(mirror x)
 		(unit 1)
@@ -29192,7 +29192,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 215.9 36.83 0)
 			(hide yes)
 			(show_name no)
@@ -29252,7 +29252,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 95.25 180)
 		(unit 1)
 		(body_style 1)
@@ -29283,7 +29283,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 95.25 90)
 			(hide yes)
 			(show_name no)
@@ -29354,7 +29354,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 101.6 270)
 		(mirror x)
 		(unit 1)
@@ -29386,7 +29386,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -29446,7 +29446,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x08")
+		(lib_id "Connector_local:Screw_Terminal_01x08")
 		(at 22.86 46.99 0)
 		(mirror y)
 		(unit 1)
@@ -29478,7 +29478,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-8-3.5-H_1x08_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-8-3.5-H_1x08_P3.50mm_Horizontal"
 			(at 22.86 46.99 0)
 			(hide yes)
 			(show_name no)
@@ -29556,7 +29556,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 139.7 270)
 		(mirror x)
 		(unit 1)
@@ -29588,7 +29588,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 139.7 0)
 			(hide yes)
 			(show_name no)
@@ -29648,7 +29648,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 77.47 33.02 0)
 		(mirror x)
 		(unit 1)
@@ -29680,7 +29680,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 77.47 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -29740,7 +29740,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:Prototype_Area")
+		(lib_id "Custom_local:Prototype_Area")
 		(at 144.78 186.69 0)
 		(unit 1)
 		(body_style 1)
@@ -29772,7 +29772,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
+		(property "Footprint" "Custom_local:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
 			(at 144.78 186.69 0)
 			(hide yes)
 			(show_name no)
@@ -29827,7 +29827,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 127 0)
 		(unit 1)
 		(body_style 1)
@@ -29860,7 +29860,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 130.302 0)
 			(hide yes)
 			(show_name no)
@@ -29965,7 +29965,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x05")
+		(lib_id "Connector_local:Screw_Terminal_01x05")
 		(at 22.86 170.18 0)
 		(mirror y)
 		(unit 1)
@@ -29997,7 +29997,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-5-3.5-H_1x05_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-5-3.5-H_1x05_P3.50mm_Horizontal"
 			(at 22.86 170.18 0)
 			(hide yes)
 			(show_name no)
@@ -30066,7 +30066,7 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
+		(lib_id "power_local:GND")
 		(at 139.7 191.77 0)
 		(unit 1)
 		(body_style 1)
@@ -30141,7 +30141,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 146.05 270)
 		(unit 1)
 		(body_style 1)
@@ -30172,7 +30172,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 146.05 0)
 			(hide yes)
 			(show_name no)
@@ -30232,7 +30232,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 153.67 0)
 		(unit 1)
 		(body_style 1)
@@ -30265,7 +30265,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 156.972 0)
 			(hide yes)
 			(show_name no)
@@ -30370,7 +30370,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 233.68 26.67 90)
 		(mirror x)
 		(unit 1)
@@ -30401,7 +30401,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 233.68 26.67 0)
 			(hide yes)
 			(show_name no)
@@ -30461,7 +30461,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 102.87 168.91 0)
 		(mirror y)
 		(unit 1)
@@ -30493,7 +30493,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 102.87 168.91 0)
 			(hide yes)
 			(show_name no)
@@ -30553,7 +30553,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 64.77 270)
 		(unit 1)
 		(body_style 1)
@@ -30584,7 +30584,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 64.77 0)
 			(hide yes)
 			(show_name no)
@@ -30644,7 +30644,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 92.71 270)
 		(unit 1)
 		(body_style 1)
@@ -30675,7 +30675,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 92.71 0)
 			(hide yes)
 			(show_name no)
@@ -30735,7 +30735,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 105.41 180)
 		(unit 1)
 		(body_style 1)
@@ -30766,7 +30766,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 105.41 90)
 			(hide yes)
 			(show_name no)
@@ -30837,7 +30837,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x04")
+		(lib_id "Connector_Generic_local:Conn_01x04")
 		(at 107.95 86.36 0)
 		(mirror y)
 		(unit 1)
@@ -30869,7 +30869,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x04_P2.54mm_Vertical"
 			(at 107.95 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -30924,7 +30924,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 73.66 180)
 		(unit 1)
 		(body_style 1)
@@ -30955,7 +30955,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 73.66 90)
 			(hide yes)
 			(show_name no)
@@ -31026,7 +31026,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 111.76 270)
 		(mirror x)
 		(unit 1)
@@ -31057,7 +31057,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 111.76 0)
 			(hide yes)
 			(show_name no)
@@ -31117,7 +31117,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 110.49 180)
 		(unit 1)
 		(body_style 1)
@@ -31148,7 +31148,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 110.49 90)
 			(hide yes)
 			(show_name no)
@@ -31219,7 +31219,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 152.4 270)
 		(mirror x)
 		(unit 1)
@@ -31251,7 +31251,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 152.4 0)
 			(hide yes)
 			(show_name no)
@@ -31311,7 +31311,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 55.88 137.16 90)
 		(mirror x)
 		(unit 1)
@@ -31342,7 +31342,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 55.88 137.16 0)
 			(hide yes)
 			(show_name no)
@@ -31402,7 +31402,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 49.53 73.66 0)
 		(unit 1)
 		(body_style 1)
@@ -31434,7 +31434,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 49.53 73.66 0)
 			(hide yes)
 			(show_name no)
@@ -31494,7 +31494,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Polarized_Small")
+		(lib_id "Device_local:C_Polarized_Small")
 		(at 95.25 156.21 0)
 		(unit 1)
 		(body_style 1)
@@ -31525,7 +31525,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT_local:CP_Radial_D5.0mm_P2.50mm"
 			(at 95.25 156.21 0)
 			(hide yes)
 			(show_name no)
@@ -31586,7 +31586,7 @@
 	)
 	(symbol
 		(lib_name "Screw_Terminal_01x02_1")
-		(lib_id "Connector:Screw_Terminal_01x02")
+		(lib_id "Connector_local:Screw_Terminal_01x02")
 		(at 22.86 182.88 0)
 		(mirror y)
 		(unit 1)
@@ -31618,7 +31618,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-2-3.5-H_1x02_P3.50mm_Horizontal"
 			(at 22.86 182.88 0)
 			(hide yes)
 			(show_name no)
@@ -31678,7 +31678,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 50.8 26.67 270)
 		(mirror x)
 		(unit 1)
@@ -31710,7 +31710,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 50.8 26.67 0)
 			(hide yes)
 			(show_name no)
@@ -31770,7 +31770,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 64.77 33.02 0)
 		(unit 1)
 		(body_style 1)
@@ -31801,7 +31801,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 64.77 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -31861,7 +31861,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:Prototype_Area")
+		(lib_id "Custom_local:Prototype_Area")
 		(at 165.1 180.34 0)
 		(unit 1)
 		(body_style 1)
@@ -31893,7 +31893,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
+		(property "Footprint" "Custom_local:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
 			(at 165.1 180.34 0)
 			(hide yes)
 			(show_name no)
@@ -31948,7 +31948,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 58.42 270)
 		(unit 1)
 		(body_style 1)
@@ -31979,7 +31979,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 58.42 0)
 			(hide yes)
 			(show_name no)
@@ -32039,7 +32039,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 115.57 180)
 		(unit 1)
 		(body_style 1)
@@ -32070,7 +32070,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 115.57 90)
 			(hide yes)
 			(show_name no)
@@ -32141,7 +32141,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 257.81 106.68 0)
 		(unit 4)
 		(body_style 1)
@@ -32174,7 +32174,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 243.078 109.982 0)
 			(hide yes)
 			(show_name no)
@@ -32279,7 +32279,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 147.32 0)
 		(unit 2)
 		(body_style 1)
@@ -32312,7 +32312,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 150.622 0)
 			(hide yes)
 			(show_name no)
@@ -32417,7 +32417,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 146.05 270)
 		(mirror x)
 		(unit 1)
@@ -32449,7 +32449,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 146.05 0)
 			(hide yes)
 			(show_name no)
@@ -32509,7 +32509,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 88.9 120.65 0)
 		(unit 1)
 		(body_style 1)
@@ -32542,7 +32542,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 74.168 123.952 0)
 			(hide yes)
 			(show_name no)
@@ -32647,7 +32647,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 139.7 270)
 		(unit 1)
 		(body_style 1)
@@ -32678,7 +32678,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 139.7 0)
 			(hide yes)
 			(show_name no)
@@ -32738,7 +32738,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 257.81 80.01 0)
 		(unit 4)
 		(body_style 1)
@@ -32771,7 +32771,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 243.078 83.312 0)
 			(hide yes)
 			(show_name no)
@@ -32876,7 +32876,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 113.03 270)
 		(mirror x)
 		(unit 1)
@@ -32908,7 +32908,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 113.03 0)
 			(hide yes)
 			(show_name no)
@@ -32968,7 +32968,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:1N4148")
+		(lib_id "Diode_local:1N4148")
 		(at 87.63 143.51 0)
 		(mirror x)
 		(unit 1)
@@ -33000,7 +33000,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-35_SOD27_P7.62mm_Horizontal"
 			(at 87.63 143.51 0)
 			(hide yes)
 			(show_name no)
@@ -33082,7 +33082,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 64.77 270)
 		(mirror x)
 		(unit 1)
@@ -33114,7 +33114,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 64.77 0)
 			(hide yes)
 			(show_name no)
@@ -33174,7 +33174,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x05")
+		(lib_id "Connector_Generic_local:Conn_01x05")
 		(at 34.29 170.18 0)
 		(unit 1)
 		(body_style 1)
@@ -33205,7 +33205,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x05_P2.54mm_Vertical"
 			(at 34.29 170.18 0)
 			(hide yes)
 			(show_name no)
@@ -33274,7 +33274,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 55.88 270)
 		(mirror x)
 		(unit 1)
@@ -33306,7 +33306,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 55.88 0)
 			(hide yes)
 			(show_name no)
@@ -33366,7 +33366,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x06")
+		(lib_id "Connector_local:Screw_Terminal_01x06")
 		(at 22.86 97.79 0)
 		(mirror y)
 		(unit 1)
@@ -33398,7 +33398,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
 			(at 22.86 97.79 0)
 			(hide yes)
 			(show_name no)
@@ -33470,7 +33470,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:1N4148")
+		(lib_id "Diode_local:1N4148")
 		(at 93.98 180.34 270)
 		(mirror x)
 		(unit 1)
@@ -33502,7 +33502,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-35_SOD27_P7.62mm_Horizontal"
 			(at 93.98 180.34 0)
 			(hide yes)
 			(show_name no)
@@ -33584,7 +33584,7 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
+		(lib_id "power_local:GND")
 		(at 50.8 186.69 0)
 		(unit 1)
 		(body_style 1)
@@ -33659,7 +33659,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:L_Small")
+		(lib_id "Device_local:L_Small")
 		(at 80.01 121.92 270)
 		(mirror x)
 		(unit 1)
@@ -33690,7 +33690,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Inductor_THT:L_Axial_L9.5mm_D4.0mm_P5.08mm_Vertical_Fastron_SMCC"
+		(property "Footprint" "Inductor_THT_local:L_Axial_L9.5mm_D4.0mm_P5.08mm_Vertical_Fastron_SMCC"
 			(at 80.01 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -33750,7 +33750,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 86.36 270)
 		(mirror x)
 		(unit 1)
@@ -33782,7 +33782,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -33842,7 +33842,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 261.62 85.09 180)
 		(unit 1)
 		(body_style 1)
@@ -33872,7 +33872,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 261.62 85.09 0)
 			(hide yes)
 			(show_name no)
@@ -33932,7 +33932,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 69.85 270)
 		(mirror x)
 		(unit 1)
@@ -33963,7 +33963,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 69.85 0)
 			(hide yes)
 			(show_name no)
@@ -34023,7 +34023,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 132.08 180)
 		(unit 1)
 		(body_style 1)
@@ -34054,7 +34054,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 132.08 90)
 			(hide yes)
 			(show_name no)
@@ -34125,7 +34125,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 62.23 181.61 0)
 		(unit 1)
 		(body_style 1)
@@ -34157,7 +34157,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 62.23 181.61 0)
 			(hide yes)
 			(show_name no)
@@ -34217,7 +34217,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:L_Small")
+		(lib_id "Device_local:L_Small")
 		(at 72.39 127 270)
 		(mirror x)
 		(unit 1)
@@ -34248,7 +34248,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Inductor_THT:L_Axial_L9.5mm_D4.0mm_P5.08mm_Vertical_Fastron_SMCC"
+		(property "Footprint" "Inductor_THT_local:L_Axial_L9.5mm_D4.0mm_P5.08mm_Vertical_Fastron_SMCC"
 			(at 72.39 127 0)
 			(hide yes)
 			(show_name no)
@@ -34308,7 +34308,7 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
+		(lib_id "power_local:GND")
 		(at 160.02 191.77 0)
 		(unit 1)
 		(body_style 1)
@@ -34383,7 +34383,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 67.31 180)
 		(unit 1)
 		(body_style 1)
@@ -34414,7 +34414,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 67.31 90)
 			(hide yes)
 			(show_name no)
@@ -34485,7 +34485,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 85.09 270)
 		(mirror x)
 		(unit 1)
@@ -34516,7 +34516,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 85.09 0)
 			(hide yes)
 			(show_name no)
@@ -34576,7 +34576,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Polarized_Small")
+		(lib_id "Device_local:C_Polarized_Small")
 		(at 82.55 180.34 0)
 		(mirror x)
 		(unit 1)
@@ -34608,7 +34608,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT_local:CP_Radial_D5.0mm_P2.50mm"
 			(at 82.55 180.34 0)
 			(hide yes)
 			(show_name no)
@@ -34668,7 +34668,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_02x02_Counter_Clockwise")
+		(lib_id "Connector_Generic_local:Conn_02x02_Counter_Clockwise")
 		(at 25.4 148.59 0)
 		(unit 1)
 		(body_style 1)
@@ -34698,7 +34698,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_2x02_P2.54mm_Vertical"
 			(at 25.4 148.59 0)
 			(hide yes)
 			(show_name no)
@@ -34753,7 +34753,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 59.69 33.02 0)
 		(unit 1)
 		(body_style 1)
@@ -34784,7 +34784,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 59.69 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -34844,7 +34844,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 54.61 33.02 0)
 		(unit 1)
 		(body_style 1)
@@ -34875,7 +34875,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 54.61 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -34935,7 +34935,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x02")
+		(lib_id "Connector_Generic_local:Conn_01x02")
 		(at 104.14 109.22 0)
 		(unit 1)
 		(body_style 1)
@@ -34966,7 +34966,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x02_P2.54mm_Vertical"
 			(at 104.14 109.22 0)
 			(hide yes)
 			(show_name no)
@@ -35026,7 +35026,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x05")
+		(lib_id "Connector_local:Screw_Terminal_01x05")
 		(at 22.86 24.13 0)
 		(mirror y)
 		(unit 1)
@@ -35058,7 +35058,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-5-3.5-H_1x05_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-5-3.5-H_1x05_P3.50mm_Horizontal"
 			(at 22.86 24.13 0)
 			(hide yes)
 			(show_name no)
@@ -35127,7 +35127,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 90.17 82.55 0)
 		(mirror x)
 		(unit 1)
@@ -35159,7 +35159,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 90.17 82.55 0)
 			(hide yes)
 			(show_name no)
@@ -35219,7 +35219,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 119.38 270)
 		(unit 1)
 		(body_style 1)
@@ -35250,7 +35250,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 119.38 0)
 			(hide yes)
 			(show_name no)
@@ -35310,7 +35310,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 142.24 270)
 		(mirror x)
 		(unit 1)
@@ -35342,7 +35342,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 142.24 0)
 			(hide yes)
 			(show_name no)
@@ -35402,7 +35402,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 63.5 180)
 		(unit 1)
 		(body_style 1)
@@ -35432,7 +35432,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 63.5 0)
 			(hide yes)
 			(show_name no)
@@ -35492,7 +35492,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Polarized_Small")
+		(lib_id "Device_local:C_Polarized_Small")
 		(at 50.8 156.21 0)
 		(mirror y)
 		(unit 1)
@@ -35524,7 +35524,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT_local:CP_Radial_D5.0mm_P2.50mm"
 			(at 50.8 156.21 0)
 			(hide yes)
 			(show_name no)
@@ -35584,7 +35584,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 121.92 270)
 		(mirror x)
 		(unit 1)
@@ -35616,7 +35616,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 121.92 0)
 			(hide yes)
 			(show_name no)
@@ -35676,7 +35676,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 99.06 270)
 		(unit 1)
 		(body_style 1)
@@ -35707,7 +35707,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 99.06 0)
 			(hide yes)
 			(show_name no)
@@ -35767,7 +35767,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Transistor_BJT:BC547")
+		(lib_id "Transistor_BJT_local:BC547")
 		(at 105.41 180.34 0)
 		(mirror y)
 		(unit 1)
@@ -35799,7 +35799,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_THT:TO-92L_Wide"
+		(property "Footprint" "Package_TO_SOT_THT_local:TO-92L_Wide"
 			(at 100.33 182.245 0)
 			(hide yes)
 			(show_name no)
@@ -35876,7 +35876,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 83.82 180)
 		(unit 1)
 		(body_style 1)
@@ -35907,7 +35907,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 83.82 90)
 			(hide yes)
 			(show_name no)
@@ -35978,7 +35978,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 137.16 180)
 		(unit 1)
 		(body_style 1)
@@ -36009,7 +36009,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 137.16 90)
 			(hide yes)
 			(show_name no)
@@ -36080,7 +36080,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 91.44 156.21 0)
 		(mirror y)
 		(unit 1)
@@ -36112,7 +36112,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 91.44 156.21 0)
 			(hide yes)
 			(show_name no)
@@ -36172,7 +36172,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 124.46 270)
 		(mirror x)
 		(unit 1)
@@ -36203,7 +36203,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 124.46 0)
 			(hide yes)
 			(show_name no)
@@ -36263,7 +36263,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 256.54 52.07 0)
 		(unit 4)
 		(body_style 1)
@@ -36296,7 +36296,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 241.808 55.372 0)
 			(hide yes)
 			(show_name no)
@@ -36401,7 +36401,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 73.66 270)
 		(mirror x)
 		(unit 1)
@@ -36433,7 +36433,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 73.66 0)
 			(hide yes)
 			(show_name no)
@@ -36493,7 +36493,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x04")
+		(lib_id "Connector_Generic_local:Conn_01x04")
 		(at 107.95 106.68 0)
 		(mirror y)
 		(unit 1)
@@ -36525,7 +36525,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x04_P2.54mm_Vertical"
 			(at 107.95 106.68 0)
 			(hide yes)
 			(show_name no)
@@ -36580,7 +36580,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 63.5 137.16 0)
 		(mirror y)
 		(unit 1)
@@ -36612,7 +36612,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 63.5 137.16 0)
 			(hide yes)
 			(show_name no)
@@ -36672,7 +36672,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 118.11 180)
 		(unit 1)
 		(body_style 1)
@@ -36702,7 +36702,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 118.11 0)
 			(hide yes)
 			(show_name no)
@@ -36762,7 +36762,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 91.44 114.3 180)
 		(unit 1)
 		(body_style 1)
@@ -36793,7 +36793,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 91.44 114.3 0)
 			(hide yes)
 			(show_name no)
@@ -36853,7 +36853,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x04")
+		(lib_id "Connector_Generic_local:Conn_01x04")
 		(at 38.1 127 0)
 		(mirror y)
 		(unit 1)
@@ -36885,7 +36885,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x04_P2.54mm_Vertical"
 			(at 38.1 127 0)
 			(hide yes)
 			(show_name no)
@@ -36951,7 +36951,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 148.59 270)
 		(mirror x)
 		(unit 1)
@@ -36983,7 +36983,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 148.59 0)
 			(hide yes)
 			(show_name no)
@@ -37043,7 +37043,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 105.41 33.02 0)
 		(unit 1)
 		(body_style 1)
@@ -37075,7 +37075,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 105.41 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -37135,7 +37135,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 60.96 180)
 		(unit 1)
 		(body_style 1)
@@ -37166,7 +37166,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 60.96 90)
 			(hide yes)
 			(show_name no)
@@ -37237,7 +37237,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 261.62 97.79 180)
 		(unit 1)
 		(body_style 1)
@@ -37267,7 +37267,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 261.62 97.79 0)
 			(hide yes)
 			(show_name no)
@@ -37327,7 +37327,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:1N4148")
+		(lib_id "Diode_local:1N4148")
 		(at 81.28 127 0)
 		(mirror y)
 		(unit 1)
@@ -37358,7 +37358,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-35_SOD27_P7.62mm_Horizontal"
 			(at 81.28 127 0)
 			(hide yes)
 			(show_name no)
@@ -37440,7 +37440,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_02x02_Counter_Clockwise")
+		(lib_id "Connector_Generic_local:Conn_02x02_Counter_Clockwise")
 		(at 25.4 158.75 0)
 		(unit 1)
 		(body_style 1)
@@ -37470,7 +37470,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_2x02_P2.54mm_Vertical"
 			(at 25.4 158.75 0)
 			(hide yes)
 			(show_name no)
@@ -37525,7 +37525,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 54.61 82.55 180)
 		(unit 1)
 		(body_style 1)
@@ -37556,7 +37556,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 54.61 82.55 0)
 			(hide yes)
 			(show_name no)
@@ -37616,7 +37616,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 74.93 156.21 0)
 		(unit 1)
 		(body_style 1)
@@ -37647,7 +37647,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 74.93 156.21 0)
 			(hide yes)
 			(show_name no)
@@ -37707,7 +37707,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x06")
+		(lib_id "Connector_local:Screw_Terminal_01x06")
 		(at 271.78 119.38 0)
 		(unit 1)
 		(body_style 1)
@@ -37739,7 +37739,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
 			(at 271.78 119.38 0)
 			(hide yes)
 			(show_name no)
@@ -37811,7 +37811,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x06")
+		(lib_id "Connector_local:Screw_Terminal_01x06")
 		(at 271.78 92.71 0)
 		(unit 1)
 		(body_style 1)
@@ -37843,7 +37843,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
 			(at 271.78 92.71 0)
 			(hide yes)
 			(show_name no)
@@ -37915,7 +37915,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x08")
+		(lib_id "Connector_Generic_local:Conn_01x08")
 		(at 38.1 46.99 0)
 		(mirror y)
 		(unit 1)
@@ -37947,7 +37947,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x08_P2.54mm_Vertical"
 			(at 38.1 46.99 0)
 			(hide yes)
 			(show_name no)
@@ -38025,7 +38025,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 97.79 270)
 		(mirror x)
 		(unit 1)
@@ -38056,7 +38056,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 97.79 0)
 			(hide yes)
 			(show_name no)
@@ -38116,7 +38116,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 138.43 270)
 		(mirror x)
 		(unit 1)
@@ -38147,7 +38147,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 138.43 0)
 			(hide yes)
 			(show_name no)
@@ -38207,7 +38207,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 144.78 180)
 		(unit 1)
 		(body_style 1)
@@ -38237,7 +38237,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 144.78 0)
 			(hide yes)
 			(show_name no)
@@ -38297,7 +38297,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 114.3 0)
 		(unit 3)
 		(body_style 1)
@@ -38330,7 +38330,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 117.602 0)
 			(hide yes)
 			(show_name no)
@@ -38435,7 +38435,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 59.69 130.81 270)
 		(mirror x)
 		(unit 1)
@@ -38467,7 +38467,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 59.69 130.81 0)
 			(hide yes)
 			(show_name no)
@@ -38527,7 +38527,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 91.44 270)
 		(mirror x)
 		(unit 1)
@@ -38558,7 +38558,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 91.44 0)
 			(hide yes)
 			(show_name no)
@@ -38618,7 +38618,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 110.49 270)
 		(mirror x)
 		(unit 1)
@@ -38650,7 +38650,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 110.49 0)
 			(hide yes)
 			(show_name no)
@@ -38710,7 +38710,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Polarized_Small")
+		(lib_id "Device_local:C_Polarized_Small")
 		(at 74.93 114.3 180)
 		(unit 1)
 		(body_style 1)
@@ -38741,7 +38741,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT_local:CP_Radial_D5.0mm_P2.50mm"
 			(at 74.93 114.3 0)
 			(hide yes)
 			(show_name no)
@@ -38801,7 +38801,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 57.15 180)
 		(unit 1)
 		(body_style 1)
@@ -38831,7 +38831,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 57.15 0)
 			(hide yes)
 			(show_name no)
@@ -38891,7 +38891,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 50.8 24.13 270)
 		(mirror x)
 		(unit 1)
@@ -38923,7 +38923,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 50.8 24.13 0)
 			(hide yes)
 			(show_name no)
@@ -38983,7 +38983,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 158.75 180)
 		(unit 1)
 		(body_style 1)
@@ -39014,7 +39014,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 158.75 90)
 			(hide yes)
 			(show_name no)
@@ -39085,7 +39085,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 215.9 31.75 270)
 		(mirror x)
 		(unit 1)
@@ -39117,7 +39117,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 215.9 31.75 0)
 			(hide yes)
 			(show_name no)
@@ -39177,7 +39177,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:Buzzer")
+		(lib_id "Device_local:Buzzer")
 		(at 254 36.83 0)
 		(unit 1)
 		(body_style 1)
@@ -39209,7 +39209,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Buzzer_Beeper:Buzzer_12x9.5RM7.6"
+		(property "Footprint" "Buzzer_Beeper_local:Buzzer_12x9.5RM7.6"
 			(at 253.365 34.29 90)
 			(hide yes)
 			(show_name no)
@@ -39258,7 +39258,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x04")
+		(lib_id "Connector_local:Screw_Terminal_01x04")
 		(at 22.86 127 0)
 		(mirror y)
 		(unit 1)
@@ -39290,7 +39290,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-4-3.5-H_1x04_P3.50mm_Horizontal"
 			(at 22.86 127 0)
 			(hide yes)
 			(show_name no)
@@ -39356,7 +39356,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 57.15 181.61 0)
 		(mirror y)
 		(unit 1)
@@ -39388,7 +39388,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 57.15 181.61 0)
 			(hide yes)
 			(show_name no)
@@ -39448,7 +39448,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Potentiometer_Trim")
+		(lib_id "Device_local:R_Potentiometer_Trim")
 		(at 73.66 177.8 0)
 		(mirror y)
 		(unit 1)
@@ -39480,7 +39480,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical"
+		(property "Footprint" "Potentiometer_THT_local:Potentiometer_Bourns_3296W_Vertical"
 			(at 73.66 177.8 0)
 			(hide yes)
 			(show_name no)
@@ -39565,7 +39565,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 86.36 270)
 		(unit 1)
 		(body_style 1)
@@ -39596,7 +39596,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 86.36 0)
 			(hide yes)
 			(show_name no)
@@ -39656,7 +39656,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 67.31 270)
 		(mirror x)
 		(unit 1)
@@ -39688,7 +39688,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 67.31 0)
 			(hide yes)
 			(show_name no)
@@ -39748,7 +39748,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x02")
+		(lib_id "Connector_Generic_local:Conn_01x02")
 		(at 38.1 182.88 0)
 		(mirror y)
 		(unit 1)
@@ -39780,7 +39780,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x02_P2.54mm_Vertical"
 			(at 38.1 182.88 0)
 			(hide yes)
 			(show_name no)
@@ -39840,7 +39840,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_02x02_Counter_Clockwise")
+		(lib_id "Connector_Generic_local:Conn_02x02_Counter_Clockwise")
 		(at 25.4 138.43 0)
 		(unit 1)
 		(body_style 1)
@@ -39870,7 +39870,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_2x02_P2.54mm_Vertical"
 			(at 25.4 138.43 0)
 			(hide yes)
 			(show_name no)
@@ -39925,7 +39925,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 140.97 0)
 		(unit 3)
 		(body_style 1)
@@ -39958,7 +39958,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 144.272 0)
 			(hide yes)
 			(show_name no)
@@ -40063,7 +40063,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 119.38 270)
 		(mirror x)
 		(unit 1)
@@ -40095,7 +40095,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 119.38 0)
 			(hide yes)
 			(show_name no)
@@ -40155,7 +40155,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 50.8 29.21 270)
 		(mirror x)
 		(unit 1)
@@ -40187,7 +40187,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 50.8 29.21 0)
 			(hide yes)
 			(show_name no)
@@ -40247,7 +40247,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x05")
+		(lib_id "Connector_Generic_local:Conn_01x05")
 		(at 41.91 170.18 0)
 		(unit 1)
 		(body_style 1)
@@ -40278,7 +40278,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x05_P2.54mm_Vertical"
 			(at 41.91 170.18 0)
 			(hide yes)
 			(show_name no)
@@ -40347,7 +40347,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 261.62 91.44 180)
 		(unit 1)
 		(body_style 1)
@@ -40377,7 +40377,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 261.62 91.44 0)
 			(hide yes)
 			(show_name no)
@@ -40437,7 +40437,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 128.27 180)
 		(unit 1)
 		(body_style 1)
@@ -40468,7 +40468,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 128.27 90)
 			(hide yes)
 			(show_name no)
@@ -40539,7 +40539,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 53.34 87.63 90)
 		(unit 1)
 		(body_style 1)
@@ -40570,7 +40570,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 53.34 87.63 0)
 			(hide yes)
 			(show_name no)
@@ -40630,7 +40630,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 83.82 270)
 		(mirror x)
 		(unit 1)
@@ -40662,7 +40662,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 83.82 0)
 			(hide yes)
 			(show_name no)
@@ -40722,7 +40722,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Regulator_Linear:L7805")
+		(lib_id "Regulator_Linear_local:L7805")
 		(at 82.55 148.59 0)
 		(unit 1)
 		(body_style 1)
@@ -40753,7 +40753,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_THT:TO-220-3_Horizontal_TabDown"
+		(property "Footprint" "Package_TO_SOT_THT_local:TO-220-3_Horizontal_TabDown"
 			(at 83.185 152.4 0)
 			(hide yes)
 			(show_name no)
@@ -40818,7 +40818,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x06")
+		(lib_id "Connector_local:Screw_Terminal_01x06")
 		(at 271.78 146.05 0)
 		(unit 1)
 		(body_style 1)
@@ -40850,7 +40850,7 @@
 				)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
+		(property "Footprint" "TerminalBlock_Phoenix_local:TerminalBlock_Phoenix_PT-1,5-6-3.5-H_1x06_P3.50mm_Horizontal"
 			(at 271.78 146.05 0)
 			(hide yes)
 			(show_name no)
@@ -40922,7 +40922,7 @@
 		)
 	)
 	(symbol
-		(lib_id "MCU_Custom:MAX202CPE")
+		(lib_id "MCU_Custom_local:MAX202CPE")
 		(at 72.39 90.17 0)
 		(mirror y)
 		(unit 1)
@@ -40955,7 +40955,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Package_DIP:DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Package_DIP_local:DIP-16_W7.62mm_Socket_LongPads"
 			(at 71.12 116.84 0)
 			(hide yes)
 			(show_name no)
@@ -41058,7 +41058,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 77.47 180)
 		(unit 1)
 		(body_style 1)
@@ -41089,7 +41089,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 77.47 90)
 			(hide yes)
 			(show_name no)
@@ -41160,7 +41160,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:Prototype_Area")
+		(lib_id "Custom_local:Prototype_Area")
 		(at 165.1 173.99 0)
 		(unit 1)
 		(body_style 1)
@@ -41192,7 +41192,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
+		(property "Footprint" "Custom_local:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
 			(at 165.1 173.99 0)
 			(hide yes)
 			(show_name no)
@@ -41247,7 +41247,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:Prototype_Area")
+		(lib_id "Custom_local:Prototype_Area")
 		(at 144.78 180.34 0)
 		(unit 1)
 		(body_style 1)
@@ -41279,7 +41279,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
+		(property "Footprint" "Custom_local:Prototype Area 5x13 with 4 rails (5x17) 2.54mm Grid"
 			(at 144.78 180.34 0)
 			(hide yes)
 			(show_name no)
@@ -41334,7 +41334,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 128.27 157.48 270)
 		(mirror x)
 		(unit 1)
@@ -41366,7 +41366,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 128.27 157.48 0)
 			(hide yes)
 			(show_name no)
@@ -41426,7 +41426,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 69.85 33.02 0)
 		(unit 1)
 		(body_style 1)
@@ -41457,7 +41457,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 69.85 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -41517,7 +41517,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 59.69 48.26 0)
 		(unit 1)
 		(body_style 1)
@@ -41548,7 +41548,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 59.69 48.26 0)
 			(hide yes)
 			(show_name no)
@@ -41608,7 +41608,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 158.75 270)
 		(mirror x)
 		(unit 1)
@@ -41640,7 +41640,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 158.75 0)
 			(hide yes)
 			(show_name no)
@@ -41700,7 +41700,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 69.85 180)
 		(unit 1)
 		(body_style 1)
@@ -41730,7 +41730,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 69.85 0)
 			(hide yes)
 			(show_name no)
@@ -41790,7 +41790,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 124.46 180)
 		(unit 1)
 		(body_style 1)
@@ -41820,7 +41820,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 124.46 0)
 			(hide yes)
 			(show_name no)
@@ -41880,7 +41880,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 105.41 270)
 		(mirror x)
 		(unit 1)
@@ -41912,7 +41912,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 105.41 0)
 			(hide yes)
 			(show_name no)
@@ -41972,7 +41972,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x02")
+		(lib_id "Connector_Generic_local:Conn_01x02")
 		(at 38.1 114.3 0)
 		(mirror y)
 		(unit 1)
@@ -42004,7 +42004,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x02_P2.54mm_Vertical"
 			(at 38.1 114.3 0)
 			(hide yes)
 			(show_name no)
@@ -42064,7 +42064,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 72.39 0)
 		(unit 1)
 		(body_style 1)
@@ -42097,7 +42097,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 75.692 0)
 			(hide yes)
 			(show_name no)
@@ -42202,7 +42202,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x16")
+		(lib_id "Connector_Generic_local:Conn_01x16")
 		(at 203.2 78.74 0)
 		(unit 1)
 		(body_style 1)
@@ -42232,7 +42232,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x16_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x16_P2.54mm_Vertical"
 			(at 203.2 78.74 0)
 			(hide yes)
 			(show_name no)
@@ -42334,7 +42334,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 152.4 270)
 		(unit 1)
 		(body_style 1)
@@ -42365,7 +42365,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 152.4 0)
 			(hide yes)
 			(show_name no)
@@ -42425,7 +42425,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 232.41 36.83 180)
 		(unit 1)
 		(body_style 1)
@@ -42456,7 +42456,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 232.41 36.83 90)
 			(hide yes)
 			(show_name no)
@@ -42527,7 +42527,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:Fuse_Small")
+		(lib_id "Device_local:Fuse_Small")
 		(at 45.72 129.54 0)
 		(mirror x)
 		(unit 1)
@@ -42558,7 +42558,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:Fuse_Blade_ATO_directSolder (longer holes)"
+		(property "Footprint" "Custom_local:Fuse_Blade_ATO_directSolder (longer holes)"
 			(at 45.72 129.54 0)
 			(hide yes)
 			(show_name no)
@@ -42607,7 +42607,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 50.8 21.59 270)
 		(mirror x)
 		(unit 1)
@@ -42639,7 +42639,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 50.8 21.59 0)
 			(hide yes)
 			(show_name no)
@@ -42699,7 +42699,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 68.58 137.16 270)
 		(unit 1)
 		(body_style 1)
@@ -42729,7 +42729,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 68.58 137.16 0)
 			(hide yes)
 			(show_name no)
@@ -42789,7 +42789,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 215.9 26.67 270)
 		(mirror x)
 		(unit 1)
@@ -42821,7 +42821,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 215.9 26.67 0)
 			(hide yes)
 			(show_name no)
@@ -42881,7 +42881,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 148.59 180)
 		(unit 1)
 		(body_style 1)
@@ -42912,7 +42912,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 148.59 90)
 			(hide yes)
 			(show_name no)
@@ -42983,7 +42983,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 144.78 270)
 		(mirror x)
 		(unit 1)
@@ -43014,7 +43014,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 144.78 0)
 			(hide yes)
 			(show_name no)
@@ -43074,7 +43074,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Small")
+		(lib_id "Device_local:C_Small")
 		(at 54.61 156.21 0)
 		(unit 1)
 		(body_style 1)
@@ -43105,7 +43105,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D4.3mm_W1.9mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D4.3mm_W1.9mm_P5.00mm"
 			(at 54.61 156.21 0)
 			(hide yes)
 			(show_name no)
@@ -43165,7 +43165,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 71.12 270)
 		(mirror x)
 		(unit 1)
@@ -43197,7 +43197,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 71.12 0)
 			(hide yes)
 			(show_name no)
@@ -43257,7 +43257,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 125.73 270)
 		(mirror x)
 		(unit 1)
@@ -43289,7 +43289,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 125.73 0)
 			(hide yes)
 			(show_name no)
@@ -43349,7 +43349,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 121.92 180)
 		(unit 1)
 		(body_style 1)
@@ -43380,7 +43380,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 121.92 90)
 			(hide yes)
 			(show_name no)
@@ -43451,7 +43451,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 111.76 180)
 		(unit 1)
 		(body_style 1)
@@ -43481,7 +43481,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 111.76 0)
 			(hide yes)
 			(show_name no)
@@ -43541,7 +43541,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 60.96 172.72 0)
 		(unit 3)
 		(body_style 1)
@@ -43574,7 +43574,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 46.228 176.022 0)
 			(hide yes)
 			(show_name no)
@@ -43679,7 +43679,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x06")
+		(lib_id "Connector_Generic_local:Conn_01x06")
 		(at 38.1 97.79 0)
 		(mirror y)
 		(unit 1)
@@ -43711,7 +43711,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x06_P2.54mm_Vertical"
 			(at 38.1 97.79 0)
 			(hide yes)
 			(show_name no)
@@ -43783,7 +43783,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Switch:SW_Push")
+		(lib_id "Switch_local:SW_Push")
 		(at 232.41 24.13 0)
 		(unit 1)
 		(body_style 1)
@@ -43814,7 +43814,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH-12mm"
+		(property "Footprint" "Button_Switch_THT_local:SW_PUSH-12mm"
 			(at 232.41 19.05 0)
 			(hide yes)
 			(show_name no)
@@ -43863,7 +43863,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 88.9 180)
 		(unit 1)
 		(body_style 1)
@@ -43894,7 +43894,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 88.9 90)
 			(hide yes)
 			(show_name no)
@@ -43965,7 +43965,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 87.63 128.27 0)
 		(mirror y)
 		(unit 2)
@@ -43998,7 +43998,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 102.362 131.572 0)
 			(hide yes)
 			(show_name no)
@@ -44103,7 +44103,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 111.76 173.99 0)
 		(mirror y)
 		(unit 1)
@@ -44135,7 +44135,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 111.76 173.99 0)
 			(hide yes)
 			(show_name no)
@@ -44195,7 +44195,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 120.65 0)
 		(unit 2)
 		(body_style 1)
@@ -44228,7 +44228,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 123.952 0)
 			(hide yes)
 			(show_name no)
@@ -44333,7 +44333,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 142.24 180)
 		(unit 1)
 		(body_style 1)
@@ -44364,7 +44364,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 142.24 90)
 			(hide yes)
 			(show_name no)
@@ -44435,7 +44435,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:C_Smaller")
+		(lib_id "Custom_local:C_Smaller")
 		(at 259.08 63.5 270)
 		(mirror x)
 		(unit 1)
@@ -44466,7 +44466,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:C_Disc_D5.1mm_W3.2mm_P5.00mm"
+		(property "Footprint" "Capacitor_THT_local:C_Disc_D5.1mm_W3.2mm_P5.00mm"
 			(at 259.08 63.5 0)
 			(hide yes)
 			(show_name no)
@@ -44526,7 +44526,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 50.8 41.91 270)
 		(mirror x)
 		(unit 1)
@@ -44558,7 +44558,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 50.8 41.91 0)
 			(hide yes)
 			(show_name no)
@@ -44618,7 +44618,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 55.88 180)
 		(unit 1)
 		(body_style 1)
@@ -44649,7 +44649,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 55.88 90)
 			(hide yes)
 			(show_name no)
@@ -44720,7 +44720,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 137.16 270)
 		(mirror x)
 		(unit 1)
@@ -44752,7 +44752,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 137.16 0)
 			(hide yes)
 			(show_name no)
@@ -44812,7 +44812,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 154.94 270)
 		(mirror x)
 		(unit 1)
@@ -44844,7 +44844,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 154.94 0)
 			(hide yes)
 			(show_name no)
@@ -44904,7 +44904,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C_Polarized_Small")
+		(lib_id "Device_local:C_Polarized_Small")
 		(at 71.12 156.21 0)
 		(mirror y)
 		(unit 1)
@@ -44936,7 +44936,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm"
+		(property "Footprint" "Capacitor_THT_local:CP_Radial_D5.0mm_P2.50mm"
 			(at 71.12 156.21 0)
 			(hide yes)
 			(show_name no)
@@ -44996,7 +44996,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x02")
+		(lib_id "Connector_Generic_local:Conn_01x02")
 		(at 104.14 114.3 0)
 		(unit 1)
 		(body_style 1)
@@ -45027,7 +45027,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x02_P2.54mm_Vertical"
 			(at 104.14 114.3 0)
 			(hide yes)
 			(show_name no)
@@ -45087,7 +45087,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Diode:1N4148")
+		(lib_id "Diode_local:1N4148")
 		(at 248.92 35.56 90)
 		(mirror x)
 		(unit 1)
@@ -45119,7 +45119,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-35_SOD27_P7.62mm_Horizontal"
 			(at 248.92 35.56 0)
 			(hide yes)
 			(show_name no)
@@ -45201,7 +45201,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 226.06 26.67 270)
 		(mirror x)
 		(unit 1)
@@ -45233,7 +45233,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 226.06 26.67 0)
 			(hide yes)
 			(show_name no)
@@ -45293,7 +45293,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:LED_Small")
+		(lib_id "Device_local:LED_Small")
 		(at 234.95 154.94 180)
 		(unit 1)
 		(body_style 1)
@@ -45324,7 +45324,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:LED_THT_L72CB_Kingbright"
+		(property "Footprint" "Custom_local:LED_THT_L72CB_Kingbright"
 			(at 234.95 154.94 90)
 			(hide yes)
 			(show_name no)
@@ -45395,7 +45395,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 82.55 33.02 0)
 		(mirror x)
 		(unit 1)
@@ -45427,7 +45427,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 82.55 33.02 0)
 			(hide yes)
 			(show_name no)
@@ -45487,7 +45487,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 128.27 270)
 		(mirror x)
 		(unit 1)
@@ -45519,7 +45519,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 128.27 0)
 			(hide yes)
 			(show_name no)
@@ -45579,7 +45579,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 50.8 57.15 270)
 		(mirror x)
 		(unit 1)
@@ -45611,7 +45611,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 50.8 57.15 0)
 			(hide yes)
 			(show_name no)
@@ -45671,7 +45671,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 60.96 270)
 		(mirror x)
 		(unit 1)
@@ -45703,7 +45703,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 60.96 0)
 			(hide yes)
 			(show_name no)
@@ -45763,7 +45763,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 88.9 270)
 		(mirror x)
 		(unit 1)
@@ -45795,7 +45795,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 88.9 0)
 			(hide yes)
 			(show_name no)
@@ -45855,7 +45855,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 93.98 0)
 		(unit 2)
 		(body_style 1)
@@ -45888,7 +45888,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 97.282 0)
 			(hide yes)
 			(show_name no)
@@ -45993,7 +45993,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 132.08 270)
 		(mirror x)
 		(unit 1)
@@ -46025,7 +46025,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 132.08 0)
 			(hide yes)
 			(show_name no)
@@ -46085,7 +46085,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 228.6 95.25 270)
 		(mirror x)
 		(unit 1)
@@ -46117,7 +46117,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 228.6 95.25 0)
 			(hide yes)
 			(show_name no)
@@ -46177,7 +46177,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:D_TVS_U_Small")
+		(lib_id "Custom_local:D_TVS_U_Small")
 		(at 262.89 151.13 180)
 		(unit 1)
 		(body_style 1)
@@ -46207,7 +46207,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_THT:D_DO-201AE_P15.24mm_Horizontal"
+		(property "Footprint" "Diode_THT_local:D_DO-201AE_P15.24mm_Horizontal"
 			(at 262.89 151.13 0)
 			(hide yes)
 			(show_name no)
@@ -46267,7 +46267,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Misc_Custom:PC817_smallx3")
+		(lib_id "Misc_Custom_local:PC817_smallx3")
 		(at 246.38 100.33 0)
 		(unit 1)
 		(body_style 1)
@@ -46300,7 +46300,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Custom:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
+		(property "Footprint" "Custom_local:3 x PC817 on a DIP-16_W7.62mm_Socket_LongPads"
 			(at 231.648 103.632 0)
 			(hide yes)
 			(show_name no)
@@ -46405,7 +46405,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x02")
+		(lib_id "Connector_Generic_local:Conn_01x02")
 		(at 92.71 34.29 90)
 		(unit 1)
 		(body_style 1)
@@ -46436,7 +46436,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x02_P2.54mm_Vertical"
 			(at 92.71 34.29 0)
 			(hide yes)
 			(show_name no)
@@ -46496,7 +46496,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:L_Small")
+		(lib_id "Device_local:L_Small")
 		(at 59.69 127 90)
 		(unit 1)
 		(body_style 1)
@@ -46526,7 +46526,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Inductor_THT:L_Axial_L9.5mm_D4.0mm_P5.08mm_Vertical_Fastron_SMCC"
+		(property "Footprint" "Inductor_THT_local:L_Axial_L9.5mm_D4.0mm_P5.08mm_Vertical_Fastron_SMCC"
 			(at 59.69 127 0)
 			(hide yes)
 			(show_name no)
@@ -46586,7 +46586,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 113.03 270)
 		(unit 1)
 		(body_style 1)
@@ -46617,7 +46617,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 113.03 0)
 			(hide yes)
 			(show_name no)
@@ -46677,7 +46677,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector_Generic:Conn_01x04")
+		(lib_id "Connector_Generic_local:Conn_01x04")
 		(at 38.1 63.5 0)
 		(mirror y)
 		(unit 1)
@@ -46709,7 +46709,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinHeader_2.54mm_local:PinHeader_1x04_P2.54mm_Vertical"
 			(at 38.1 63.5 0)
 			(hide yes)
 			(show_name no)
@@ -46775,7 +46775,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Regulator_Linear:L78L09_TO92")
+		(lib_id "Regulator_Linear_local:L78L09_TO92")
 		(at 62.23 148.59 0)
 		(mirror y)
 		(unit 1)
@@ -46806,7 +46806,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_THT:TO-92_Inline"
+		(property "Footprint" "Package_TO_SOT_THT_local:TO-92_Inline"
 			(at 62.23 142.875 0)
 			(hide yes)
 			(show_name no)
@@ -46859,7 +46859,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 232.41 92.71 270)
 		(mirror x)
 		(unit 1)
@@ -46891,7 +46891,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 232.41 92.71 0)
 			(hide yes)
 			(show_name no)
@@ -46951,7 +46951,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 252.73 125.73 270)
 		(unit 1)
 		(body_style 1)
@@ -46982,7 +46982,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 252.73 125.73 0)
 			(hide yes)
 			(show_name no)
@@ -47042,7 +47042,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Custom:Enclosure")
+		(lib_id "Custom_local:Enclosure")
 		(at 13.97 195.58 0)
 		(unit 1)
 		(body_style 1)
@@ -47074,7 +47074,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom:Hammond_Enclosure_RM2095L"
+		(property "Footprint" "Custom_local:Hammond_Enclosure_RM2095L"
 			(at 13.97 195.58 0)
 			(hide yes)
 			(show_name no)
@@ -47117,7 +47117,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_Small")
+		(lib_id "Device_local:R_Small")
 		(at 74.93 33.02 0)
 		(mirror x)
 		(unit 1)
@@ -47149,7 +47149,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+		(property "Footprint" "Resistor_THT_local:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
 			(at 74.93 33.02 0)
 			(hide yes)
 			(show_name no)
